@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <title>Form Tooltip Extension</title>
-    <!-- Include Roboto font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
     <style>
         body {
@@ -24,13 +23,25 @@
             font-size: 14px;
         }
 
-        .button {
+        .toggle-container {
             margin-top: 10px;
+        }
+
+        .button-container {
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 5px;
             padding: 8px 12px;
             background-color: #1976d2;
             color: #fff;
             border: none;
             border-radius: 4px;
+            cursor: pointer;
+        }
+
+        label {
             cursor: pointer;
         }
     </style>
@@ -41,9 +52,22 @@
     <div class="content">
         <p>This extension adds tooltips to form fields on webpages.</p>
         <p>You are using the <strong>free</strong> tier.</p>
-        <button class="button" id="settingsBtn">Settings</button>
+
+        <!-- Checkbox to enable/disable tooltips -->
+        <div class="toggle-container">
+            <label>
+                <input type="checkbox" id="toggleTooltips" />
+                Enable Tooltips
+            </label>
+        </div>
+
+        <!-- Button to open the local dashboard -->
+        <div class="button-container">
+            <button id="openDashboardBtn">Open Dashboard</button>
+        </div>
     </div>
-    <!-- Reference to external script -->
+
+    <!-- Your popup JS here (make sure it sends a message to the content script to toggle) -->
     <script src="popup.js"></script>
 </body>
 

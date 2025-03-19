@@ -1,6 +1,6 @@
 // pages/api/question-lookup.js
 import { PrismaClient } from "@prisma/client";
-import { getTooltipsFromDb } from "../../lib/getTooltipsFromDb";
+import { getTooltipsFromAlgolia } from "../../lib/getTooltipsFromAlgolia.mjs";
 import { getTooltipsFromAi } from "../../lib/getTooltipsFromAi";
 
 const prisma = new PrismaClient();
@@ -38,7 +38,7 @@ export default async function handler (req, res)
         if (userTier === "free")
         {
             // Use the DB-based helper
-            result = await getTooltipsFromDb(keys);
+            result = await getTooltipsFromAlgolia(keys);
         } else
         {
             // Use the GPT-based helper
