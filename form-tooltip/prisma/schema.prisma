@@ -12,6 +12,7 @@ model QuestionMapping {
   id       Int    @id @default(autoincrement())
   key      String @unique
   question String
+  synonyms String[]
 }
 
 model User {

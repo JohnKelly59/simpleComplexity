@@ -28,7 +28,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 const drawerWidth = 240;
 
-// Define some random greetings
 const greetings = [
     "Hello",
     "Hi there",
@@ -85,7 +84,7 @@ export default function DashboardPage (props)
                         button
                         key={item.text}
                         onClick={() => router.push(item.path)}
-                        aria-label={item.text} // Accessibility: label for navigation items
+                        aria-label={item.text}
                     >
                         <ListItemIcon>{item.icon}</ListItemIcon>
                         <ListItemText primary={item.text} />
@@ -107,7 +106,6 @@ export default function DashboardPage (props)
     return (
         <Box sx={{ display: "flex" }}>
             <CssBaseline />
-            {/* AppBar */}
             <AppBar
                 position="fixed"
                 sx={{
@@ -137,13 +135,11 @@ export default function DashboardPage (props)
                     </Button>
                 </Toolbar>
             </AppBar>
-            {/* Drawer */}
             <Box
                 component="nav"
                 sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
                 aria-label="sidebar navigation"
             >
-                {/* Mobile drawer */}
                 <Drawer
                     variant="temporary"
                     open={mobileOpen}
@@ -158,7 +154,6 @@ export default function DashboardPage (props)
                 >
                     {drawer}
                 </Drawer>
-                {/* Permanent drawer */}
                 <Drawer
                     variant="permanent"
                     sx={{
@@ -170,7 +165,6 @@ export default function DashboardPage (props)
                     {drawer}
                 </Drawer>
             </Box>
-            {/* Main Content */}
             <Box
                 component="main"
                 sx={{
@@ -189,8 +183,6 @@ export default function DashboardPage (props)
                     Your current subscription tier is:{" "}
                     <strong>{session.user.subscriptionTier}</strong>
                 </Typography>
-
-                {/* Explanation Section */}
                 <Card sx={{ my: 3 }}>
                     <CardContent>
                         <Typography variant="h5" gutterBottom>
@@ -240,7 +232,6 @@ export default function DashboardPage (props)
                     </Card>
                 )}
 
-                {/* Additional Dashboard Content */}
                 <Card sx={{ my: 3 }}>
                     <CardContent>
                         <Typography variant="h5" gutterBottom>

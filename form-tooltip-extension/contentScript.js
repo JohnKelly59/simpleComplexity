@@ -1,12 +1,98 @@
 (function ()
 {
-    // Global variables
     let questionMatrix = {};
     let refreshCounts = {};
     let tooltipsEnabled = true;
     let tooltipRefGlobal = null;
+    let lastRefreshTimes = {};
 
-    // Create tooltip container with Shadow DOM and return a reference object
+    function fetchWithAuth (url, options = {})
+    {
+        return new Promise((resolve, reject) =>
+        {
+            chrome.storage.sync.get(["authToken"], async (storageResult) =>
+            {
+                const bearerToken = typeof storageResult.authToken === "string"
+                    ? storageResult.authToken
+                    : storageResult.authToken?.token || "";
+                const headers = {
+                    ...options.headers,
+                    Authorization: `Bearer ${bearerToken}`,
+                };
+                try
+                {
+                    const response = await fetch(url, { ...options, headers });
+                    resolve(response);
+                } catch (err)
+                {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    function selfCheckAuth ()
+    {
+        fetch("http://localhost:3000/api/get-token", {
+            method: "GET",
+            credentials: "include",
+        })
+            .then((resp) =>
+            {
+                if (resp.status === 401)
+                {
+                    console.log("User is no longer logged in (cookie removed). Removing extension token...");
+                    chrome.storage.sync.remove("authToken", () =>
+                    {
+                        console.log("Extension token removed due to server logout.");
+                    });
+                }
+            })
+            .catch((err) =>
+            {
+                if (err.message && err.message.includes("Extension context invalidated"))
+                {
+                    console.warn("Fetch aborted because the extension context no longer exists.");
+                } else
+                {
+                    console.error("Failed to fetch question mappings:", err);
+                }
+                return {};
+            });
+    }
+
+    setInterval(() =>
+    {
+        selfCheckAuth();
+    }, 300 * 1000);
+
+    function fetchTooltipsForKeys (keys)
+    {
+        return fetchWithAuth("http://localhost:3000/api/question-lookup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keys }),
+        })
+            .then((resp) => resp.json())
+            .catch((err) =>
+            {
+                console.error("Failed to fetch question mappings:", err);
+                return {};
+            });
+    }
+
+    const fetchQuestionForKey = (key) =>
+    {
+        if (questionMatrix[key]) return Promise.resolve(questionMatrix[key]);
+        console.log("fetching question for key:", key);
+        return fetchTooltipsForKeys([key]).then((data) =>
+        {
+            questionMatrix[key] =
+                data && data[key] ? data[key] : "Please fill out this field.";
+            return questionMatrix[key];
+        });
+    };
+
     const createTooltipContainer = () =>
     {
         const container = document.createElement("div");
@@ -17,9 +103,9 @@
             width: "100%",
             height: "100%",
             pointerEvents: "none",
+            zIndex: 2147483647,
         });
         document.body.appendChild(container);
-
         const shadow = container.attachShadow({ mode: "open" });
         const style = document.createElement("style");
         style.textContent = `
@@ -31,41 +117,26 @@
           border-radius: 4px !important;
           font-size: 12px !important;
           display: none;
-          z-index: 999999 !important;
           pointer-events: auto !important;
           white-space: nowrap !important;
+          z-index: 2147483647 !important;
         }
       `;
         shadow.appendChild(style);
-
         const tooltip = document.createElement("div");
         tooltip.classList.add("tooltip");
         shadow.appendChild(tooltip);
-
-        // Property to manage a shared hide-timer
         return { container, tooltip, shadow, hideTimer: null };
     };
 
-    /**
-     * Determine the best key from a field using id, name, or placeholder.
-     * Fall back to something meaningful for <select> if no id/name/placeholder.
-     */
     const determineBestKey = (field) =>
     {
-        // Use existing id, name, or placeholder if they exist
         const baseKey =
             field.id ||
             field.name ||
             (field.placeholder && field.placeholder.trim()) ||
             null;
-
-        if (baseKey)
-        {
-            return baseKey;
-        }
-
-        // If this is a <select> without id/name/placeholder,
-        // fall back to something from its first option or a generic fallback.
+        if (baseKey) return baseKey;
         if (field.tagName.toLowerCase() === "select")
         {
             if (field.options && field.options.length > 0)
@@ -75,20 +146,14 @@
             }
             return "Select field";
         }
-
-        // Final fallback for any other field
         return "Unknown field";
     };
 
-    // Attach a tooltip icon to the field (if not already added)
     const addTooltipToField = (field, tooltipRef) =>
     {
         if (field.dataset.tooltipInjected === "true" || !tooltipsEnabled) return;
         field.dataset.tooltipInjected = "true";
-
-        // Determine & store which key we ended up using
         field.dataset.keyUsed = field.dataset.keyUsed || determineBestKey(field) || "";
-
         const iconContainer = document.createElement("span");
         Object.assign(iconContainer.style, {
             display: "inline-flex",
@@ -97,7 +162,6 @@
             zIndex: "100000",
         });
         iconContainer.classList.add("tooltip-icon-container");
-
         const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         icon.setAttribute("width", "20");
         icon.setAttribute("height", "20");
@@ -113,19 +177,15 @@
              8.27 14 10c0 .89-.44 1.61-1.07 2.25z"
         />
       `;
-
-        // Function to display tooltip content
         const showTooltip = (e) =>
         {
             if (!tooltipsEnabled) return;
             const usedKey = field.dataset.keyUsed;
             const question = questionMatrix[usedKey] || "Please fill out this field.";
             tooltipRef.tooltip.innerHTML = "";
-
             const textSpan = document.createElement("span");
             textSpan.textContent = question;
             tooltipRef.tooltip.appendChild(textSpan);
-
             refreshCounts[usedKey] = refreshCounts[usedKey] || 0;
             const refreshBtn = document.createElement("button");
             Object.assign(refreshBtn.style, {
@@ -151,12 +211,17 @@
                 event.stopPropagation();
                 event.preventDefault();
                 if (refreshCounts[usedKey] >= 3) return;
-                fetch("http://localhost:3000/api/question-lookup", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ keys: [usedKey] }),
-                })
-                    .then((resp) => resp.json())
+                const now = Date.now();
+                const lastRefresh = lastRefreshTimes[usedKey] || 0;
+                if (now - lastRefresh < 5000)
+                {
+                    console.log(
+                        `Please wait at least 5 seconds between refreshes for "${usedKey}".`
+                    );
+                    return;
+                }
+                lastRefreshTimes[usedKey] = now;
+                fetchTooltipsForKeys([usedKey])
                     .then((data) =>
                     {
                         if (data[usedKey])
@@ -165,7 +230,10 @@
                             textSpan.textContent = data[usedKey];
                         }
                     })
-                    .catch((err) => console.error("Failed to refresh question:", err))
+                    .catch((err) =>
+                    {
+                        console.error("Failed to refresh question:", err);
+                    })
                     .finally(() =>
                     {
                         refreshCounts[usedKey]++;
@@ -173,20 +241,16 @@
                     });
             });
             tooltipRef.tooltip.appendChild(refreshBtn);
-
             tooltipRef.tooltip.style.display = "block";
             const rect = e.target.getBoundingClientRect();
             tooltipRef.tooltip.style.top = rect.bottom + window.scrollY + 5 + "px";
             tooltipRef.tooltip.style.left = rect.left + window.scrollX + 5 + "px";
-
             if (tooltipRef.hideTimer)
             {
                 clearTimeout(tooltipRef.hideTimer);
                 tooltipRef.hideTimer = null;
             }
         };
-
-        // Start a timer to hide the tooltip after a short delay
         const startHideTimer = () =>
         {
             tooltipRef.hideTimer = setTimeout(() =>
@@ -194,8 +258,6 @@
                 tooltipRef.tooltip.style.display = "none";
             }, 2000);
         };
-
-        // Attach icon events
         icon.addEventListener("mouseenter", showTooltip);
         icon.addEventListener("mouseleave", () =>
         {
@@ -208,12 +270,10 @@
             tooltipRef.tooltip.style.top = rect.bottom + window.scrollY + 5 + "px";
             tooltipRef.tooltip.style.left = rect.left + window.scrollX + 5 + "px";
         });
-
         iconContainer.appendChild(icon);
         field.insertAdjacentElement("afterend", iconContainer);
     };
 
-    // Process all existing form fields and attach tooltips
     const processFormFields = (tooltipRef) =>
     {
         document.querySelectorAll("input, textarea, select").forEach((field) =>
@@ -222,7 +282,6 @@
         });
     };
 
-    // Observe dynamic additions to the DOM for new form fields
     const observeDynamicFields = (tooltipRef) =>
     {
         const observer = new MutationObserver((mutations) =>
@@ -237,9 +296,9 @@
                         {
                             addTooltipToField(node, tooltipRef);
                         }
-                        node.querySelectorAll?.("input, textarea, select").forEach((f) =>
-                            addTooltipToField(f, tooltipRef)
-                        );
+                        node
+                            .querySelectorAll?.("input, textarea, select")
+                            .forEach((f) => addTooltipToField(f, tooltipRef));
                     }
                 });
             });
@@ -250,7 +309,6 @@
         });
     };
 
-    // Gather all unique keys from existing form fields
     const gatherKeysFromFields = () =>
     {
         const keys = new Set();
@@ -262,10 +320,6 @@
         return Array.from(keys);
     };
 
-    /**
-     * Remove all tooltip icons from the page AND reset `data-tooltipInjected`
-     * so that toggling them on again will properly re-inject.
-     */
     const removeAllTooltipIcons = () =>
     {
         document.querySelectorAll(".tooltip-icon-container").forEach((iconContainer) =>
@@ -279,7 +333,6 @@
         });
     };
 
-    // Toggle tooltips on or off
     const toggleTooltips = (enabled) =>
     {
         tooltipsEnabled = enabled;
@@ -293,13 +346,10 @@
         }
     };
 
-    // Initialize tooltips on the page
     const initTooltips = () =>
     {
         if (!document.body) return;
         tooltipRefGlobal = createTooltipContainer();
-
-        // Global tooltip container events (attached only once)
         tooltipRefGlobal.tooltip.addEventListener("mouseenter", () =>
         {
             if (tooltipRefGlobal.hideTimer)
@@ -318,33 +368,62 @@
                 }, 2000);
             }
         });
-
         const keys = gatherKeysFromFields();
-        fetch("http://localhost:3000/api/question-lookup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ keys }),
-        })
-            .then((resp) => resp.json())
-            .then((data) =>
+        fetchTooltipsForKeys(keys).then((data) =>
+        {
+            questionMatrix = data;
+            if (tooltipsEnabled) processFormFields(tooltipRefGlobal);
+            observeDynamicFields(tooltipRefGlobal);
+        });
+        const pollIntervalMs = 5000;
+        setInterval(() =>
+        {
+            if (!tooltipsEnabled) return;
+            const fields = Array.from(
+                document.querySelectorAll("input, textarea, select")
+            );
+            const keysSet = new Set();
+            fields.forEach((field) =>
             {
-                questionMatrix = data;
-                if (tooltipsEnabled) processFormFields(tooltipRefGlobal);
-                observeDynamicFields(tooltipRefGlobal);
-            })
-            .catch((err) =>
-            {
-                console.error("Failed to fetch question mappings:", err);
-                // Even if it fails, we still proceed with local defaults
-                if (tooltipsEnabled) processFormFields(tooltipRefGlobal);
-                observeDynamicFields(tooltipRefGlobal);
+                const key = determineBestKey(field);
+                keysSet.add(key);
             });
+            const keysArray = Array.from(keysSet);
+            fetchTooltipsForKeys(keysArray)
+                .then((data) =>
+                {
+                    let updated = false;
+                    keysArray.forEach((key) =>
+                    {
+                        if (data[key] && questionMatrix[key] !== data[key])
+                        {
+                            questionMatrix[key] = data[key];
+                            updated = true;
+                        }
+                    });
+                    if (updated)
+                    {
+                        fields.forEach((field) =>
+                        {
+                            const iconContainer = field.parentNode?.querySelector(
+                                ".tooltip-icon-container"
+                            );
+                            if (!iconContainer)
+                            {
+                                addTooltipToField(field, tooltipRefGlobal);
+                            }
+                        });
+                    }
+                })
+                .catch((err) =>
+                {
+                    console.error("Failed to refresh questions:", err);
+                });
+        }, pollIntervalMs);
     };
 
-    // Check stored tooltipsEnabled setting and initialize when DOM is ready
     chrome.storage.sync.get(["tooltipsEnabled"], (result) =>
     {
-        // default = true if not found
         tooltipsEnabled = result.tooltipsEnabled !== false;
         if (document.readyState === "loading")
         {
@@ -355,9 +434,9 @@
         }
     });
 
-    // Listen for extension messages to toggle tooltips
     chrome.runtime.onMessage.addListener((message) =>
     {
         if (message.type === "TOGGLE_TOOLTIPS") toggleTooltips(message.enabled);
     });
+
 })();

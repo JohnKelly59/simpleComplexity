@@ -2,15 +2,15 @@ document.addEventListener("DOMContentLoaded", function ()
 {
     const toggleTooltipsCheckbox = document.getElementById("toggleTooltips");
     const openDashboardBtn = document.getElementById("openDashboardBtn");
+    const openSigninBtn = document.getElementById("openSigninBtn");
+    const fetchTokenBtn = document.getElementById("fetchTokenBtn");
 
-    // 1) Load stored preference
     chrome.storage.sync.get(["tooltipsEnabled"], (result) =>
     {
         const storedValue = result.tooltipsEnabled;
-        toggleTooltipsCheckbox.checked = (storedValue !== false);
+        toggleTooltipsCheckbox.checked = storedValue !== false;
     });
 
-    // 2) Listen for changes to the checkbox
     toggleTooltipsCheckbox.addEventListener("change", function ()
     {
         const isChecked = toggleTooltipsCheckbox.checked;
@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function ()
             console.log("Tooltips enabled set to:", isChecked);
         });
 
-        // Send a message to the active tab to toggle tooltips
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs)
         {
             if (tabs && tabs[0])
@@ -32,9 +31,44 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     });
 
-    // 3) "Open Dashboard"
     openDashboardBtn.addEventListener("click", function ()
     {
         chrome.tabs.create({ url: "http://localhost:3000/dashboard" });
+    });
+
+    openSigninBtn.addEventListener("click", function ()
+    {
+        chrome.tabs.create({ url: "http://localhost:3000/auth/login" });
+    });
+
+    fetchTokenBtn.addEventListener("click", async function ()
+    {
+        try
+        {
+            const resp = await fetch("http://localhost:3000/api/get-token", {
+                method: "GET",
+                credentials: "include",
+            });
+            if (!resp.ok)
+            {
+                throw new Error("Failed to get token. Are you logged in?");
+            }
+            const data = await resp.json();
+            if (data.token)
+            {
+                chrome.storage.sync.set({ authToken: data.token }, () =>
+                {
+                    alert("Token stored in extension!");
+                    console.log("Token stored:", data.token);
+                });
+            } else
+            {
+                alert("No token returned. Possibly not logged in on the site.");
+            }
+        } catch (err)
+        {
+            console.error(err);
+            alert("Could not retrieve token. Check console for details.");
+        }
     });
 });

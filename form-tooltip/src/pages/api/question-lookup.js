@@ -1,20 +1,19 @@
-// pages/api/question-lookup.js
+
 import { PrismaClient } from "@prisma/client";
-import { getTooltipsFromAlgolia } from "../../lib/getTooltipsFromAlgolia.mjs";
-import { getTooltipsFromAi } from "../../lib/getTooltipsFromAi";
+import { getTooltipsFromDb } from "../../lib/getTooltipsFromDb.js";
+import { getTooltipsFromAi } from "../../lib/getTooltipsFromAi.js";
+import { getToken } from "next-auth/jwt";
 
 const prisma = new PrismaClient();
 
 export default async function handler (req, res)
 {
-    // Basic CORS setup (adjust for your domain if needed)
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
     if (req.method === "OPTIONS")
     {
-        // Preflight request
         return res.status(200).end();
     }
 
@@ -25,23 +24,24 @@ export default async function handler (req, res)
 
     try
     {
-        const userTier = "free";
+        const token = await getToken({
+            req,
+            secret: process.env.NEXTAUTH_SECRET,
+        });
 
-        const { keys } = req.body;
-        if (!Array.isArray(keys))
+        if (!token)
         {
-            return res.status(400).json({ error: "Body must contain an array 'keys'." });
+            return res.status(401).json({ error: "Not authenticated" });
         }
 
+        const userTier = token.subscriptionTier || "free";
+        const { keys } = req.body;
         let result;
-
         if (userTier === "free")
         {
-            // Use the DB-based helper
-            result = await getTooltipsFromAlgolia(keys);
+            result = await getTooltipsFromDb(keys);
         } else
         {
-            // Use the GPT-based helper
             result = await getTooltipsFromAi(keys);
         }
 

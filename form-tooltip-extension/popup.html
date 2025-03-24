@@ -23,10 +23,7 @@
             font-size: 14px;
         }
 
-        .toggle-container {
-            margin-top: 10px;
-        }
-
+        .toggle-container,
         .button-container {
             margin-top: 10px;
         }
@@ -53,7 +50,6 @@
         <p>This extension adds tooltips to form fields on webpages.</p>
         <p>You are using the <strong>free</strong> tier.</p>
 
-        <!-- Checkbox to enable/disable tooltips -->
         <div class="toggle-container">
             <label>
                 <input type="checkbox" id="toggleTooltips" />
@@ -61,13 +57,19 @@
             </label>
         </div>
 
-        <!-- Button to open the local dashboard -->
         <div class="button-container">
             <button id="openDashboardBtn">Open Dashboard</button>
         </div>
+
+        <div class="button-container">
+            <button id="openSigninBtn">Open Sign-In</button>
+        </div>
+
+        <div class="button-container">
+            <button id="fetchTokenBtn">Sync Token</button>
+        </div>
     </div>
 
-    <!-- Your popup JS here (make sure it sends a message to the content script to toggle) -->
     <script src="popup.js"></script>
 </body>
 
