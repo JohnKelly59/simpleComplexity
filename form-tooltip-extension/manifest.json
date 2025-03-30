@@ -1,5 +1,5 @@
 {
-    "name": "Form Tooltip Extension",
+    "name": "Form Tooltip",
     "version": "1.0",
     "manifest_version": 3,
     "description": "Adds an icon to the right of each question field with a simplified description.",
@@ -14,7 +14,8 @@
     "permissions": [
         "activeTab",
         "scripting",
-        "storage"
+        "storage",
+        "identity"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -32,5 +33,16 @@
     ],
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
-    }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "SC_COLOR.png",
+                "icon128.png"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
 }

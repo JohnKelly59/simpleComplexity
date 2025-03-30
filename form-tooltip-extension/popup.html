@@ -3,73 +3,141 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Form Tooltip Extension</title>
+    <title>Form Tooltip</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
     <style>
+        :root {
+            --primary-main: #116530;
+            --secondary-main: #D4A017;
+            --bg-default: #1f2937;
+            /* Updated overall background color */
+            --card-bg: #1f2937;
+            /* Updated card background color */
+            --text-color: #f5f7fa;
+            /* Light text for dark background */
+            --border-color: #e0e0e0;
+        }
+
         body {
+            background-color: var(--bg-default);
             font-family: "Roboto", sans-serif;
             margin: 0;
-            padding: 10px;
-            width: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 300px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         .header {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 500;
-            margin-bottom: 10px;
+            padding: 15px;
+            background-color: var(--primary-main);
+            color: #fff;
+            text-align: center;
         }
 
         .content {
+            padding: 15px;
             font-size: 14px;
+            color: var(--text-color);
         }
 
         .toggle-container,
-        .button-container {
+        .button-container,
+        .field-container {
             margin-top: 10px;
-        }
-
-        button {
-            margin-top: 5px;
-            padding: 8px 12px;
-            background-color: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
 
         label {
             cursor: pointer;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        /* Set checkbox accent color to primary color */
+        input[type="checkbox"] {
+            accent-color: var(--primary-main);
+            margin-right: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-main);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-main);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .field-container input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            background-color: #374151;
+            /* Dark input background for consistency */
+            color: var(--text-color);
+        }
+
+        #logoutSection {
+            display: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">Tooltip Extension</div>
-    <div class="content">
-        <p>This extension adds tooltips to form fields on webpages.</p>
-        <p>You are using the <strong>free</strong> tier.</p>
-
-        <div class="toggle-container">
-            <label>
-                <input type="checkbox" id="toggleTooltips" />
-                Enable Tooltips
-            </label>
-        </div>
-
-        <div class="button-container">
-            <button id="openDashboardBtn">Open Dashboard</button>
-        </div>
-
-        <div class="button-container">
-            <button id="openSigninBtn">Open Sign-In</button>
-        </div>
-
-        <div class="button-container">
-            <button id="fetchTokenBtn">Sync Token</button>
+    <div class="card">
+        <div class="header">Form Tooltip</div>
+        <div class="content">
+            <p>Sign in to enable advanced features.</p>
+            <div class="toggle-container">
+                <label>
+                    <input type="checkbox" id="toggleTooltips" />
+                    Enable Tooltips
+                </label>
+            </div>
+            <div id="loginSection">
+                <div class="field-container">
+                    <label for="emailField">Email:</label>
+                    <input type="text" id="emailField" placeholder="you@example.com" />
+                </div>
+                <div class="field-container">
+                    <label for="passwordField">Password:</label>
+                    <input type="password" id="passwordField" placeholder="••••••••" />
+                </div>
+                <div class="button-container">
+                    <button id="loginBtn">Login &amp; Store Token</button>
+                </div>
+                <div class="button-container">
+                    <button id="googleSignInBtn">Sign in with Google</button>
+                </div>
+            </div>
+            <div id="logoutSection">
+                <div class="button-container">
+                    <button id="logoutBtn">Logout</button>
+                </div>
+            </div>
         </div>
     </div>
-
     <script src="popup.js"></script>
 </body>
 
