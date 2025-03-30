@@ -12,6 +12,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->name('question-lookup');
 });
 
+
 Route::post('/login', function (Request $request) {
     $request->validate([
         'email'    => 'required|email',
