@@ -1,73 +1,43 @@
 (function ()
 {
+    // Set default to not show tooltips
     let questionMatrix = {};
     let refreshCounts = {};
-    let tooltipsEnabled = true;
+    let tooltipsEnabled = false;
     let tooltipRefGlobal = null;
     let lastRefreshTimes = {};
 
-    /**
-     * Helper: check if page background is light.
-     */
-    function isBackgroundLight ()
+    // -------------------------------------------
+    // 1) fetchWithAuth function using configuration options
+    // -------------------------------------------
+    async function fetchWithAuth (url, options = {})
     {
-        const bgColor = window.getComputedStyle(document.body).backgroundColor;
-        const rgb = bgColor.match(/\d+/g);
-        if (rgb && rgb.length >= 3)
-        {
-            const [r, g, b] = rgb.map((x) => parseInt(x, 10));
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            return brightness > 128;
-        }
-        return true;
+        // Read the API token from the global configuration object
+        const token = window.TooltipEmbedConfig?.apiToken || "";
+        const headers = {
+            ...(options.headers || {}),
+            Authorization: `Bearer ${token}`,
+        };
+        return fetch(url, { ...options, headers });
     }
 
-    /**
-     * Helper: fetch with stored auth token in header.
-     */
-    function fetchWithAuth (url, options = {})
-    {
-        return new Promise((resolve, reject) =>
-        {
-            chrome.storage.sync.get(["authToken"], async (storageResult) =>
-            {
-                if (chrome.runtime.lastError)
-                {
-                    console.error("Storage error:", chrome.runtime.lastError.message);
-                    reject(chrome.runtime.lastError);
-                    return;
-                }
-                const bearerToken =
-                    typeof storageResult.authToken === "string"
-                        ? storageResult.authToken
-                        : storageResult.authToken?.token || "";
-                const headers = {
-                    ...options.headers,
-                    Authorization: `Bearer ${bearerToken}`,
-                };
-                try
-                {
-                    const response = await fetch(url, { ...options, headers });
-                    resolve(response);
-                } catch (err)
-                {
-                    reject(err);
-                }
-            });
-        });
-    }
-
-    /**
-     * Fetch tooltips for given keys from the backend.
-     */
+    // -------------------------------------------
+    // 2) fetchTooltipsForKeys using configurable API base URL
+    // -------------------------------------------
     function fetchTooltipsForKeys (keys = [])
     {
-        return fetchWithAuth("http://localhost:8000/api/question-lookup", {
+        const apiBaseUrl = window.TooltipEmbedConfig?.apiBaseUrl || "";
+        return fetchWithAuth(`${apiBaseUrl}/question-lookup`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ keys }),
         })
-            .then((resp) => resp.json())
+            .then((resp) =>
+            {
+                // If you’re receiving a 302 on first load, confirm your route
+                // is publicly accessible or that your token is valid.
+                return resp.json();
+            })
             .catch((err) =>
             {
                 console.error("Failed to fetch question mappings:", err);
@@ -75,9 +45,9 @@
             });
     }
 
-    /**
-     * Determine a "best" unique key based on field attributes.
-     */
+    // -------------------------------------------
+    // 3) Determine best key from a field
+    // -------------------------------------------
     function determineBestKey (field)
     {
         const baseKey =
@@ -85,7 +55,9 @@
             field.name ||
             (field.placeholder && field.placeholder.trim()) ||
             null;
+
         if (baseKey) return baseKey;
+
         if (field.tagName.toLowerCase() === "select")
         {
             if (field.options && field.options.length > 0)
@@ -95,12 +67,13 @@
             }
             return "Select field";
         }
+
         return "Unknown field";
     }
 
-    /**
-     * Create the container for the tooltip (using a shadow root).
-     */
+    // -------------------------------------------
+    // 4) Create the tooltip container
+    // -------------------------------------------
     function createTooltipContainer ()
     {
         const container = document.createElement("div");
@@ -118,18 +91,18 @@
         const shadow = container.attachShadow({ mode: "open" });
         const style = document.createElement("style");
         style.textContent = `
-            .tooltip {
-                position: absolute !important;
-                padding: 4px 8px !important;
-                background-color: rgba(0, 0, 0, 0.7) !important;
-                color: #fff !important;
-                border-radius: 4px !important;
-                font-size: 12px !important;
-                display: none;
-                pointer-events: auto !important;
-                white-space: nowrap !important;
-                z-index: 2147483647 !important;
-            }
+          .tooltip {
+            position: absolute !important;
+            padding: 4px 8px !important;
+            background-color: rgba(0, 0, 0, 0.7) !important;
+            color: #fff !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            display: none;
+            pointer-events: auto !important;
+            white-space: nowrap !important;
+            z-index: 2147483647 !important;
+          }
         `;
         shadow.appendChild(style);
 
@@ -140,9 +113,9 @@
         return { container, tooltip, shadow, hideTimer: null };
     }
 
-    /**
-     * Add a tooltip icon next to a field if not already present.
-     */
+    // -------------------------------------------
+    // 5) Add the tooltip to a single field
+    // -------------------------------------------
     function addTooltipToField (field, tooltipRef)
     {
         if (field.dataset.tooltipInjected === "true" || !tooltipsEnabled) return;
@@ -165,7 +138,7 @@
         icon.setAttribute("aria-label", "Help");
         icon.style.cursor = "pointer";
         icon.innerHTML = `
-            <path fill="#000"
+          <path fill="#000"
                 d="M12 2C6.47 2 2 6.47 2 12s4.47 10 
                    10 10 10-4.47 10-10S17.53 2 12 2zm.07 
                    15H10v-2h2v2zm1.07-4.75c-.73.73-1.17 
@@ -175,13 +148,14 @@
                    10 9.96H8c0-1.69 1.37-3.06 
                    3.06-3.06S14 8.27 14 10c0 .89-.44 
                    1.61-1.07 2.25z"
-            />
+          />
         `;
 
         // Show the tooltip on mouseenter
         const showTooltip = (evt) =>
         {
             if (!tooltipsEnabled) return;
+
             const usedKey = field.dataset.keyUsed;
             const question = questionMatrix[usedKey] || "Please fill out this field.";
             tooltipRef.tooltip.innerHTML = "";
@@ -204,26 +178,29 @@
                 pointerEvents: "auto",
             });
             refreshBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                     viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="#fff"
-                        d="M17.65 6.35A7.95 7.95 0 0 0 
-                           12 4C8.74 4 6 6.03 4.69 9h2.02a6.011
-                           6.011 0 0 1 10.09-1.24l-1.81 1.81H20V4
-                           l-2.35 2.35zM6.35 17.65A7.95 7.95 0 0 0
-                           12 20c3.26 0 6-2.03 7.31-5h-2.02a6.011
-                           6.011 0 0 1-10.09 1.24l1.81-1.81H4v4l2.35-2.35z"/>
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                   viewBox="0 0 24 24" width="16" height="16">
+                <path fill="#fff"
+                      d="M17.65 6.35A7.95 7.95 0 0 0 
+                         12 4C8.74 4 6 6.03 4.69 9h2.02a6.011
+                         6.011 0 0 1 10.09-1.24l-1.81 1.81H20V4
+                         l-2.35 2.35zM6.35 17.65A7.95 7.95 0 0 0
+                         12 20c3.26 0 6-2.03 7.31-5h-2.02a6.011
+                         6.011 0 0 1-10.09 1.24l1.81-1.81H4v4l2.35-2.35z"/>
+              </svg>
             `;
+
             if (refreshCounts[usedKey] >= 3)
             {
                 refreshBtn.disabled = true;
             }
+
             refreshBtn.addEventListener("click", (clickEvent) =>
             {
                 clickEvent.stopPropagation();
                 clickEvent.preventDefault();
                 if (refreshCounts[usedKey] >= 3) return;
+
                 const now = Date.now();
                 const lastRefresh = lastRefreshTimes[usedKey] || 0;
                 if (now - lastRefresh < 5000)
@@ -232,6 +209,7 @@
                     return;
                 }
                 lastRefreshTimes[usedKey] = now;
+
                 // Re-fetch data for this key
                 fetchTooltipsForKeys([usedKey])
                     .then((data) =>
@@ -255,6 +233,7 @@
                         }
                     });
             });
+
             tooltipRef.tooltip.appendChild(refreshBtn);
             tooltipRef.tooltip.style.display = "block";
 
@@ -298,9 +277,9 @@
         field.insertAdjacentElement("afterend", iconContainer);
     }
 
-    /**
-     * Add tooltips to all existing fields.
-     */
+    // -------------------------------------------
+    // 6) Process all form fields
+    // -------------------------------------------
     function processFormFields (tooltipRef)
     {
         document.querySelectorAll("input, textarea, select").forEach((field) =>
@@ -309,9 +288,9 @@
         });
     }
 
-    /**
-     * Observe DOM mutations; if new fields are added, inject tooltips as well.
-     */
+    // -------------------------------------------
+    // 7) Observe DOM mutations for dynamically added fields
+    // -------------------------------------------
     function observeDynamicFields (tooltipRef)
     {
         const observer = new MutationObserver((mutations) =>
@@ -334,15 +313,16 @@
                 });
             });
         });
+
         observer.observe(document.body || document.documentElement, {
             childList: true,
             subtree: true,
         });
     }
 
-    /**
-     * Gather unique keys from all form fields.
-     */
+    // -------------------------------------------
+    // 8) Gather unique keys from fields
+    // -------------------------------------------
     function gatherKeysFromFields ()
     {
         const keys = new Set();
@@ -354,9 +334,9 @@
         return Array.from(keys);
     }
 
-    /**
-     * Remove all injected icons from the page.
-     */
+    // -------------------------------------------
+    // 9) Remove all tooltip icons
+    // -------------------------------------------
     function removeAllTooltipIcons ()
     {
         document.querySelectorAll(".tooltip-icon-container").forEach((iconContainer) =>
@@ -370,31 +350,43 @@
         });
     }
 
-    /**
-     * Enable or disable tooltips globally.
-     */
+    // -------------------------------------------
+    // 10) Toggle tooltips globally and automatically refresh when enabling
+    // -------------------------------------------
     function toggleTooltips (enabled)
     {
         tooltipsEnabled = enabled;
-        if (!tooltipsEnabled)
+        if (tooltipRefGlobal)
         {
-            if (tooltipRefGlobal)
+            if (enabled)
             {
+                // When enabling tooltips, automatically refresh by gathering keys and fetching data.
+                const keys = gatherKeysFromFields();
+                fetchTooltipsForKeys(keys)
+                    .then((data) =>
+                    {
+                        questionMatrix = data;
+                        processFormFields(tooltipRefGlobal);
+                    })
+                    .catch((err) =>
+                    {
+                        console.error("Failed to refresh tooltips:", err);
+                    });
+            } else
+            {
+                // If disabling, hide any open tooltip and remove tooltip icons.
                 tooltipRefGlobal.tooltip.style.display = "none";
+                removeAllTooltipIcons();
             }
-            removeAllTooltipIcons();
-        } else if (tooltipRefGlobal)
-        {
-            processFormFields(tooltipRefGlobal);
         }
     }
 
-    // --- Speed Dial Refresh Button Setup ---
+    // -------------------------------------------
+    // 11) Create a Speed Dial with two actions:
+    //     a) Toggle tooltips on/off
+    //     b) Refresh tooltips
+    // -------------------------------------------
     let speedDialRef = null;
-
-    /**
-     * Create a speed dial with only a refresh option.
-     */
     function createSpeedDial ()
     {
         // Container
@@ -408,9 +400,10 @@
         speedDial.style.flexDirection = "column";
         speedDial.style.alignItems = "flex-end";
 
-        // Main FAB (Speed Dial Trigger) – now with an image
+        // Main FAB (Speed Dial Trigger)
         const mainButton = document.createElement("button");
         mainButton.id = "tooltipSpeedDial_mainButton";
+        mainButton.textContent = "⋮"; // or any icon
         Object.assign(mainButton.style, {
             width: "48px",
             height: "48px",
@@ -420,33 +413,41 @@
             backgroundColor: "#1f2937",
             color: "#fff",
             boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            fontSize: "24px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             marginBottom: "8px",
         });
-
-        // Insert your main Speed Dial icon as an <img>
-        const mainImg = document.createElement("img");
-        mainImg.src = isBackgroundLight()
-            ? chrome.runtime.getURL("icon128.png")
-            : chrome.runtime.getURL("SC_COLOR.png");
-        mainImg.alt = "Open Speed Dial";
-        mainImg.style.width = "28px";
-        mainImg.style.height = "28px";
-        mainButton.appendChild(mainImg);
-
         speedDial.appendChild(mainButton);
 
-        // Actions container (only refresh action)
+        // Actions container
         const actionsContainer = document.createElement("div");
-        actionsContainer.style.display = "none";
+        actionsContainer.style.display = "none"; // hidden by default
         actionsContainer.style.flexDirection = "column";
         actionsContainer.style.gap = "8px";
         actionsContainer.style.marginBottom = "8px";
 
+        // 1) Toggle tooltips
+        const toggleButton = document.createElement("button");
+        toggleButton.textContent = "Toggle Tooltips";
+        Object.assign(toggleButton.style, {
+            padding: "8px 12px",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            backgroundColor: "#4b5563",
+            color: "#fff",
+        });
+        toggleButton.addEventListener("click", () =>
+        {
+            // Toggle the tooltipsEnabled boolean and auto-refresh if enabling
+            toggleTooltips(!tooltipsEnabled);
+        });
+        actionsContainer.appendChild(toggleButton);
+
+        // 2) Refresh tooltips
         const refreshButton = document.createElement("button");
-        // Keep an image inside the refresh button if you prefer
         refreshButton.textContent = "Refresh Tooltips";
         Object.assign(refreshButton.style, {
             padding: "8px 12px",
@@ -460,6 +461,8 @@
         {
             event.preventDefault();
             event.stopPropagation();
+            if (!tooltipsEnabled) return;
+
             // Re-fetch tooltip data for all fields
             const keys = gatherKeysFromFields();
             fetchTooltipsForKeys(keys)
@@ -478,6 +481,7 @@
         speedDial.appendChild(actionsContainer);
         document.body.appendChild(speedDial);
 
+        // Toggle the actions on main button click
         mainButton.addEventListener("click", () =>
         {
             actionsContainer.style.display =
@@ -488,13 +492,14 @@
             speedDial,
             mainButton,
             actionsContainer,
+            toggleButton,
             refreshButton,
         };
     }
 
-    /**
-     * Initialize tooltips on page load.
-     */
+    // -------------------------------------------
+    // 12) Initialize tooltips
+    // -------------------------------------------
     function initTooltips ()
     {
         if (!document.body) return;
@@ -509,7 +514,6 @@
                 tooltipRefGlobal.hideTimer = null;
             }
         });
-
         // Start hide timer if mouse leaves tooltip
         tooltipRefGlobal.tooltip.addEventListener("mouseleave", () =>
         {
@@ -522,7 +526,7 @@
             }
         });
 
-        // Fetch all keys once and add tooltips
+        // Gather all keys and fetch them (but only process form fields if tooltips are enabled)
         const keys = gatherKeysFromFields();
         fetchTooltipsForKeys(keys).then((data) =>
         {
@@ -534,29 +538,19 @@
             observeDynamicFields(tooltipRefGlobal);
         });
 
-        // Create the speed dial refresh button
+        // Create our Speed Dial with toggle & refresh actions
         speedDialRef = createSpeedDial();
     }
 
-    // Read the stored state for tooltipsEnabled, then init
-    chrome.storage.sync.get(["tooltipsEnabled"], (result) =>
+    // Run `initTooltips` when the DOM is ready
+    if (document.readyState === "loading")
     {
-        tooltipsEnabled = result.tooltipsEnabled !== false;
-        if (document.readyState === "loading")
-        {
-            document.addEventListener("DOMContentLoaded", initTooltips);
-        } else
-        {
-            initTooltips();
-        }
-    });
+        document.addEventListener("DOMContentLoaded", initTooltips);
+    } else
+    {
+        initTooltips();
+    }
 
-    // Listen for messages to toggle tooltips on/off
-    chrome.runtime.onMessage.addListener((message) =>
-    {
-        if (message.type === "TOGGLE_TOOLTIPS")
-        {
-            toggleTooltips(message.enabled);
-        }
-    });
+    // Expose toggle function globally if you want external toggling
+    window.toggleFormTooltips = toggleTooltips;
 })();
