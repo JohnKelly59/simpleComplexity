@@ -1,32 +1,42 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Card, CardMedia, useTheme } from '@mui/material';
 
 const Demo = () =>
 {
+    const theme = useTheme();
+
     return (
-        <Box sx={{ py: 8, textAlign: 'center' }}>
+        <Box sx={{ py: 10, textAlign: 'center', backgroundColor: theme.palette.grey[100] }}>
             <Typography variant="h4" gutterBottom>
                 See It in Action
             </Typography>
-            <Typography variant="body1" color="textSecondary" gutterBottom>
-                Watch our demo to see how tooltips transform confusing forms into clear, user-friendly experiences.
+            <Typography variant="body1" color="text.secondary" gutterBottom>
+                Watch how Form-Tooltip turns complex forms into clear, user-friendly experiences.
             </Typography>
-            {/* Replace the below Box with your demo video or animated GIF */}
-            <Box
+
+            <Card
+                elevation={4}
                 sx={{
-                    width: '100%',
-                    height: '300px',
-                    backgroundColor: '#e0e0e0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 2,
-                    mt: 2,
+                    maxWidth: 800,
+                    mx: 'auto',
+                    mt: 4,
+                    overflow: 'hidden',
+                    borderRadius: 3,
                 }}
             >
-                <Typography variant="h6" color="textSecondary">
-                    Demo Video/GIF Placeholder
-                </Typography>
-            </Box>
+                <CardMedia
+                    component="video"
+                    src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/Tooltipdemo1.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    controls={false}
+                    sx={{
+                        width: '100%',
+                        height: { xs: 250, sm: 400 },
+                        objectFit: 'cover',
+                    }}
+                />
+            </Card>
         </Box>
     );
 };
