@@ -5,101 +5,63 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
+use Stripe\StripeClient;
+
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Subscribe or upgrade to tier2 or tier3.
-     */
-    public function subscribe(Request $request)
+    public function upgrade(Request $request, string $tier)
     {
-        $request->validate([
-            'tier'           => 'required|in:tier2,tier3',
-            'payment_method' => 'required|string',
-        ]);
+        // 1) Ensure the user is logged in.
+        $user = $request->user();
 
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'Not authenticated'], 401);
-        }
-
-        // Map the incoming tier => Stripe price ID
-        $priceId = $request->tier === 'tier2'
-            ? env('STRIPE_PRICE_TIER2')
-            : env('STRIPE_PRICE_TIER3');
-
-        // Ensure the user is a Stripe customer
+        // 2) Make sure the user has a Stripe customer ID.
+        // This will create a new Stripe customer if one does not exist.
         $user->createOrGetStripeCustomer();
 
-        // Update the default payment method
-        $user->updateDefaultPaymentMethod($request->payment_method);
+        // 3) Determine the Stripe Price ID based on the subscription tier.
+        $stripePriceId = match ($tier) {
+            'pro'       => env('STRIPE_PRICE_TIER2'),
+            'unlimited' => env('STRIPE_PRICE_TIER3'),
+            default     => null,
+        };
 
-        try {
-            $subscription = $user->subscription('default');
-
-            // If the user already has an active subscription, we'll SWAP instead of creating a brand new one
-            if ($subscription && $subscription->active()) {
-                // Swap to the new plan
-                $subscription->swap($priceId);
-
-                return response()->json([
-                    'status'        => 'upgraded',
-                    'tier'          => $request->tier,
-                    'stripe_status' => $subscription->refresh()->stripe_status,
-                ], 200);
-            } else {
-                // Otherwise, create a new subscription
-                $newSubscription = $user->newSubscription('default', $priceId)
-                    ->create($request->payment_method);
-
-                return response()->json([
-                    'status'        => 'subscribed',
-                    'tier'          => $request->tier,
-                    'stripe_status' => $newSubscription->stripe_status,
-                ], 200);
-            }
-        } catch (PaymentActionRequired $e) {
-            // If 3D Secure or SCA is required
-            return response()->json([
-                'error'                         => 'Payment action required',
-                'payment_intent_client_secret'  => $e->payment->client_secret,
-            ], 422);
-        } catch (\Exception $e) {
-            \Log::error('SubscriptionController@subscribe error: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Failed to subscribe or upgrade subscription'
-            ], 500);
+        if (!$stripePriceId) {
+            abort(404, 'Unknown subscription tier.');
         }
+
+        // 4) Create a Stripe Checkout Session for a subscription.
+        $stripe = new StripeClient(config('cashier.secret'));
+        $checkoutSession = $stripe->checkout->sessions->create([
+            'customer' => $user->stripe_id,
+            'mode'     => 'subscription',
+            'line_items' => [
+                [
+                    'price'    => $stripePriceId,
+                    'quantity' => 1,
+                ],
+            ],
+            'subscription_data' => [
+                'metadata' => [
+                    'type' => $tier,
+                ],
+            ],
+            'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url'  => route('subscription.cancel'),
+        ]);
+
+        // 5) Redirect the user to Stripe's hosted Checkout page.
+        return redirect($checkoutSession->url);
     }
 
-    /**
-     * Cancel the user's subscription.
-     */
-    public function cancel(Request $request)
+    public function success(Request $request)
     {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'Not authenticated'], 401);
-        }
+        // Optionally, verify the checkout session using $request->session_id
+        return redirect()->route('dashboard')->with('success', 'Subscription successful!');
+    }
 
-        $subscription = $user->subscription('default');
-        if (!$subscription) {
-            return response()->json(['error' => 'No subscription found'], 404);
-        }
-
-        // If subscription not active or already canceled
-        if (!$subscription->active()) {
-            return response()->json([
-                'error' => 'Subscription is not currently active or already canceled'
-            ], 400);
-        }
-
-        // Cancel at period end (if you want immediate cancellation, use cancelNow())
-        $subscription->cancel();
-
-        return response()->json([
-            'status'        => 'canceled',
-            'stripe_status' => $subscription->refresh()->stripe_status,
-        ], 200);
+    public function cancelView(Request $request)
+    {
+        return redirect()->route('dashboard')->with('error', 'Subscription process was canceled.');
     }
 }

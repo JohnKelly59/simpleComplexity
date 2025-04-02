@@ -25,7 +25,10 @@ class User extends Authenticatable
         'password',
         'subscription_id',
         'ai_calls_count',
-
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
+        'trial_ends_at',
     ];
 
     /**
@@ -43,16 +46,14 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+    ];
 
-    public function userSubscription()
+
+    public function subscriptions()
     {
-        return $this->hasOne(Subscription::class);
+        return $this->hasMany(\Laravel\Cashier\Subscription::class);
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\GoogleExtensionController;
 use Laravel\Cashier\Http\Controllers\WebhookController;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as VerifyCsrfTokenMiddleware;
 use App\Http\Controllers\SubscriptionController;
 
 /*
@@ -31,13 +32,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $tier = 'free';
 
         // Check if the user has an active subscription
-        $subscription = $user->subscription('default');
-        if ($subscription && $subscription->active()) {
-            $priceId = $subscription->items->first()->stripe_price ?? null;
-            if ($priceId === env('STRIPE_PRICE_TIER2')) {
-                $tier = 'tier2';
-            } elseif ($priceId === env('STRIPE_PRICE_TIER3')) {
-                $tier = 'tier3';
+        if ($user->subscribed('pro') || $user->subscribed('unlimited')) {
+            \Log::info('User is subscribed');
+            if ($user->subscribed('pro')) {
+                $tier = 'Pro';
+            } elseif ($user->subscribed('unlimited')) {
+                $tier = 'Unlimited';
             }
         }
 
@@ -55,9 +55,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('dashboard');
 
-    // (Optional) subscription endpoints
     Route::post('/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
-    Route::post('/cancel-subscription', [SubscriptionController::class, 'cancel'])->name('cancel-subscription');
+    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::get('/subscription/manage', [SubscriptionController::class, 'managePortal'])->name('subscription.manage');
+    Route::get('/subscription/upgrade/{tier}', [SubscriptionController::class, 'upgrade'])
+        ->name('subscription.upgrade');
+    Route::get('/subscription/success', [SubscriptionController::class, 'success'])->name('subscription.success');
+    Route::get('/subscription/cancel', [SubscriptionController::class, 'cancelView'])->name('subscription.cancel');
 });
 
 // Google OAuth routes
@@ -90,30 +94,8 @@ Route::get('/auth/google/extension', [GoogleExtensionController::class, 'redirec
 Route::get('/auth/google/extension/callback', [GoogleExtensionController::class, 'callback'])->name('google.extension.callback');
 
 // Stripe Webhook endpoint for Cashier
-Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook']);
+Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook'])->withoutMiddleware([VerifyCsrfTokenMiddleware::class]);;
 
-Route::get('/subscription/manage', function () {
-    $user = Auth::user();
-    $tier = 'free';
-    $subscription = $user->subscription('default');
-    if ($subscription && $subscription->active()) {
-        $priceId = $subscription->items->first()->stripe_price ?? null;
-        if ($priceId === env('STRIPE_PRICE_TIER2')) {
-            $tier = 'tier2';
-        } elseif ($priceId === env('STRIPE_PRICE_TIER3')) {
-            $tier = 'tier3';
-        }
-    }
-    return Inertia::render('SubscriptionManagement', [
-        'auth' => [
-            'user' => [
-                'id'   => $user->id,
-                'name' => $user->name,
-                'tier' => $tier,
-            ],
-        ],
-    ]);
-})->name('subscription.manage');
 // Include other routes
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

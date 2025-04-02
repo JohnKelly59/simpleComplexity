@@ -24,16 +24,15 @@ Route::middleware('auth')->group(function () {
         $user = Auth::user();
 
         // Default to 'free'
-        $tier = 'free';
+        $tier = 'Free';
 
         // Check subscription
-        $subscription = $user->subscription('default');
-        if ($subscription && $subscription->active()) {
-            $priceId = $subscription->items->first()->stripe_price ?? null;
-            if ($priceId === env('STRIPE_PRICE_TIER2')) {
-                $tier = 'tier2';
-            } elseif ($priceId === env('STRIPE_PRICE_TIER3')) {
-                $tier = 'tier3';
+        if ($user->subscribed('pro') || $user->subscribed('unlimited')) {
+            \Log::info('User is subscribed');
+            if ($user->subscribed('pro')) {
+                $tier = 'Pro';
+            } elseif ($user->subscribed('unlimited')) {
+                $tier = 'Unlimited';
             }
         }
 

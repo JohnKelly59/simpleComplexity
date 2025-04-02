@@ -29,52 +29,33 @@ class QuestionLookupController extends Controller
             return response()->json(['error' => 'Not authenticated'], 401);
         }
 
-        // Determine tier from Stripe subscription
-        $subscription = $user->subscription('default');
-        $tier = 'free';
-        if ($subscription && $subscription->active()) {
-            $priceId = $subscription->items->first()->stripe_price ?? null;
-            if ($priceId === env('STRIPE_PRICE_TIER2')) {
-                $tier = 'tier2';
-            } elseif ($priceId === env('STRIPE_PRICE_TIER3')) {
-                $tier = 'tier3';
-            }
-        }
-
-        // Map tier -> AI limit
-        $tierAiLimits = [
-            'free'  => 0,
-            'tier2' => 5000,
-            'tier3' => null, // unlimited
-        ];
-
-        $limit   = $tierAiLimits[$tier];
-        $current = $user->ai_calls_count ?? 0; // store usage on user or elsewhere
-
         try {
-            // If free => fallback
-            if ($tier === 'free') {
-                $result = $this->dbService->getTooltips($request->keys);
-            }
-            // If tier2 => check usage
-            elseif ($tier === 'tier2') {
-                if (!is_null($limit) && $current < $limit) {
-                    $result = $this->aiService->getTooltips($request->keys);
-                    $user->increment('ai_calls_count');
-                } else {
-                    $result = $this->dbService->getTooltips($request->keys);
-                }
-            }
-            // If tier3 => unlimited
-            else { // 'tier3'
+            // Check if user is on an unlimited subscription first
+            if ($user->subscribed('unlimited')) {
+                \Log::info('User is on unlimited subscription');
                 $result = $this->aiService->getTooltips($request->keys);
                 $user->increment('ai_calls_count');
             }
+            // For pro subscription, enforce the 5000 AI call limit
+            elseif ($user->subscribed('pro')) {
+                \Log::info('User is on pro subscription');
+                if (($user->ai_calls_count ?? 0) < 5000) {
+                    $result = $this->aiService->getTooltips($request->keys);
+                    $user->increment('ai_calls_count');
+                } else {
+                    \Log::info('Pro user AI call limit reached; falling back to database');
+                    $result = $this->dbService->getTooltips($request->keys);
+                }
+            }
+            // Non-subscribed users use database tooltips
+            else {
+                $result = $this->dbService->getTooltips($request->keys);
+            }
 
-            return response()->json($result, 200);
+            return response()->json($result, Response::HTTP_OK);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
-            return response()->json(['error' => 'Failed to look up tooltips'], 500);
+            return response()->json(['error' => 'Failed to look up tooltips'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

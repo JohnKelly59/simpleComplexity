@@ -35,12 +35,18 @@ return [
         ],
     ],
     'google' => [
-    'client_id' => env('GOOGLE_CLIENT_ID'),
-    'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-    'redirect' => env('GOOGLE_REDIRECT_URL', 'http://localhost:8000/callback/google'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', 'http://localhost:8000/callback/google'),
     ],
     'openai' => [
-    'key' => env('OPENAI_API_KEY'),
+        'key' => env('OPENAI_API_KEY'),
+    ],
+    'stripe' => [
+        'model'  => App\Models\User::class,
+        'key'    => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
 ];
