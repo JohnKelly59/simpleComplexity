@@ -55,11 +55,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('dashboard');
 
-    Route::post('/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
-    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
     Route::get('/subscription/manage', [SubscriptionController::class, 'managePortal'])->name('subscription.manage');
     Route::get('/subscription/upgrade/{tier}', [SubscriptionController::class, 'upgrade'])
         ->name('subscription.upgrade');
+    Route::post('/subscription/cancel-subscription', [SubscriptionController::class, 'cancelSubscription'])
+        ->name('subscription.cancel-subscription');
     Route::get('/subscription/success', [SubscriptionController::class, 'success'])->name('subscription.success');
     Route::get('/subscription/cancel', [SubscriptionController::class, 'cancelView'])->name('subscription.cancel');
 });

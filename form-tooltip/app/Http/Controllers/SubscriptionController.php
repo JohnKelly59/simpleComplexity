@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Cashier\Exceptions\PaymentActionRequired;
 use Stripe\StripeClient;
+use Inertia\Inertia;
 
 
 class SubscriptionController extends Controller
@@ -63,5 +64,29 @@ class SubscriptionController extends Controller
     public function cancelView(Request $request)
     {
         return redirect()->route('dashboard')->with('error', 'Subscription process was canceled.');
+    }
+
+    public function cancelSubscription(Request $request)
+    {
+        $user = $request->user();
+
+        // Check if the user is subscribed to 'pro' or 'unlimited'
+        if ($user->subscribed('pro')) {
+            $user->subscription('pro')->cancel();
+        } elseif ($user->subscribed('unlimited')) {
+            $user->subscription('unlimited')->cancel();
+        } else {
+            return Inertia::render('SubscriptionSettings', [
+                'flash' => [
+                    'error' => 'No active subscription found to cancel.'
+                ],
+            ]);
+        }
+
+        return Inertia::render('settings/subscription', [
+            'flash' => [
+                'success' => 'Subscription cancelled. You will retain access until the end of your billing period.'
+            ],
+        ]);
     }
 }

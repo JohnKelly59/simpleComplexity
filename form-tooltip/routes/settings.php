@@ -36,12 +36,22 @@ Route::middleware('auth')->group(function () {
             }
         }
 
+        $cancelled = false;
+        if ($user->subscribed('pro')) {
+            $tier = 'Pro';
+            $cancelled = $user->subscription('pro')->canceled();
+        } elseif ($user->subscribed('unlimited')) {
+            $tier = 'Unlimited';
+            $cancelled = $user->subscription('unlimited')->canceled();
+        }
+
         return Inertia::render('settings/subscription', [
             'auth' => [
                 'user' => [
                     'id'   => $user->id,
                     'name' => $user->name,
                     'tier' => $tier,
+                    'subscription_cancelled' => $cancelled,
                 ],
             ],
         ]);

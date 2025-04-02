@@ -61,31 +61,29 @@ export default function Dashboard() {
 
                     {/* Upgrade Card */}
                     <div className="flex flex-col items-center justify-center rounded-xl bg-[var(--card)] p-6 shadow-lg">
-                        {subscriptionTier === "free" && (
-                            <section className="text-center">
-                                <h2 className="text-xl font-semibold mb-2 text-[var(--card-foreground)]">
-                                    Upgrade for More Features!
-                                </h2>
-                                <p className="mb-2 text-[var(--card-foreground)]">
-                                    Upgrade your subscription to unlock premium features such as:
-                                </p>
-                                <ul className="list-disc list-inside mb-2 text-left text-[var(--card-foreground)]">
-                                    <li>Customizable tooltip questions and styles.</li>
-                                    <li>Advanced analytics on form interactions.</li>
-                                    <li>Priority support and regular updates.</li>
-                                </ul>
-                                {subscriptionTier === 'free' && (
-                                    <div>
-                                        <Link
-                                            href={route('settings.subscription')}
-                                            className="mt-4 inline-block rounded bg-primary px-4 py-2 text-white hover:opacity-90"
-                                        >
-                                            Manage Subscription
-                                        </Link>
-                                    </div>
-                                )}
-                            </section>
-                        )}
+                        <section className="text-center">
+                            <h2 className="text-xl font-semibold mb-2 text-[var(--card-foreground)]">
+                                Upgrade for More Features!
+                            </h2>
+                            <p className="mb-2 text-[var(--card-foreground)]">
+                                Upgrade your subscription to unlock premium features such as:
+                            </p>
+                            <ul className="list-disc list-inside mb-2 text-left text-[var(--card-foreground)]">
+                                <li>Customizable tooltip questions and styles.</li>
+                                <li>Advanced analytics on form interactions.</li>
+                                <li>Priority support and regular updates.</li>
+                            </ul>
+                            <div>
+                                <Link
+                                    href={route('settings.subscription')}
+                                    className="mt-4 inline-block rounded bg-primary px-4 py-2 text-white hover:opacity-90"
+                                >
+                                    Manage Subscription
+                                </Link>
+                            </div>
+
+                        </section>
+
                     </div>
                 </div>
 
