@@ -54,7 +54,11 @@ const Pricing = () =>
                                     </Typography>
                                 ))}
                                 <Box mt={2}>
-                                    <Button variant="contained" color="primary">
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        href="https://simple-complexity.com"
+                                    >
                                         Choose Plan
                                     </Button>
                                 </Box>
