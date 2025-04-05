@@ -57,7 +57,7 @@ const Pricing = () =>
                                     <Button
                                         variant="contained"
                                         color="primary"
-                                        href="https://simple-complexity.com"
+                                        href="https://app.simple-complexity.com"
                                     >
                                         Choose Plan
                                     </Button>
