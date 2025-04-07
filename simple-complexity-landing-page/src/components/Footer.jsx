@@ -1,15 +1,41 @@
-import { Box, Container, Link, Typography } from '@mui/material';
+import { Box, Container, Link as MuiLink, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import scFlatLogo from '../assets/SC_FLAT.png';
 
-const Footer = () =>
+const Footer = ({ variant = 'default' }) =>
 {
+
+    const baseSx = {
+        py: 4,
+        width: '100%',
+    };
+
+    const variantSx = {
+        default: {
+            backgroundColor: '#f5f5f5',
+            borderTop: '1px solid #e0e0e0',
+            color: 'text.secondary',
+            '& a': {
+                color: 'primary.main',
+            },
+        },
+        styled: {
+            background: 'linear-gradient(to right, #116530, #134E8E)',
+            color: '#fff',
+            '& a': {
+                color: '#fff',
+                textDecorationColor: 'rgba(255, 255, 255, 0.7)',
+                '&:hover': {
+                    textDecorationColor: '#fff',
+                }
+            },
+        },
+    };
+
     return (
         <Box
-            sx={{
-                py: 4,
-                mt: 4,
-                backgroundColor: '#f5f5f5',
-            }}
+            component="footer"
+            sx={{ ...baseSx, ...variantSx[variant] }}
         >
             <Container
                 maxWidth="lg"
@@ -20,7 +46,6 @@ const Footer = () =>
                     textAlign: 'center',
                 }}
             >
-                {/* LOGO */}
                 <Box
                     component="img"
                     src={scFlatLogo}
@@ -30,24 +55,21 @@ const Footer = () =>
                         mb: 1,
                     }}
                 />
-
-                <Typography variant="body2" color="textSecondary">
-                    © {new Date().getFullYear()} Tooltip Accessibility. All rights reserved.
+                <Typography variant="body2" color="inherit" sx={{ opacity: variant === 'styled' ? 0.9 : 1 }}>
+                    © {new Date().getFullYear()} Simple Complexity. All rights reserved.
                 </Typography>
 
                 <Box mt={1}>
-                    <Link href="#" sx={{ mx: 1 }}>
+                    <MuiLink component={RouterLink} to="/about" sx={{ mx: 1 }}>
                         About
-                    </Link>
-                    <Link href="#" sx={{ mx: 1 }}>
-                        Blog
-                    </Link>
-                    <Link href="#" sx={{ mx: 1 }}>
+                    </MuiLink>
+                    <MuiLink component={RouterLink} to="/blog" sx={{ mx: 1 }}>Blog</MuiLink>
+                    <MuiLink component={RouterLink} to="/contact" sx={{ mx: 1 }}>
                         Contact
-                    </Link>
-                    <Link href="#" sx={{ mx: 1 }}>
+                    </MuiLink>
+                    <MuiLink component={RouterLink} to="/privacy" sx={{ mx: 1 }}>
                         Privacy Policy
-                    </Link>
+                    </MuiLink>
                 </Box>
             </Container>
         </Box>

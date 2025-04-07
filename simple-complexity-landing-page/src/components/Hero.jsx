@@ -23,14 +23,12 @@ const Hero = () =>
                 justifyContent: 'center',
                 textAlign: 'center',
                 p: 4,
-                // Use your green as a background or a gradient with gold
                 background: 'linear-gradient(to right, #116530, #134E8E)',
             }}
         >
             <Container maxWidth="sm">
                 <Fade in={loaded} timeout={1000}>
                     <Box>
-                        {/* LOGO AT THE TOP */}
                         <Box
                             component="img"
                             src={scColorLogo}
@@ -38,7 +36,6 @@ const Hero = () =>
                             sx={{
                                 width: '240px',
                                 mb: 1,
-                                // Adjust as needed for your layout
                             }}
                         />
                         <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
