@@ -1,8 +1,8 @@
 {
     "name": "Form Tooltip",
-    "version": "1.0",
+    "version": "1.1",
     "manifest_version": 3,
-    "description": "Adds an icon to the right of each question field with a simplified description.",
+    "description": "Adds an icon to the right of each question field with a simplified description and allows getting definitions for selected text.",
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
@@ -15,11 +15,15 @@
         "activeTab",
         "scripting",
         "storage",
-        "identity"
+        "identity",
+        "contextMenus"
     ],
     "host_permissions": [
         "<all_urls>"
     ],
+    "background": {
+        "service_worker": "backgroundScript.js"
+    },
     "content_scripts": [
         {
             "matches": [
@@ -38,11 +42,18 @@
         {
             "resources": [
                 "SC_COLOR.png",
-                "icon128.png"
+                "icon128.png",
+                "icon16.png",
+                "icon48.png"
             ],
             "matches": [
                 "<all_urls>"
             ]
         }
-    ]
+    ],
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }
 }
