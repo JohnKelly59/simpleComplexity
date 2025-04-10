@@ -1,22 +1,16 @@
-// content.js
-
 (function ()
 {
-    // --- Global State Variables ---
-    let questionMatrix = {}; // Stores fetched tooltips { key: questionText }
-    let refreshCounts = {}; // Tracks refresh clicks per key { key: count }
-    let tooltipsEnabled = true; // Master switch for form field tooltips
-    let tooltipRefGlobal = null; // Reference to the main tooltip container object
-    let lastRefreshTimes = {}; // Tracks last refresh timestamp per key { key: timestamp }
-    let speedDialRef = null; // Reference to the speed dial elements
-    let temporaryTooltipRef = null; // Reference to the temporary selection tooltip element
+    let questionMatrix = {};
+    let refreshCounts = {};
+    let tooltipsEnabled = true;
+    let tooltipRefGlobal = null;
+    let lastRefreshTimes = {};
+    let speedDialRef = null;
+    let temporaryTooltipRef = null;
+    let activeFetches = 0;
 
-    // --- Helper Functions ---
+    // --- Utility Functions ---
 
-    /**
-     * Helper: check if page background is light.
-     * Used for selecting the appropriate speed dial icon.
-     */
     function isBackgroundLight ()
     {
         try
@@ -26,7 +20,6 @@
             if (rgb && rgb.length >= 3)
             {
                 const [r, g, b] = rgb.map((x) => parseInt(x, 10));
-                // Formula for perceived brightness
                 const brightness = (r * 299 + g * 587 + b * 114) / 1000;
                 return brightness > 128;
             }
@@ -34,367 +27,474 @@
         {
             console.warn("Could not determine background color, defaulting to light.", e);
         }
-        // Default assumption if calculation fails
         return true;
     }
 
-    /**
-     * Helper: fetch wrapper that includes the auth token from chrome.storage.sync.
-     */
+    // --- Loading Indicator Logic ---
+
+    const loaderSVG = `
+        <svg width="28" height="28" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#fff" style="display: block; margin: auto;">
+            <g fill="none" fill-rule="evenodd">
+                <g transform="translate(1 1)" stroke-width="3">
+                    <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
+                    <path d="M36 18c0-9.94-8.06-18-18-18">
+                        <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/>
+                    </path>
+                </g>
+            </g>
+        </svg>`;
+
+    function showLoaderOnSpeedDial ()
+    {
+        if (speedDialRef && speedDialRef.mainButton && speedDialRef.mainImg)
+        {
+            // Store original content if not already loading (using a data attribute)
+            if (!speedDialRef.mainButton.dataset.isLoading)
+            {
+                speedDialRef.mainButton.dataset.originalContent = speedDialRef.mainButton.innerHTML;
+                speedDialRef.mainButton.innerHTML = loaderSVG;
+                speedDialRef.mainButton.dataset.isLoading = "true";
+            }
+        }
+    }
+
+    function hideLoaderOnSpeedDial ()
+    {
+        if (speedDialRef && speedDialRef.mainButton && speedDialRef.mainButton.dataset.isLoading === "true")
+        {
+            // Restore original content only if it was stored
+            if (speedDialRef.mainButton.dataset.originalContent)
+            {
+                speedDialRef.mainButton.innerHTML = speedDialRef.mainButton.dataset.originalContent;
+            } else
+            {
+                // Fallback if original somehow wasn't stored (shouldn't happen often)
+                speedDialRef.mainButton.innerHTML = ''; // Clear loader
+                speedDialRef.mainButton.appendChild(speedDialRef.mainImg); // Re-add original img ref
+            }
+            delete speedDialRef.mainButton.dataset.isLoading;
+            delete speedDialRef.mainButton.dataset.originalContent;
+        }
+    }
+
+
+    // --- Data Fetching ---
+
     function fetchWithAuth (url, options = {})
     {
         return new Promise((resolve, reject) =>
         {
-            // Use chrome.storage.sync to get the token
+            // Show loader only when the first fetch starts
+            if (activeFetches === 0)
+            {
+                showLoaderOnSpeedDial();
+            }
+            activeFetches++;
+
             chrome.storage.sync.get(["authToken"], (storageResult) =>
             {
                 if (chrome.runtime.lastError)
                 {
-                    console.error("Storage error:", chrome.runtime.lastError.message);
-                    // Reject the promise if storage fails
+                    activeFetches--; // Decrement count on error before fetch
+                    if (activeFetches === 0) hideLoaderOnSpeedDial();
                     reject(new Error(`Storage error: ${chrome.runtime.lastError.message}`));
                     return;
                 }
 
-                // Extract token safely, handling different storage formats
                 const bearerToken =
                     typeof storageResult.authToken === "string"
                         ? storageResult.authToken
-                        : storageResult.authToken?.token || ""; // Handle object or string
+                        : storageResult.authToken?.token || "";
 
-                // Prepare headers, merging existing options.headers if any
                 const headers = {
-                    ...options.headers, // Spread existing headers
-                    Authorization: `Bearer ${bearerToken}`, // Add Authorization header
+                    ...options.headers,
+                    Authorization: `Bearer ${bearerToken}`,
                 };
 
-                // Perform the fetch call with the merged options and headers
                 fetch(url, { ...options, headers })
-                    .then(resolve) // Resolve the promise with the response
-                    .catch(reject); // Reject the promise if fetch fails
+                    .then(resolve)
+                    .catch(reject)
+                    .finally(() =>
+                    { // Use finally to ensure cleanup happens on success or error
+                        activeFetches--;
+                        // Hide loader only when the last concurrent fetch finishes
+                        if (activeFetches === 0)
+                        {
+                            hideLoaderOnSpeedDial();
+                        }
+                    });
             });
         });
     }
 
-    /**
-     * Fetch tooltip definitions from the backend for given keys.
-     */
     function fetchTooltipsForKeys (keys = [])
     {
-        // Ensure keys is an array and not empty
         if (!Array.isArray(keys) || keys.length === 0)
         {
-            return Promise.resolve({}); // Return empty object if no keys
+            return Promise.resolve({});
         }
 
-        // Use the authenticated fetch helper
-        return fetchWithAuth("http://localhost:8000/api/question-lookup", { // Replace with your actual backend URL
+        const uniqueKeys = [...new Set(keys)].filter(k => typeof k === 'string' && k.trim() !== '');
+        if (uniqueKeys.length === 0)
+        {
+            return Promise.resolve({});
+        }
+
+        return fetchWithAuth("http://localhost:8000/api/question-lookup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ keys }), // Send keys in the expected format
+            body: JSON.stringify({ keys: uniqueKeys }),
         })
             .then((resp) =>
             {
-                // Check for non-OK response status
                 if (!resp.ok)
                 {
-                    console.error(`Failed to fetch question mappings: ${resp.status} ${resp.statusText}`);
-                    // Optionally try to read error body: await resp.text()
-                    return {}; // Return empty object on error status
+                    // Try to read error body if possible
+                    return resp.text().then(text =>
+                    {
+                        return {}; // Return empty on error
+                    }).catch(() => ({})); // Return empty if reading body fails too
                 }
-                return resp.json(); // Parse JSON response
+                return resp.json();
             })
             .catch((err) =>
             {
-                // Log network or other fetch errors
-                console.error("Network error fetching question mappings:", err);
-                return {}; // Return empty object on fetch error
+                return {}; // Return empty on network error
             });
     }
 
-    /**
-     * Determine a "best" unique key based on form field attributes (id, name, placeholder).
-     */
+
+    // --- Field Identification ---
+
     function determineBestKey (field)
     {
-        // Prioritize attributes: id, name, trimmed placeholder
-        const baseKey =
-            field.id ||
-            field.name ||
-            (field.placeholder && field.placeholder.trim()) ||
-            null; // Return null if none found yet
-
-        if (baseKey) return baseKey;
-
-        // Fallback for SELECT elements without common attributes
-        if (field.tagName.toLowerCase() === "select")
+        if (field.labels && field.labels.length > 0 && field.labels[0].textContent.trim())
         {
-            // Try using the text of the first option if available
-            if (field.options && field.options.length > 0)
+            return field.labels[0].textContent.trim();
+        }
+        if (field.id)
+        {
+            const labelElement = document.querySelector(`label[for="${field.id}"]`);
+            if (labelElement && labelElement.textContent.trim())
             {
-                const firstOptionText = field.options[0].text.trim();
-                // Use first option text or a generic fallback
-                return firstOptionText || "Select field";
+                return labelElement.textContent.trim();
             }
-            // Generic fallback if no options
-            return "Select field";
         }
 
-        // Absolute fallback for other unknown fields
-        return "Unknown field";
+        // Prioritize data-tooltip-key attribute if present
+        if (field.dataset.tooltipKey && field.dataset.tooltipKey.trim())
+        {
+            return field.dataset.tooltipKey.trim();
+        }
+
+        const baseKey = field.name || field.id || null; // Use name before id as fallback after label/data-attr
+        if (baseKey) return baseKey;
+
+        if (field.tagName.toLowerCase() === "select")
+        {
+            if (field.options && field.options.length > 0)
+            {
+                for (let i = 0; i < field.options.length; i++)
+                {
+                    const optionText = field.options[i].text.trim();
+                    // More robust check for placeholder options
+                    if (optionText && !/^(select|choose|\-\-|please select|select an option)/i.test(optionText) && field.options[i].value !== '')
+                    {
+                        return optionText; // Use first meaningful option text
+                    }
+                }
+                // If only placeholder options, use the first one or a default
+                const firstOptionText = field.options[0]?.text.trim();
+                return firstOptionText || "Select field";
+            }
+            return "Select field"; // Default for empty select
+        }
+
+        if (field.placeholder && field.placeholder.trim())
+        {
+            return field.placeholder.trim();
+        }
+
+        // Added: Try aria-label or aria-labelledby as a last resort
+        const ariaLabel = field.getAttribute('aria-label');
+        if (ariaLabel && ariaLabel.trim())
+        {
+            return ariaLabel.trim();
+        }
+        const ariaLabelledBy = field.getAttribute('aria-labelledby');
+        if (ariaLabelledBy)
+        {
+            const labelledByElement = document.getElementById(ariaLabelledBy);
+            if (labelledByElement && labelledByElement.textContent.trim())
+            {
+                return labelledByElement.textContent.trim();
+            }
+        }
+
+
+        return null; // Return null if no suitable key found
     }
 
+    // --- Tooltip UI ---
 
-    // --- Main Tooltip System (for Form Fields) ---
-
-    /**
-     * Create the main container for form field tooltips (using a shadow root).
-     * This container is persistent and reused.
-     */
     function createTooltipContainer ()
     {
-        // Create the host element for the shadow DOM
         const container = document.createElement("div");
-        container.id = "form-tooltip-container"; // Add an ID for easier debugging
+        container.id = "form-tooltip-container";
         Object.assign(container.style, {
-            position: "fixed", // Use fixed positioning relative to viewport
+            position: "fixed", // Important for positioning relative to viewport
             top: "0",
             left: "0",
-            width: "0", // Occupy no space initially
+            width: "0", // Takes no space itself
             height: "0",
-            pointerEvents: "none", // Allow clicks to pass through the container
-            zIndex: 2147483647, // Max z-index to be on top
+            pointerEvents: "none", // Allows clicks to pass through container
+            zIndex: 2147483647, // Max z-index
         });
         document.body.appendChild(container);
 
-        // Attach the shadow root
         const shadow = container.attachShadow({ mode: "open" });
 
-        // Create and append styles specific to the shadow DOM
         const style = document.createElement("style");
         style.textContent = `
             .tooltip {
-                position: absolute !important; /* Crucial for positioning */
+                position: absolute !important; /* Positioned relative to the fixed container */
                 padding: 4px 8px !important;
-                background-color: rgba(0, 0, 0, 0.75) !important; /* Slightly darker */
+                background-color: rgba(0, 0, 0, 0.85) !important;
                 color: #fff !important;
                 border-radius: 4px !important;
                 font-size: 12px !important;
-                font-family: sans-serif !important; /* Consistent font */
-                display: none; /* Hidden by default */
-                pointer-events: auto !important; /* Allow interaction with tooltip content */
-                white-space: normal !important; /* Allow text wrapping */
-                max-width: 250px !important; /* Limit width */
+                font-family: sans-serif !important;
+                display: none; /* Initially hidden */
+                pointer-events: auto !important; /* Allows interaction with tooltip */
+                white-space: normal !important;
+                max-width: 250px !important;
                 word-wrap: break-word !important;
-                z-index: 1 !important; /* Relative to shadow host, already max z-index */
-                box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                z-index: 1 !important; /* Stack within the container */
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                line-height: 1.4;
             }
-            .tooltip button { /* Style refresh button */
-                 margin-left: 8px;
-                 cursor: pointer;
-                 border: none;
-                 background: transparent;
-                 color: #fff; /* Inherit color */
-                 font-size: 11px;
-                 border-radius: 3px;
-                 pointer-events: auto; /* Ensure button is clickable */
-                 vertical-align: middle; /* Align with text */
-                 padding: 0;
+            .tooltip button {
+                margin-left: 8px;
+                cursor: pointer;
+                border: none;
+                background: transparent;
+                color: #a7a7a7; /* Lighter color for icon */
+                font-size: 11px;
+                border-radius: 3px;
+                pointer-events: auto;
+                vertical-align: middle;
+                padding: 0;
+                line-height: 1;
             }
-             .tooltip button svg { /* Style SVG inside button */
-                 display: block; /* Prevent extra space below SVG */
-                 vertical-align: middle;
+             .tooltip button:hover {
+                 color: #ffffff;
              }
+            .tooltip button svg {
+                display: block; /* Prevents extra space below SVG */
+                vertical-align: middle; /* Align icon with text */
+            }
             .tooltip button:disabled {
                 cursor: not-allowed;
-                opacity: 0.5;
+                opacity: 0.4;
+                color: #777777 !important; /* Distinct disabled color */
             }
-            .tooltip-text { /* Span for the main text content */
-                vertical-align: middle;
+            .tooltip-text {
+                vertical-align: middle; /* Align text with button */
             }
         `;
         shadow.appendChild(style);
 
-        // Create the tooltip element itself within the shadow DOM
         const tooltip = document.createElement("div");
         tooltip.classList.add("tooltip");
-        tooltip.setAttribute("role", "tooltip"); // Accessibility
+        tooltip.setAttribute("role", "tooltip");
         shadow.appendChild(tooltip);
 
-        // Return references needed elsewhere
         return { container, tooltip, shadow, hideTimer: null };
     }
 
-    /**
-     * Add a tooltip icon next to a specific form field if not already present.
-     */
-    function addTooltipToField (field, tooltipRef) // tooltipRef is tooltipRefGlobal
+    function addTooltipToField (field, tooltipRef)
     {
-        // Prevent adding multiple icons and respect the global toggle
-        if (field.dataset.tooltipInjected === "true" || !tooltipsEnabled) return;
+        // Ensure field is valid and hasn't already been processed
+        if (!field || field.dataset.tooltipInjected === "true" || !tooltipsEnabled) return;
 
-        field.dataset.tooltipInjected = "true"; // Mark field as processed
-        // Determine and store the key used for this field
-        field.dataset.keyUsed = field.dataset.keyUsed || determineBestKey(field);
+        // Only add to fields within a form and visible
+        if (!field.closest('form') || field.offsetParent === null)
+        {
+            return;
+        }
 
-        // Create a container for the icon (span for inline layout)
+        // Try to find the key. If no key, don't add icon.
+        const key = determineBestKey(field);
+        if (!key)
+        {
+            return;
+        }
+        field.dataset.keyUsed = key;
+
+        // Check if we actually have a definition for this key before adding icon
+        if (!questionMatrix[key])
+        {
+            return;
+        }
+
+        field.dataset.tooltipInjected = "true"; // Mark as processed
+
         const iconContainer = document.createElement("span");
-        iconContainer.classList.add("tooltip-icon-container"); // For easy removal
+        iconContainer.classList.add("tooltip-icon-container");
+        // Basic styling, can be adjusted
         Object.assign(iconContainer.style, {
-            display: "inline-flex", // Use flex for alignment
-            alignItems: "center", // Vertically center icon
-            marginLeft: "5px", // Space between field and icon
-            marginRight: "5px", // Space if something comes after
-            verticalAlign: "middle", // Align container with text/field line
-            position: "relative", // Needed if icon needs absolute positioning relative to this
-            zIndex: "1000", // Ensure icon is above most page elements
+            display: "inline-flex", // Use inline-flex for better alignment
+            alignItems: "center",
+            marginLeft: "5px",
+            verticalAlign: "middle", // Align with text/input middle
+            position: "relative", // Needed if any absolute positioning inside later
+            zIndex: "1000", // Ensure icon is clickable over other elements
+            cursor: "pointer", // Indicate clickability
         });
 
-        // Create the SVG icon element
+        // The ONLY two lines changed: make the icon 24×24 instead of 16×16
         const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        icon.setAttribute("width", "18"); // Slightly smaller icon
-        icon.setAttribute("height", "18");
+        icon.setAttribute("width", "24"); // bigger icon for better visibility
+        icon.setAttribute("height", "24");
         icon.setAttribute("viewBox", "0 0 24 24");
-        icon.setAttribute("aria-label", "Help Information"); // Accessibility
+        icon.setAttribute("aria-label", "Help Information");
         icon.setAttribute("role", "img");
-        icon.style.cursor = "pointer";
-        icon.style.fill = "#555"; // Use a neutral color, adjust as needed
-        // Adjust fill based on background might be complex here, keep simple
+        icon.style.fill = "#555"; // Standard icon color
+        icon.style.display = 'block'; // Prevent extra space below icon
         icon.innerHTML = `
-            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm.07 15H10v-2h2.07v2zm1.07-4.75c-.73.73-1.17 1.24-1.17 2.33h-2v-.5c0-.83.44-1.61 1.17-2.34l1.24-1.24c.33-.33.49-.78.49-1.25 0-.98-.8-1.78-1.78-1.78S10 8.98 10 9.96H8c0-1.69 1.37-3.06 3.06-3.06S14.13 8.27 14.13 10c0 .89-.44 1.61-1.07 2.25z"/>
+            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-1-10h2v2h-2zm0 4h2v4h-2z"/>
+            <path fill="none" d="M0 0h24v24H0z"/>
         `;
 
-        // --- Event Handlers for the Icon ---
-
-        // Function to show the tooltip
         const showTooltip = (evt) =>
         {
-            if (!tooltipsEnabled) return; // Check global toggle again
+            if (!tooltipsEnabled || !tooltipRef) return; // Check tooltipRef exists
 
             const usedKey = field.dataset.keyUsed;
-            const question = questionMatrix[usedKey] || "No information available for this field."; // Default text
+            const question = questionMatrix[usedKey] || "No information available for this field.";
 
-            // Clear previous content (important for refresh)
-            tooltipRef.tooltip.innerHTML = "";
+            tooltipRef.tooltip.innerHTML = ""; // Clear previous content
 
-            // Add text content
             const textSpan = document.createElement("span");
             textSpan.classList.add("tooltip-text");
             textSpan.textContent = question;
             tooltipRef.tooltip.appendChild(textSpan);
 
-            // Add Refresh button within tooltip
-            refreshCounts[usedKey] = refreshCounts[usedKey] || 0; // Initialize count if needed
+            // --- Refresh Button ---
+            refreshCounts[usedKey] = refreshCounts[usedKey] || 0;
             const refreshBtn = document.createElement("button");
             refreshBtn.setAttribute("aria-label", "Refresh definition");
-            // SVG for refresh icon
             refreshBtn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14">
                     <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4C8.74 4 6 6.03 4.69 9h2.02a6.011 6.011 0 0 1 10.09-1.24l-1.81 1.81H20V4l-2.35 2.35zM6.35 17.65A7.95 7.95 0 0 0 12 20c3.26 0 6-2.03 7.31-5h-2.02a6.011 6.011 0 0 1-10.09 1.24l1.81-1.81H4v4l2.35-2.35z"/>
                 </svg>
             `;
-
-            // Disable button if refresh limit reached
             if (refreshCounts[usedKey] >= 3)
             {
                 refreshBtn.disabled = true;
-                refreshBtn.setAttribute("title", "Refresh limit reached");
+                refreshBtn.setAttribute("title", "Refresh limit reached (3 max)");
             } else
             {
                 refreshBtn.setAttribute("title", "Refresh definition");
             }
 
-            // Refresh button click handler
             refreshBtn.addEventListener("click", (clickEvent) =>
             {
-                clickEvent.stopPropagation(); // Prevent event bubbling
-                clickEvent.preventDefault(); // Prevent default button action
+                clickEvent.stopPropagation(); // Prevent tooltip closing
+                clickEvent.preventDefault();
 
-                if (refreshCounts[usedKey] >= 3) return; // Double-check limit
+                if (refreshBtn.disabled) return; // Already checked count, but good practice
 
                 const now = Date.now();
                 const lastRefresh = lastRefreshTimes[usedKey] || 0;
-                const cooldown = 5000; // 5 seconds cooldown
+                const cooldown = 5000; // 5 seconds
 
-                // Enforce cooldown period
                 if (now - lastRefresh < cooldown)
                 {
-                    console.log(`Please wait ${((cooldown - (now - lastRefresh)) / 1000).toFixed(1)}s before refreshing "${usedKey}" again.`);
-                    // Optional: Briefly indicate cooldown visually (e.g., flash button red)
+                    const waitTime = ((cooldown - (now - lastRefresh)) / 1000).toFixed(1);
+                    console.log(`Please wait ${waitTime}s before refreshing "${usedKey}" again.`);
+                    const originalText = textSpan.textContent;
+                    textSpan.textContent = `Wait ${waitTime}s...`;
+                    setTimeout(() =>
+                    {
+                        if (textSpan.textContent === `Wait ${waitTime}s...`)
+                        {
+                            textSpan.textContent = originalText;
+                        }
+                    }, 1500);
                     return;
                 }
-                lastRefreshTimes[usedKey] = now; // Update last refresh time
+                lastRefreshTimes[usedKey] = now; // Update last refresh time immediately
 
-                // Indicate loading state (optional)
                 textSpan.textContent = "Refreshing...";
-                refreshBtn.disabled = true;
+                refreshBtn.disabled = true; // Disable while fetching
 
-                // Re-fetch data specifically for this key
-                fetchTooltipsForKeys([usedKey])
+                fetchTooltipsForKeys([usedKey]) // Re-fetches using the main authenticated function
                     .then((data) =>
                     {
-                        if (data && data[usedKey]) // Check if data and key exist
+                        if (data && data[usedKey])
                         {
-                            questionMatrix[usedKey] = data[usedKey]; // Update local store
+                            questionMatrix[usedKey] = data[usedKey]; // Update global matrix
                             textSpan.textContent = data[usedKey]; // Update tooltip text
+                            refreshCounts[usedKey]++; // Increment count only on successful fetch
                         } else
                         {
-                            // Handle case where refresh returns no data
-                            textSpan.textContent = questionMatrix[usedKey] || "Refresh failed or no data.";
-                            console.warn(`Refresh for "${usedKey}" did not return data.`);
+                            textSpan.textContent = questionMatrix[usedKey] || "Refresh failed.";
+                            console.warn(`Refresh for "${usedKey}" did not return data or failed.`);
                         }
                     })
                     .catch((err) =>
                     {
-                        console.error(`Failed to refresh question for "${usedKey}":`, err);
-                        textSpan.textContent = "Error refreshing."; // Show error in tooltip
+                        textSpan.textContent = "Error refreshing.";
                     })
                     .finally(() =>
                     {
-                        // Increment refresh count and update button state
-                        refreshCounts[usedKey]++;
                         if (refreshCounts[usedKey] >= 3)
                         {
                             refreshBtn.disabled = true;
-                            refreshBtn.setAttribute("title", "Refresh limit reached");
+                            refreshBtn.setAttribute("title", "Refresh limit reached (3 max)");
                         } else
                         {
-                            refreshBtn.disabled = false; // Re-enable if limit not reached
+                            refreshBtn.disabled = false;
                         }
+                        if (tooltipRef.hideTimer) clearTimeout(tooltipRef.hideTimer);
+                        tooltipRef.hideTimer = null;
                     });
             });
-            tooltipRef.tooltip.appendChild(refreshBtn); // Add button to tooltip
+            tooltipRef.tooltip.appendChild(refreshBtn);
 
-            // --- Position and Display Tooltip ---
-            tooltipRef.tooltip.style.display = "block"; // Make it visible
+            tooltipRef.tooltip.style.display = "block"; // Make visible *before* getting rect
 
-            const rect = icon.getBoundingClientRect(); // Get icon position
-            const tooltipRect = tooltipRef.tooltip.getBoundingClientRect(); // Get tooltip size (after display block)
+            const iconRect = icon.getBoundingClientRect();
+            const tooltipRect = tooltipRef.tooltip.getBoundingClientRect(); // Get dimensions after display:block
 
-            // Position below the icon, centering if possible, handle screen edges
-            let top = rect.bottom + window.scrollY + 5; // Below icon + scroll offset + gap
-            let left = rect.left + window.scrollX + (rect.width / 2) - (tooltipRect.width / 2); // Center below icon
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const margin = 8;
 
-            // Adjust for left edge
-            if (left < window.scrollX + 5)
+            let potentialTop = iconRect.bottom + margin;
+            let potentialLeft = iconRect.left + (iconRect.width / 2) - (tooltipRect.width / 2);
+
+            if (potentialTop + tooltipRect.height > viewportHeight - margin)
             {
-                left = window.scrollX + 5;
+                potentialTop = iconRect.top - tooltipRect.height - margin;
             }
-            // Adjust for right edge (viewport width - tooltip width - buffer)
-            if (left + tooltipRect.width > window.innerWidth - 5)
+            if (potentialTop < margin)
             {
-                left = window.innerWidth - tooltipRect.width - 5;
+                potentialTop = margin;
             }
-            // Adjust for bottom edge (if it goes off screen, try placing above)
-            if (top + tooltipRect.height > window.innerHeight + window.scrollY - 5)
+            if (potentialLeft < margin)
             {
-                top = rect.top + window.scrollY - tooltipRect.height - 5; // Place above icon
+                potentialLeft = margin;
+            }
+            if (potentialLeft + tooltipRect.width > viewportWidth - margin)
+            {
+                potentialLeft = viewportWidth - tooltipRect.width - margin;
             }
 
-            tooltipRef.tooltip.style.top = `${top}px`;
-            tooltipRef.tooltip.style.left = `${left}px`;
+            tooltipRef.tooltip.style.top = `${potentialTop}px`;
+            tooltipRef.tooltip.style.left = `${potentialLeft}px`;
 
-            // Clear any existing hide timer if mouse re-enters quickly
             if (tooltipRef.hideTimer)
             {
                 clearTimeout(tooltipRef.hideTimer);
@@ -402,23 +502,26 @@
             }
         };
 
-        // Function to start the timer to hide the tooltip
         const startHideTimer = () =>
         {
-            // Clear existing timer before starting a new one
+            if (!tooltipRef) return;
             if (tooltipRef.hideTimer) clearTimeout(tooltipRef.hideTimer);
 
             tooltipRef.hideTimer = setTimeout(() =>
             {
-                tooltipRef.tooltip.style.display = "none"; // Hide the tooltip
+                if (tooltipRef && tooltipRef.tooltip)
+                {
+                    tooltipRef.tooltip.style.display = "none";
+                }
                 tooltipRef.hideTimer = null;
-            }, 500); // Hide after 0.5 seconds of mouse leaving icon/tooltip
+            }, 300);
         };
 
-        // --- Attach Event Listeners ---
         icon.addEventListener("mouseenter", showTooltip);
+        icon.addEventListener("focus", showTooltip);
         icon.addEventListener("mouseleave", startHideTimer);
-        // Keep tooltip visible if mouse moves onto the tooltip itself
+        icon.addEventListener("blur", startHideTimer);
+
         tooltipRef.tooltip.addEventListener("mouseenter", () =>
         {
             if (tooltipRef.hideTimer)
@@ -429,36 +532,47 @@
         });
         tooltipRef.tooltip.addEventListener("mouseleave", startHideTimer);
 
-        // Append icon to its container, and container next to the field
         iconContainer.appendChild(icon);
-        // Insert after the field element
-        field.insertAdjacentElement("afterend", iconContainer);
-    }
 
-    /**
-     * Add tooltips to all existing form fields on the page.
-     */
-    function processFormFields (tooltipRef) // tooltipRef is tooltipRefGlobal
+        const fieldParent = field.parentNode;
+        let nextElement = field.nextElementSibling;
+        let fieldLabel = field.id ? document.querySelector(`label[for="${field.id}"]`) : null;
+
+        if (fieldLabel && nextElement === fieldLabel)
+        {
+            fieldLabel.insertAdjacentElement("afterend", iconContainer);
+        }
+        else if (field.labels && field.labels.length > 0 && field.labels[0] === fieldParent)
+        {
+            field.insertAdjacentElement('afterend', iconContainer);
+        }
+        else
+        {
+            field.insertAdjacentElement("afterend", iconContainer);
+        }
+
+    } // End addTooltipToField
+
+
+    // --- DOM Processing and Observation ---
+
+    function processFormFields (tooltipRef)
     {
-        // Select input, textarea, and select elements that are likely user-interactive
+        if (!tooltipsEnabled) return;
+
         document.querySelectorAll(
-            'input:not([type="hidden"]):not([type="submit"]):not([type="reset"]):not([type="button"]):not([type="image"]), textarea, select'
+            'form input:not([type="hidden"]):not([type="submit"]):not([type="reset"]):not([type="button"]):not([type="image"]):not(:disabled), form textarea:not(:disabled), form select:not(:disabled)'
         ).forEach((field) =>
         {
-            // Check if field is visible and not disabled before adding tooltip
-            if (field.offsetParent !== null && !field.disabled)
+            if (field.offsetParent !== null)
             {
                 addTooltipToField(field, tooltipRef);
             }
         });
     }
 
-    /**
-     * Observe DOM mutations; if new form fields are added, inject tooltips.
-     */
-    function observeDynamicFields (tooltipRef) // tooltipRef is tooltipRefGlobal
+    function observeDynamicFields (tooltipRef)
     {
-        // Check if MutationObserver is supported
         if (!window.MutationObserver)
         {
             console.warn("MutationObserver not supported, dynamic fields won't get tooltips automatically.");
@@ -467,503 +581,503 @@
 
         const observer = new MutationObserver((mutations) =>
         {
-            // Use setTimeout to debounce processing, improving performance on rapid changes
             if (observer.debounceTimer) clearTimeout(observer.debounceTimer);
             observer.debounceTimer = setTimeout(() =>
             {
+                if (!tooltipsEnabled) return;
+
                 let potentiallyAddedFields = [];
                 mutations.forEach((mutation) =>
                 {
                     mutation.addedNodes.forEach((node) =>
                     {
-                        // Only process element nodes
                         if (node.nodeType === Node.ELEMENT_NODE)
                         {
-                            // Check if the node itself is a target field
-                            if (node.matches?.('input:not([type="hidden"]), textarea, select'))
+                            if (node.matches?.('form input:not([type="hidden"]), form textarea, form select'))
                             {
                                 potentiallyAddedFields.push(node);
                             }
-                            // Check if descendants of the node are target fields
-                            potentiallyAddedFields.push(...node.querySelectorAll?.('input:not([type="hidden"]), textarea, select'));
+                            potentiallyAddedFields.push(...node.querySelectorAll?.('form input:not([type="hidden"]), form textarea, form select'));
                         }
                     });
+                    if (mutation.type === 'attributes' && mutation.target.nodeType === Node.ELEMENT_NODE)
+                    {
+                        if (mutation.target.matches?.('form input:not([type="hidden"]), form textarea, form select'))
+                        {
+                            potentiallyAddedFields.push(mutation.target);
+                        }
+                    }
                 });
 
-                // Process unique fields found
                 if (potentiallyAddedFields.length > 0)
                 {
-                    const uniqueFields = [...new Set(potentiallyAddedFields)]; // Ensure uniqueness
-                    // Fetch keys for new fields IF they don't already have a key dataset
-                    const newKeysToFetch = uniqueFields
-                        .filter(f => !f.dataset.keyUsed && f.offsetParent !== null && !f.disabled)
-                        .map(f => determineBestKey(f));
+                    const uniqueFields = [...new Set(potentiallyAddedFields)];
+                    const fieldsToAddIcons = uniqueFields.filter(f =>
+                        f.offsetParent !== null &&
+                        !f.disabled &&
+                        f.closest('form') &&
+                        f.dataset.tooltipInjected !== "true"
+                    );
 
-                    if (newKeysToFetch.length > 0)
+                    if (fieldsToAddIcons.length > 0)
                     {
-                        fetchTooltipsForKeys([...new Set(newKeysToFetch)]) // Fetch unique new keys
-                            .then(newData =>
+                        const newKeysToFetch = fieldsToAddIcons
+                            .map(f => determineBestKey(f))
+                            .filter(key => key && !questionMatrix.hasOwnProperty(key));
+
+                        const uniqueNewKeys = [...new Set(newKeysToFetch)];
+
+                        const processFieldsAfterFetch = () =>
+                        {
+                            fieldsToAddIcons.forEach(field =>
                             {
-                                questionMatrix = { ...questionMatrix, ...newData }; // Merge new data
-                                // Add tooltips after data is fetched
-                                uniqueFields.forEach(field =>
+                                if (field.offsetParent !== null && !field.disabled && field.closest('form') && field.dataset.tooltipInjected !== "true")
                                 {
-                                    if (field.offsetParent !== null && !field.disabled)
+                                    const key = field.dataset.keyUsed || determineBestKey(field);
+                                    if (key && questionMatrix[key])
                                     {
                                         addTooltipToField(field, tooltipRef);
                                     }
-                                });
+                                }
                             });
-                    } else
-                    {
-                        // Add tooltips directly if no new keys needed (e.g., fields re-appeared)
-                        uniqueFields.forEach(field =>
+                        };
+
+                        if (uniqueNewKeys.length > 0)
                         {
-                            if (field.offsetParent !== null && !field.disabled)
-                            {
-                                addTooltipToField(field, tooltipRef);
-                            }
-                        });
+                            console.log('Fetching tooltips for dynamically added/updated keys:', uniqueNewKeys);
+                            fetchTooltipsForKeys(uniqueNewKeys)
+                                .then(newData =>
+                                {
+                                    questionMatrix = { ...questionMatrix, ...newData };
+                                    processFieldsAfterFetch();
+                                })
+                                .catch(err =>
+                                {
+                                    processFieldsAfterFetch();
+                                });
+                        } else
+                        {
+                            processFieldsAfterFetch();
+                        }
                     }
                 }
-            }, 300); // Debounce time in ms
+            }, 500);
         });
 
-        // Observe the body (or documentElement) for additions/removals in the subtree
         observer.observe(document.body || document.documentElement, {
-            childList: true, // Watch for direct children additions/removals
-            subtree: true,   // Watch descendants as well
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['disabled', 'style', 'class']
         });
     }
 
-    /**
-     * Gather unique keys from all relevant form fields currently on the page.
-     */
     function gatherKeysFromFields ()
     {
         const keys = new Set();
-        document.querySelectorAll('input:not([type="hidden"]), textarea, select').forEach((field) =>
+        document.querySelectorAll(
+            'form input:not([type="hidden"]), form textarea, form select'
+        ).forEach((field) =>
         {
-            // Only consider visible, enabled fields
             if (field.offsetParent !== null && !field.disabled)
             {
                 const key = determineBestKey(field);
-                if (key && key !== "Unknown field") keys.add(key); // Add valid keys
+                if (key) keys.add(key);
             }
         });
-        return Array.from(keys); // Convert Set to Array
+        return Array.from(keys);
     }
 
-    /**
-     * Remove all injected tooltip icons from the page.
-     */
     function removeAllTooltipIcons ()
     {
         document.querySelectorAll(".tooltip-icon-container").forEach((iconContainer) =>
         {
-            // Find the associated field (usually the previous sibling)
-            const maybeField = iconContainer.previousElementSibling;
-            if (maybeField && maybeField.dataset) // Check if it's an element with dataset
+            try
             {
-                // Mark the field so icon can be re-added if needed
-                maybeField.dataset.tooltipInjected = "false";
-                // Optionally remove the keyUsed dataset if keys might change
-                // delete maybeField.dataset.keyUsed;
+                const field = iconContainer.parentElement.querySelector('input, textarea, select');
+                if (field && field.dataset)
+                {
+                    field.dataset.tooltipInjected = "false";
+                    delete field.dataset.keyUsed;
+                }
+            } catch (e)
+            {
+                console.warn("Could not reliably find field to reset tooltip status", e);
             }
-            // Remove the icon container itself
+
             iconContainer.remove();
         });
+        refreshCounts = {};
+        lastRefreshTimes = {};
     }
 
-    /**
-     * Enable or disable form field tooltips globally.
-     */
     function toggleTooltips (enabled)
     {
-        tooltipsEnabled = enabled; // Update the global state
+        const changed = tooltipsEnabled !== enabled;
+        tooltipsEnabled = enabled;
+
+        if (!changed) return;
+
         if (!tooltipsEnabled)
         {
-            // If disabling, hide the main tooltip immediately
             if (tooltipRefGlobal && tooltipRefGlobal.tooltip)
             {
                 tooltipRefGlobal.tooltip.style.display = "none";
                 if (tooltipRefGlobal.hideTimer) clearTimeout(tooltipRefGlobal.hideTimer);
                 tooltipRefGlobal.hideTimer = null;
             }
-            // Remove all icons from the fields
             removeAllTooltipIcons();
             console.log("Form field tooltips disabled.");
-        } else if (tooltipRefGlobal) // If enabling
+        } else if (tooltipRefGlobal)
         {
-            // Re-process fields to add icons back (fetches data if needed)
+            console.log("Form field tooltips enabled. Processing fields...");
             const keys = gatherKeysFromFields();
             fetchTooltipsForKeys(keys).then((data) =>
             {
                 questionMatrix = data;
-                processFormFields(tooltipRefGlobal); // Add icons/tooltips to existing fields
-                console.log("Form field tooltips enabled.");
+                processFormFields(tooltipRefGlobal);
+                console.log(`Processed ${Object.keys(data).length} tooltips on enable.`);
             });
+        }
+
+        if (speedDialRef && speedDialRef.mainButton)
+        {
+            speedDialRef.mainButton.style.opacity = enabled ? '1' : '0.7';
+            speedDialRef.mainButton.title = enabled ? "Tooltip Options" : "Tooltips Disabled";
+            if (!enabled && speedDialRef.actionsContainer.style.display === 'flex')
+            {
+                speedDialRef.actionsContainer.style.display = 'none';
+                speedDialRef.mainButton.style.transform = "rotate(0deg)";
+            }
         }
     }
 
-    // --- Speed Dial Refresh Button ---
 
-    /**
-     * Create a floating speed dial button for refreshing all tooltips.
-     */
+    // --- Speed Dial UI ---
+
     function createSpeedDial ()
     {
-        // Prevent creating multiple speed dials
-        if (document.getElementById("tooltipSpeedDial")) return;
+        if (document.getElementById("tooltipSpeedDial") || !document.body) return;
 
-        // Main container for the speed dial
         const speedDial = document.createElement("div");
         speedDial.id = "tooltipSpeedDial";
         Object.assign(speedDial.style, {
             position: "fixed",
             bottom: "25px",
             right: "25px",
-            zIndex: 2147483646, // Slightly below tooltip container
+            zIndex: 2147483646,
             display: "flex",
-            flexDirection: "column-reverse", // Actions appear above main button
-            alignItems: "center", // Center items horizontally
+            flexDirection: "column-reverse",
+            alignItems: "center",
         });
 
-        // Actions container (initially hidden)
         const actionsContainer = document.createElement("div");
+        actionsContainer.classList.add("tooltip-speed-dial-actions");
         Object.assign(actionsContainer.style, {
-            display: "none", // Hidden by default
+            display: "none",
             flexDirection: "column",
             alignItems: "center",
-            marginBottom: "12px", // Space between actions and main button
-            gap: "10px", // Space between action buttons
+            marginBottom: "12px",
+            gap: "10px",
         });
 
-        // Refresh Button (Action)
         const refreshButton = document.createElement("button");
         refreshButton.setAttribute("aria-label", "Refresh all tooltips");
         refreshButton.setAttribute("title", "Refresh all tooltips");
         Object.assign(refreshButton.style, {
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            border: "none",
-            cursor: "pointer",
-            backgroundColor: "#4b5563", // Gray background
-            color: "#fff", // White icon/text
-            boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: "40px", height: "40px", borderRadius: "50%", border: "none", cursor: "pointer",
+            backgroundColor: "#4b5563",
+            color: "#fff", boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transition: 'background-color 0.2s ease',
         });
-        // Refresh SVG Icon
+        refreshButton.onmouseenter = () => refreshButton.style.backgroundColor = '#6b7280';
+        refreshButton.onmouseleave = () => refreshButton.style.backgroundColor = '#4b5563';
+
         refreshButton.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22">
-                <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4C8.74 4 6 6.03 4.69 9h2.02a6.011 6.011 0 0 1 10.09-1.24l-1.81 1.81H20V4l-2.35 2.35zM6.35 17.65A7.95 7.95 0 0 0 12 20c3.26 0 6-2.03 7.31-5h-2.02a6.011 6.011 0 0 1-10.09 1.24l1.81-1.81H4v4l2.35-2.35z"/>
-            </svg>
-         `;
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22">
+                 <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4C8.74 4 6 6.03 4.69 9h2.02a6.011 6.011 0 0 1 10.09-1.24l-1.81 1.81H20V4l-2.35 2.35zM6.35 17.65A7.95 7.95 0 0 0 12 20c3.26 0 6-2.03 7.31-5h-2.02a6.011 6.011 0 0 1-10.09 1.24l1.81-1.81H4v4l2.35-2.35z"/>
+             </svg>
+            `;
         refreshButton.addEventListener("click", (event) =>
         {
             event.preventDefault();
             event.stopPropagation();
+
+            if (!tooltipsEnabled)
+            {
+                console.log("Tooltips are disabled, cannot refresh.");
+                actionsContainer.style.display = "none";
+                if (speedDialRef && speedDialRef.mainButton) speedDialRef.mainButton.style.transform = "rotate(0deg)";
+                return;
+            }
             console.log("Refreshing all form field tooltips via speed dial...");
-            // Indicate loading state visually (optional)
             refreshButton.disabled = true;
             refreshButton.style.opacity = '0.6';
+            refreshButton.style.cursor = 'not-allowed';
 
-            const keys = gatherKeysFromFields(); // Get current keys
+            const keys = gatherKeysFromFields();
             fetchTooltipsForKeys(keys)
                 .then((data) =>
                 {
-                    questionMatrix = data; // Update data store
-                    removeAllTooltipIcons(); // Clear old icons first
-                    processFormFields(tooltipRefGlobal); // Re-add icons with fresh data
+                    questionMatrix = data;
+                    removeAllTooltipIcons();
+                    processFormFields(tooltipRefGlobal);
                     console.log("All form field tooltips refreshed.");
                 })
                 .catch((err) =>
                 {
-                    console.error("Failed to refresh all tooltips via speed dial:", err);
-                    // Optional: Show an error indication to the user
                 })
                 .finally(() =>
                 {
-                    // Restore button state
                     refreshButton.disabled = false;
                     refreshButton.style.opacity = '1';
-                    // Hide actions after click
+                    refreshButton.style.cursor = 'pointer';
                     actionsContainer.style.display = "none";
+                    if (speedDialRef && speedDialRef.mainButton) speedDialRef.mainButton.style.transform = "rotate(0deg)";
                 });
         });
-        actionsContainer.appendChild(refreshButton); // Add to actions container
+        actionsContainer.appendChild(refreshButton);
 
-        // Main FAB (Speed Dial Trigger)
         const mainButton = document.createElement("button");
         mainButton.id = "tooltipSpeedDial_mainButton";
         mainButton.setAttribute("aria-label", "Open tooltip options");
-        mainButton.setAttribute("title", "Tooltip Options");
+        mainButton.setAttribute("title", tooltipsEnabled ? "Tooltip Options" : "Tooltips Disabled");
         Object.assign(mainButton.style, {
-            width: "56px", // Standard FAB size
-            height: "56px",
-            borderRadius: "50%",
-            border: "none",
-            cursor: "pointer",
-            backgroundColor: "#1f2937", // Dark background
-            color: "#fff",
-            boxShadow: "0 3px 8px rgba(0,0,0,0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "transform 0.2s ease-out", // Smooth transition for icon rotation
+            width: "56px", height: "56px", borderRadius: "50%", border: "none", cursor: "pointer",
+            backgroundColor: "#1f2937",
+            color: "#fff", boxShadow: "0 3px 8px rgba(0,0,0,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "transform 0.2s ease-out, background-color 0.2s ease, opacity 0.2s ease",
+            opacity: tooltipsEnabled ? '1' : '0.7',
         });
+        mainButton.onmouseenter = () => { if (!mainButton.dataset.isLoading) mainButton.style.backgroundColor = '#374151'; };
+        mainButton.onmouseleave = () => { if (!mainButton.dataset.isLoading) mainButton.style.backgroundColor = '#1f2937'; };
 
-        // Main button icon (using extension icon)
         const mainImg = document.createElement("img");
-        try
-        {
-            mainImg.src = isBackgroundLight()
-                ? chrome.runtime.getURL("icon128.png") // Use light icon on light bg
-                : chrome.runtime.getURL("SC_COLOR.png"); // Use dark icon on dark bg (assuming SC_COLOR is dark theme)
-        } catch (e)
-        {
-            console.error("Error getting extension icon URL:", e);
-            mainImg.src = chrome.runtime.getURL("icon128.png"); // Fallback
-        }
-
-        mainImg.alt = ""; // Decorative image
+        mainImg.alt = "";
         mainImg.style.width = "28px";
         mainImg.style.height = "28px";
+        try
+        {
+            const iconPath = isBackgroundLight() ? "icon128.png" : "SC_COLOR.png";
+            mainImg.src = chrome.runtime.getURL(iconPath);
+        } catch (e)
+        {
+            try { mainImg.src = chrome.runtime.getURL("icon128.png"); } catch { }
+        }
         mainButton.appendChild(mainImg);
 
-        // Toggle actions on main button click
         mainButton.addEventListener("click", () =>
         {
+            if (!tooltipsEnabled)
+            {
+                console.log("Tooltips disabled, options unavailable.");
+                return;
+            }
+            if (mainButton.dataset.isLoading === 'true')
+            {
+                return;
+            }
+
             const isOpen = actionsContainer.style.display === "flex";
             actionsContainer.style.display = isOpen ? "none" : "flex";
-            // Rotate main button icon slightly when open (optional)
             mainButton.style.transform = isOpen ? "rotate(0deg)" : "rotate(45deg)";
         });
 
-        // Assemble the speed dial
         speedDial.appendChild(actionsContainer);
         speedDial.appendChild(mainButton);
         document.body.appendChild(speedDial);
 
-        // Return references (though not strictly needed with IDs)
-        return { speedDial, mainButton, actionsContainer, refreshButton };
+        return { speedDial, mainButton, actionsContainer, refreshButton, mainImg };
     }
 
-    // --- Context Menu Tooltip System (for Selected Text) ---
 
-    /**
-     * Create and display a temporary tooltip for selected text near the selection.
-     */
+    // --- Temporary Tooltip for Selection ---
+
     function displayTemporaryTooltip (text, position, status = "success")
     {
-        // Remove existing temporary tooltip if it exists
         if (temporaryTooltipRef)
         {
+            if (temporaryTooltipRef.dataset.autoCloseTimer)
+            {
+                clearTimeout(parseInt(temporaryTooltipRef.dataset.autoCloseTimer));
+            }
             temporaryTooltipRef.remove();
             temporaryTooltipRef = null;
         }
 
-        // Create the tooltip element
         const tempTooltip = document.createElement("div");
-        tempTooltip.setAttribute("role", "tooltip");
-        tempTooltip.id = "temporary-selection-tooltip"; // For easier debugging/styling
+        tempTooltip.setAttribute("role", "status");
+        tempTooltip.id = "temporary-selection-tooltip";
         Object.assign(tempTooltip.style, {
             position: "absolute",
-            padding: "6px 12px", // Slightly larger padding
-            paddingRight: "25px", // Make space for close button initially
-            backgroundColor: status === "success" ? "rgba(30, 41, 59, 0.9)" : "rgba(185, 28, 28, 0.9)", // Tailwind Slate 800 / Red 700
-            color: "#f1f5f9", // Tailwind Slate 100 (light gray)
+            padding: "6px 12px",
+            paddingRight: "25px",
+            backgroundColor: status === "success" ? "rgba(30, 41, 59, 0.95)" : "rgba(185, 28, 28, 0.95)",
+            color: "#f1f5f9",
             borderRadius: "6px",
             fontSize: "13px",
             fontFamily: "sans-serif",
-            zIndex: 2147483647, // Max z-index
-            maxWidth: "350px", // Allow slightly wider
+            zIndex: 2147483647,
+            maxWidth: "350px",
             wordWrap: "break-word",
             boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-            pointerEvents: "auto", // Allow interaction (for close button)
-            border: "1px solid rgba(255, 255, 255, 0.1)", // Subtle border
-            opacity: 0, // Start hidden for fade-in
-            transform: 'translateY(5px)', // Start slightly lower for animation
-            transition: 'opacity 0.2s ease-out, transform 0.2s ease-out', // Smooth fade/move
+            pointerEvents: "auto",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            opacity: 0,
+            transform: 'translateY(5px)',
+            transition: 'opacity 0.2s ease-out, transform 0.2s ease-out',
+            lineHeight: '1.4',
         });
         tempTooltip.textContent = text;
 
-        // Calculate position
-        let top = position.bottom + window.scrollY + 8; // Below selection + scroll offset + gap
-        let left = position.left + window.scrollX;   // Align with start of selection
+        position = position || { bottom: window.innerHeight / 2 + 10, left: window.innerWidth / 2, top: window.innerHeight / 2 - 10, width: 0, height: 20 };
 
-        // Append to body *before* getting rect for position adjustment
+        let top = (position.bottom || 0) + window.scrollY + 8;
+        let left = (position.left || 0) + window.scrollX;
+
         document.body.appendChild(tempTooltip);
-        temporaryTooltipRef = tempTooltip; // Assign reference *after* creation
+        temporaryTooltipRef = tempTooltip;
 
-        const tooltipRect = tempTooltip.getBoundingClientRect(); // Get size *after* adding to DOM
+        const tooltipRect = tempTooltip.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
+        const margin = 5;
 
-        // Adjust for left/right screen edges
-        if (left < window.scrollX + 5) left = window.scrollX + 5;
-        if (left + tooltipRect.width > window.innerWidth - 5)
+        if (top + tooltipRect.height > viewportHeight + scrollY - margin)
         {
-            left = window.innerWidth - tooltipRect.width - 5;
+            top = (position.top || 0) + scrollY - tooltipRect.height - 8;
         }
-        // Adjust for bottom edge (try placing above)
-        if (top + tooltipRect.height > window.innerHeight + window.scrollY - 10)
+        if (top < scrollY + margin) top = scrollY + margin;
+        if (left < scrollX + margin) left = scrollX + margin;
+        if (left + tooltipRect.width > viewportWidth + scrollX - margin)
         {
-            top = position.top + window.scrollY - tooltipRect.height - 8; // Place above
-        }
-        // Adjust for top edge (if still off screen above)
-        if (top < window.scrollY + 5)
-        {
-            top = window.scrollY + 5;
+            left = viewportWidth + scrollX - tooltipRect.width - margin;
         }
 
-        // Apply final calculated position
         tempTooltip.style.top = `${top}px`;
         tempTooltip.style.left = `${left}px`;
 
-        // Add a close button
         const closeButton = document.createElement("button");
         Object.assign(closeButton.style, {
-            position: 'absolute',
-            top: '3px', // Position inside padding
-            right: '3px',
-            background: 'transparent',
-            border: 'none',
-            color: 'rgba(255, 255, 255, 0.7)', // Semi-transparent white
-            fontSize: '18px', // Larger 'x'
-            cursor: 'pointer',
-            padding: '0 4px',
-            lineHeight: '1',
-            fontWeight: 'bold',
-            borderRadius: '50%', // Make it roundish
-            width: '20px',
-            height: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            position: 'absolute', top: '3px', right: '3px', background: 'transparent', border: 'none',
+            color: 'rgba(255, 255, 255, 0.7)', fontSize: '18px', cursor: 'pointer', padding: '0 4px',
+            lineHeight: '1', fontWeight: 'bold', borderRadius: '50%', width: '20px', height: '20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
         });
-        closeButton.textContent = '×'; // Multiplication sign
+        closeButton.textContent = '×';
         closeButton.setAttribute("aria-label", "Close definition");
-        closeButton.onmouseenter = () => closeButton.style.color = 'rgba(255, 255, 255, 1)'; // Brighter on hover
+        closeButton.onmouseenter = () => closeButton.style.color = 'rgba(255, 255, 255, 1)';
         closeButton.onmouseleave = () => closeButton.style.color = 'rgba(255, 255, 255, 0.7)';
         closeButton.onclick = (e) =>
         {
             e.stopPropagation();
             if (temporaryTooltipRef)
             {
-                // Fade out before removing
                 temporaryTooltipRef.style.opacity = '0';
                 temporaryTooltipRef.style.transform = 'translateY(5px)';
+                if (temporaryTooltipRef.dataset.autoCloseTimer)
+                {
+                    clearTimeout(parseInt(temporaryTooltipRef.dataset.autoCloseTimer));
+                }
                 setTimeout(() =>
                 {
                     if (temporaryTooltipRef) temporaryTooltipRef.remove();
                     temporaryTooltipRef = null;
-                }, 200); // Match transition duration
+                }, 200);
             }
         };
         tempTooltip.appendChild(closeButton);
 
-        // Trigger fade-in animation
         requestAnimationFrame(() =>
         {
-            tempTooltip.style.opacity = 1;
-            tempTooltip.style.transform = 'translateY(0)';
+            requestAnimationFrame(() =>
+            {
+                tempTooltip.style.opacity = 1;
+                tempTooltip.style.transform = 'translateY(0)';
+            });
         });
 
-
-        // Set timeout to automatically remove after a longer time (e.g., 15 seconds)
-        // User can close it manually earlier with the button
+        const autoCloseDuration = status === "success" ? 15000 : 8000;
         const autoCloseTimer = setTimeout(() =>
         {
-            if (temporaryTooltipRef === tempTooltip) // Only remove if it's still this tooltip
+            if (temporaryTooltipRef === tempTooltip)
             {
-                closeButton.click(); // Trigger the close button's logic (includes fade out)
+                closeButton.click();
             }
-        }, 15000); // 15 seconds
+        }, autoCloseDuration);
 
-        // Store timer on the element itself to clear if closed manually
-        tempTooltip.dataset.autoCloseTimer = autoCloseTimer;
-
-        // Clear timer if closed manually
-        closeButton.addEventListener('click', () =>
-        {
-            if (tempTooltip.dataset.autoCloseTimer)
-            {
-                clearTimeout(parseInt(tempTooltip.dataset.autoCloseTimer));
-            }
-        });
+        tempTooltip.dataset.autoCloseTimer = autoCloseTimer.toString();
     }
 
-
-    /**
-     * Fetch tooltip definition for the currently selected text. Triggered by background script.
-     */
     async function fetchAndShowSelectedTextTooltip ()
     {
+        if (!tooltipsEnabled)
+        {
+            console.log("Tooltips disabled, cannot fetch definition for selection.");
+            return;
+        }
+
         const selection = window.getSelection();
-        const selectedText = selection.toString().trim();
+        const selectedText = selection?.toString().trim();
 
         if (!selectedText)
         {
             console.log("No text selected for definition lookup.");
-            return; // Nothing to do
-        }
-
-        // Optional: Limit query length to prevent abuse/long requests
-        const MAX_LENGTH = 250;
-        if (selectedText.length > MAX_LENGTH)
-        {
-            console.log(`Selected text exceeds maximum length of ${MAX_LENGTH}.`);
-            // Optionally show a message to the user near the selection
-            try
-            {
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                displayTemporaryTooltip(`Selection too long (max ${MAX_LENGTH} chars)`, rect, "error");
-            } catch (e) { console.error("Could not get selection range for error message:", e); }
             return;
         }
 
+        const MAX_LENGTH = 250;
         let range, rect;
+
         try
         {
-            range = selection.getRangeAt(0); // Get the selection's range
-            rect = range.getBoundingClientRect(); // Get its position and dimensions
+            range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+            if (!range) throw new Error("No range in selection");
+
+            const clientRects = range.getClientRects();
+            rect = clientRects.length > 0 ? clientRects[0] : range.getBoundingClientRect();
+
+            rect = {
+                top: rect.top,
+                bottom: rect.bottom,
+                left: rect.left,
+                right: rect.left + 1,
+                width: 1,
+                height: rect.height
+            };
+
         } catch (e)
         {
-            console.error("Could not get selection range/rect:", e);
-            // Fallback position (e.g., center of the viewport) if range fails
-            rect = {
-                bottom: window.innerHeight / 2 + 10, left: window.innerWidth / 2,
-                top: window.innerHeight / 2 - 10, right: window.innerWidth / 2,
-                width: 0, height: 20 // Minimal rect
-            };
+            rect = { bottom: window.innerHeight / 2 + 10, left: window.innerWidth / 2, top: window.innerHeight / 2 - 10 };
         }
 
-        // Display a temporary "loading" message immediately
+        if (selectedText.length > MAX_LENGTH)
+        {
+            console.log(`Selected text exceeds maximum length of ${MAX_LENGTH}.`);
+            displayTemporaryTooltip(`Selection too long (max ${MAX_LENGTH} chars). Selected ${selectedText.length}.`, rect, "error");
+            return;
+        }
+
         displayTemporaryTooltip("Fetching definition...", rect, "success");
 
         try
         {
-            // Use fetchTooltipsForKeys, treating the selected text as a single key
-            // ASSUMPTION: Backend handles arbitrary strings in the 'keys' array.
             const responseData = await fetchTooltipsForKeys([selectedText]);
-            const tooltipText = responseData ? responseData[selectedText] : null; // Safely access the result
+            const tooltipText = responseData ? responseData[selectedText] : null;
 
             if (tooltipText)
             {
-                // Display the fetched definition
                 displayTemporaryTooltip(tooltipText, rect, "success");
             } else
             {
-                // Display "not found" message
                 displayTemporaryTooltip(`No definition found for "${selectedText}"`, rect, "error");
             }
         } catch (error)
         {
-            // Handle network or other errors during fetch
-            console.error("Error fetching tooltip for selection:", error);
             displayTemporaryTooltip("Error fetching definition.", rect, "error");
         }
     }
@@ -971,121 +1085,112 @@
 
     // --- Initialization and Event Listeners ---
 
-    /**
-     * Initialize all tooltip systems on page load or readiness.
-     */
     function initTooltips ()
     {
-        // Ensure body exists before proceeding
         if (!document.body)
         {
             console.warn("Document body not ready for tooltip initialization.");
+            setTimeout(initTooltips, 100);
             return;
         }
         console.log("Initializing tooltips...");
 
-        // 1. Create the main tooltip container (only once)
         if (!tooltipRefGlobal)
         {
             tooltipRefGlobal = createTooltipContainer();
         }
 
-        // 2. Fetch initial data for existing form fields and add icons/tooltips IF enabled
         if (tooltipsEnabled)
         {
+            removeAllTooltipIcons();
             const initialKeys = gatherKeysFromFields();
-            fetchTooltipsForKeys(initialKeys).then((data) =>
+            console.log(`Found ${initialKeys.length} initial keys from form fields.`);
+            if (initialKeys.length > 0)
             {
-                questionMatrix = data;
-                processFormFields(tooltipRefGlobal); // Add tooltips to static fields
-                console.log(`Processed ${Object.keys(data).length} initial tooltips.`);
-            });
+                fetchTooltipsForKeys(initialKeys).then((data) =>
+                {
+                    questionMatrix = data;
+                    processFormFields(tooltipRefGlobal);
+                    console.log(`Processed ${Object.keys(data).length} initial tooltips.`);
+                }).catch(err => { });
+            } else
+            {
+                console.log("No initial fields found to process.");
+            }
         } else
         {
             console.log("Tooltips initially disabled, skipping form field processing.");
+            removeAllTooltipIcons();
         }
 
-
-        // 3. Set up observer for dynamically added fields (runs regardless of initial state)
         observeDynamicFields(tooltipRefGlobal);
 
-        // 4. Create the speed dial refresh button (only once)
-        if (!speedDialRef)
+        if (!speedDialRef && document.body)
         {
             speedDialRef = createSpeedDial();
+        } else if (speedDialRef && speedDialRef.mainButton)
+        {
+            speedDialRef.mainButton.style.opacity = tooltipsEnabled ? '1' : '0.7';
+            speedDialRef.mainButton.title = tooltipsEnabled ? "Tooltip Options" : "Tooltips Disabled";
         }
 
         console.log("Tooltip initialization complete.");
     }
 
-    // --- Entry Point ---
-
-    // Get the initial enabled state from storage
     chrome.storage.sync.get(["tooltipsEnabled"], (result) =>
     {
-        // Default to true if the setting is not found or is not explicitly false
-        tooltipsEnabled = result.tooltipsEnabled !== false;
+        if (chrome.runtime.lastError)
+        {
+            tooltipsEnabled = true;
+        } else
+        {
+            tooltipsEnabled = result.tooltipsEnabled !== false;
+        }
 
-        // Initialize once the DOM is ready
         if (document.readyState === "loading")
         {
             document.addEventListener("DOMContentLoaded", initTooltips);
         } else
         {
-            // DOM is already ready
             initTooltips();
         }
     });
 
-    // Listen for messages from the background script or popup
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
     {
-        let responseSent = false; // Flag to ensure sendResponse is called only once
+        let responseSent = false;
+        const sendAsyncResponse = (response) =>
+        {
+            if (!responseSent)
+            {
+                sendResponse(response);
+                responseSent = true;
+            }
+        };
 
         if (message.type === "TOGGLE_TOOLTIPS")
         {
             toggleTooltips(message.enabled);
-            // Acknowledge the message
-            sendResponse({ status: "Tooltip visibility updated", enabled: tooltipsEnabled });
-            responseSent = true;
+            sendAsyncResponse({ status: "Tooltip visibility updated", enabled: tooltipsEnabled });
         }
         else if (message.type === "FETCH_SELECTED_TEXT_TOOLTIP")
         {
-            // Trigger the fetch and display for selected text
             fetchAndShowSelectedTextTooltip()
                 .then(() =>
                 {
-                    // Acknowledge after async operation (optional)
-                    if (!responseSent)
-                    {
-                        sendResponse({ status: "Attempted to fetch tooltip for selection" });
-                        responseSent = true;
-                    }
+                    sendAsyncResponse({ status: "Attempted to fetch tooltip for selection" });
                 })
                 .catch(err =>
                 {
-                    console.error("Error in fetchAndShowSelectedTextTooltip:", err);
-                    if (!responseSent)
-                    {
-                        sendResponse({ status: "Error processing selection tooltip request" });
-                        responseSent = true;
-                    }
+                    sendAsyncResponse({ status: "Error processing selection tooltip request", error: err.message });
                 });
-            // Indicate that sendResponse will be called asynchronously
             return true;
         }
-
-        // If no specific handler matched, and we haven't sent a response
-        if (!responseSent)
+        else
         {
-            console.log("Received unhandled message type:", message.type);
-            // You might still want to send a default response or nothing
+            console.log("Received unhandled message type in content script:", message.type, message);
         }
 
-        // Return true if sendResponse might be called asynchronously (as in the second case)
-        // Return false or undefined otherwise. Here, we return true because of the async possibility.
-        return true;
-
+        return message.type === "FETCH_SELECTED_TEXT_TOOLTIP";
     });
-
-})(); // End IIFE (Immediately Invoked Function Expression)
+})();
