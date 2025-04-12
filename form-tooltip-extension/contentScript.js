@@ -140,7 +140,7 @@
             return Promise.resolve({});
         }
 
-        return fetchWithAuth("http://localhost:8000/api/question-lookup", {
+        return fetchWithAuth("https://app.simple-complexity.com/api/question-lookup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ keys: uniqueKeys }),

@@ -2,7 +2,7 @@
     "name": "Form Tooltip",
     "version": "1.1",
     "manifest_version": 3,
-    "description": "Enhances web forms by automatically adding tooltip icons next to visible input, textarea, and select fields. When you hover over an icon, a concise, dynamically fetched definition is displayed—with the option to refresh each tooltip individually. The extension also includes a floating speed dial interface for bulk refreshing and toggling tooltip visibility, plus it supports lookup of definitions for selected text.",
+    "description": "Adds tooltip icons to form fields to show dynamic definitions on hover. Features bulk refresh, toggle visibility, and text lookup.",
     "action": {
         "default_popup": "popup.html",
         "default_icon": {

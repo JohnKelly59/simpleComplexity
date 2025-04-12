@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function ()
 {
+    var mainAppBtn = document.getElementById('mainAppBtn');
+    if (mainAppBtn)
+    {
+        mainAppBtn.addEventListener('click', function ()
+        {
+            window.open('https://app.simple-complexity.com/', '_blank');
+        });
+    }
+
+
     const toggleTooltipsCheckbox = document.getElementById("toggleTooltips");
     const loginBtn = document.getElementById("loginBtn");
     const emailField = document.getElementById("emailField");
@@ -9,6 +19,17 @@ document.addEventListener("DOMContentLoaded", function ()
 
     const loginSection = document.getElementById("loginSection");
     const logoutSection = document.getElementById("logoutSection");
+    const popupMessage = document.getElementById("popup-message");
+
+    function showPopupMessage (message)
+    {
+        popupMessage.textContent = message;
+        popupMessage.style.display = "block";
+        setTimeout(() =>
+        {
+            popupMessage.style.display = "none";
+        }, 3000); // Adjust time as needed
+    }
 
     // 1. Check if the user is already signed in (token present):
     chrome.storage.sync.get(["authToken"], (result) =>
@@ -62,13 +83,13 @@ document.addEventListener("DOMContentLoaded", function ()
 
             if (!email || !password)
             {
-                alert("Email/Password required.");
+                showPopupMessage("Email and password are required.");
                 return;
             }
 
             try
             {
-                const resp = await fetch("http://localhost:8000/api/login", {
+                const resp = await fetch("https://app.simple-complexity.com/api/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password }),
@@ -85,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function ()
                 {
                     chrome.storage.sync.set({ authToken: data.token }, () =>
                     {
-                        alert("Login successful. Token stored!");
+                        showPopupMessage("Login successful. Token stored!");
                         console.log("Token stored:", data.token);
                         // Hide login, show logout
                         loginSection.style.display = "none";
@@ -93,12 +114,12 @@ document.addEventListener("DOMContentLoaded", function ()
                     });
                 } else
                 {
-                    alert("No token returned. Possibly invalid credentials.");
+                    showPopupMessage("No token returned. Possibly invalid credentials.");
                 }
             } catch (err)
             {
-                console.error("Login error:", err);
-                alert("Login failed. Check console for details.");
+                //console.error("Login error:", err);
+                showPopupMessage("Login failed. Check console for details.");
             }
         });
     }
@@ -109,8 +130,9 @@ document.addEventListener("DOMContentLoaded", function ()
         googleSignInBtn.addEventListener("click", () =>
         {
             const extensionRedirectUri = chrome.identity.getRedirectURL();
-            const authUrl = `http://localhost:8000/auth/google/extension?redirect_uri=${encodeURIComponent(extensionRedirectUri)}`;
-
+            const authUrl = `https://app.simple-complexity.com/auth/google/extension?redirect_uri=${encodeURIComponent(extensionRedirectUri)}`;
+            console.log('extension', extensionRedirectUri)
+            console.log('authUrl', authUrl)
             chrome.identity.launchWebAuthFlow(
                 {
                     url: authUrl,
@@ -120,11 +142,11 @@ document.addEventListener("DOMContentLoaded", function ()
                 {
                     if (chrome.runtime.lastError)
                     {
-                        console.error(
-                            "Google auth error:",
-                            chrome.runtime.lastError.message
-                        );
-                        alert("Google auth failed: " + chrome.runtime.lastError.message);
+                        // console.error(
+                        //     "Google auth error:",
+                        //     chrome.runtime.lastError.message
+                        // );
+                        showPopupMessage("Google auth failed: " + chrome.runtime.lastError.message);
                         return;
                     }
 
@@ -134,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function ()
                     {
                         chrome.storage.sync.set({ authToken: token }, () =>
                         {
-                            alert("Google Sign-In successful! Token stored.");
+                            showPopupMessage("Google Sign-In successful! Token stored.");
                             console.log("Stored token:", token);
                             // Hide login, show logout
                             loginSection.style.display = "none";
@@ -142,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function ()
                         });
                     } else
                     {
-                        alert("No token found in final URL. Check server logic.");
+                        showPopupMessage("No token found in final URL. Check server logic.");
                     }
                 }
             );
@@ -156,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function ()
         {
             chrome.storage.sync.remove("authToken", () =>
             {
-                alert("You have been logged out.");
+                showPopupMessage("You have been logged out.");
                 // Show login UI again
                 loginSection.style.display = "block";
                 logoutSection.style.display = "none";
