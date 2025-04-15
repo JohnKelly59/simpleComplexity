@@ -1,85 +1,52 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, Card, CardMedia, useTheme, CircularProgress } from '@mui/material';
+import { Box, Typography, Card, CardMedia, useTheme } from '@mui/material';
+
+// **1. Import or define your poster image URL**
+//    Ideally, this is a thumbnail or the first frame of your video.
+const posterImageUrl = "https://your-s3-bucket/path/to/your/poster-image.jpg"; // Replace with your actual poster image URL
 
 const Demo = () => {
-  const theme = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
-  const videoRef = useRef(null);
+    const theme = useTheme();
 
-  useEffect(() => {
-    const videoElement = videoRef.current;
+    return (
+        <Box sx={{ py: 10, textAlign: 'center', backgroundColor: theme.palette.grey[100] }}>
+            <Typography variant="h4" gutterBottom>
+                See It in Action
+            </Typography>
+            <Typography variant="body1" color="text.secondary" gutterBottom>
+                Watch how Form-Tooltip turns complex forms into clear, user-friendly experiences.
+            </Typography>
 
-    const handleVideoLoaded = () => {
-      setIsLoading(false);
-    };
-
-    if (videoElement) {
-      videoElement.addEventListener('canplaythrough', handleVideoLoaded);
-
-      if (videoElement.readyState >= 4) {
-        setIsLoading(false);
-      }
-    }
-
-    return () => {
-      if (videoElement) {
-        videoElement.removeEventListener('canplaythrough', handleVideoLoaded);
-      }
-    };
-  }, []);
-
-  return (
-    <Box sx={{ py: 10, textAlign: 'center', backgroundColor: theme.palette.grey[100] }}>
-      <Typography variant="h4" gutterBottom>
-        See It in Action
-      </Typography>
-      <Typography variant="body1" color="text.secondary" gutterBottom>
-        Watch how Form-Tooltip turns complex forms into clear, user-friendly experiences.
-      </Typography>
-
-      <Card
-        elevation={4}
-        sx={{
-          maxWidth: 800,
-          mx: 'auto',
-          mt: 4,
-          overflow: 'hidden',
-          borderRadius: 3,
-        }}
-      >
-        <Box
-          sx={{
-            position: 'relative',
-            width: '100%',
-            height: { xs: 250, sm: 400 },
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: isLoading ? theme.palette.grey[200] : 'transparent',
-          }}
-        >
-          {isLoading && <CircularProgress sx={{ position: 'absolute' }} />}
-
-          <CardMedia
-            ref={videoRef}
-            component="video"
-            src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/Tooltipdemo1.mp4"
-            autoPlay
-            muted
-            loop
-            controls={false}
-            sx={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              opacity: isLoading ? 0 : 1,
-              transition: 'opacity 0.3s ease-in-out',
-            }}
-          />
+            <Card
+                elevation={4}
+                sx={{
+                    maxWidth: 800,
+                    mx: 'auto',
+                    mt: 4,
+                    overflow: 'hidden',
+                    borderRadius: 3,
+                }}
+            >
+                <CardMedia
+                    component="video"
+                    // **2. Add the image prop here**
+                    image={posterImageUrl} // This will act as the poster
+                    src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/Tooltipdemo1.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline // Good practice for mobile autoplay
+                    controls={false} // Keep controls hidden as originally intended
+                    sx={{
+                        width: '100%',
+                        height: { xs: 250, sm: 400 },
+                        objectFit: 'cover',
+                        // Optional: Add a background color while things load initially
+                        // backgroundColor: theme.palette.grey[300], // Or another placeholder color
+                    }}
+                />
+            </Card>
         </Box>
-      </Card>
-    </Box>
-  );
+    );
 };
 
 export default Demo;
