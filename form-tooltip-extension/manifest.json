@@ -13,7 +13,6 @@
     },
     "permissions": [
         "activeTab",
-        "scripting",
         "storage",
         "identity",
         "contextMenus"
