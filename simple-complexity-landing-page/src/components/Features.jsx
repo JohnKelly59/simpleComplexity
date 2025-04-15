@@ -1,62 +1,100 @@
-import { Box, Grid, Paper, Typography } from '@mui/material';
+import React from 'react';
+import { Box, Grid, Typography, Slide, Grow } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { useInView } from 'react-intersection-observer';
+
+import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
+import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
+import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 
 const features = [
     {
+        icon: <LightbulbOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Instant Clarity',
-        description:
-            'Automatically simplify confusing form questions using our database of tooltips.',
-        details:
-            'Ensures users quickly understand and complete forms without frustration. Perfect for standard form fields and common questions.',
+        description: 'Automatically simplify confusing form questions using our database of tooltips.',
+        details: 'Ensures users quickly understand and complete forms without frustration. Perfect for standard form fields and common questions.',
     },
     {
+        icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'AI-Powered Insights',
-        description:
-            'Real-time AI generation for tooltips when a question isn’t in our database.',
-        details:
-            'Our cutting-edge AI analyzes context to generate accurate, plain language tooltips instantly—saving time and reducing confusion.',
+        description: 'Real-time AI generation for tooltips when a question isn’t in our database.',
+        details: 'Our cutting-edge AI analyzes context to generate accurate, plain language tooltips instantly—saving time and reducing confusion.',
     },
     {
+        icon: <TranslateOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Multilingual Support',
-        description:
-            'Overcome language barriers with built-in translations for non-English speakers.',
-        details:
-            'Supports over 30 languages to ensure that everyone can fill out forms correctly, regardless of their native language.',
+        description: 'Overcome language barriers with built-in translations for non-English speakers.',
+        details: 'Supports over 30 languages to ensure that everyone can fill out forms correctly, regardless of their native language.',
     },
     {
+        icon: <ExtensionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Seamless Integration',
-        description:
-            'Use our browser extension or embed our SDK to deliver a smooth user experience.',
-        details:
-            'Quick setup with one line of code and compatibility with most modern web platforms ensures effortless deployment and consistent performance.',
+        description: 'Use our browser extension or embed our SDK to deliver a smooth user experience.',
+        details: 'Quick setup with one line of code and compatibility with most modern web platforms ensures effortless deployment and consistent performance.',
     },
 ];
 
-const Features = () =>
-{
+const FeatureSection = styled(Box)(({ theme }) => ({
+    paddingTop: theme.spacing(8),
+    paddingBottom: theme.spacing(8),
+    overflow: 'hidden',
+}));
+
+const FeatureRow = ({ feature, index }) => {
+    const { ref, inView } = useInView({
+        triggerOnce: true,
+        threshold: 0.2,
+    });
+
+    const isEven = index % 2 === 0;
+    const slideDirectionIcon = isEven ? 'right' : 'left';
+    const slideDirectionText = isEven ? 'left' : 'right';
+
     return (
-        <Box sx={{ py: 8, textAlign: 'center' }}>
-            <Typography variant="h4" gutterBottom>
-                Features
-            </Typography>
-            <Grid container spacing={4} justifyContent="center">
-                {features.map((feature, index) => (
-                    <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: 'flex' }}>
-                        <Paper elevation={3} sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="h6" gutterBottom>
+        <FeatureSection ref={ref}>
+            <Grid container spacing={6} alignItems="center" justifyContent="center" sx={{ px: { xs: 2, md: 4 } }}>
+                <Grid item xs={12} md={5} sx={{ textAlign: { xs: 'center', md: isEven ? 'right' : 'left' }, order: { xs: 1, md: isEven ? 1 : 2 } }}>
+                    <Slide direction={slideDirectionIcon} in={inView} timeout={800}>
+                        <Box display="inline-block">
+                            {feature.icon}
+                        </Box>
+                    </Slide>
+                </Grid>
+
+                <Grid item xs={12} md={5} sx={{ order: { xs: 2, md: isEven ? 2 : 1 } }}>
+                    <Slide direction={slideDirectionText} in={inView} timeout={800}>
+                        <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                            <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 'medium' }}>
                                 {feature.title}
                             </Typography>
-                            <Typography variant="body2" color="textSecondary">
+                            <Typography variant="body1" color="text.secondary" sx={{ mb: 1.5 }}>
                                 {feature.description}
                             </Typography>
                             {feature.details && (
-                                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                                <Typography variant="body2" color="text.secondary">
                                     {feature.details}
                                 </Typography>
                             )}
-                        </Paper>
-                    </Grid>
-                ))}
+                        </Box>
+                    </Slide>
+                </Grid>
             </Grid>
+        </FeatureSection>
+    );
+};
+
+const Features = () => {
+    return (
+        <Box sx={{ py: 6, bgcolor: 'background.paper' }}>
+            <Grow in={true} timeout={500}>
+                <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 4, fontWeight: 'bold' }}>
+                    Features
+                </Typography>
+            </Grow>
+            {features.map((feature, index) => (
+                <FeatureRow key={feature.title} feature={feature} index={index} />
+            ))}
         </Box>
     );
 };
