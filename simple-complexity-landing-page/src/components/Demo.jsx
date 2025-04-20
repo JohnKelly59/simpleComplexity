@@ -23,7 +23,7 @@ const Demo = () => {
         See It in Action
       </Typography>
       <Typography variant="body1" color="text.secondary" gutterBottom>
-        Watch how Form-Tooltip turns complex forms into clear, user-friendly experiences.
+        Watch how SimpleForm turns complex forms into clear, user-friendly experiences.
       </Typography>
 
       <Card
