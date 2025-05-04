@@ -29,9 +29,6 @@ const PrivacyPolicyPage = () =>
                             <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
                                 Welcome to Simple Complexity ("we", "us", "our"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website, browser extension, and services (collectively, the "Service"). Please read this policy carefully. If you do not agree with the terms of this privacy policy, please do not access the Service.
                             </Typography>
-                            <Typography variant="body1" paragraph sx={{ opacity: 0.9, fontStyle: 'italic' }}>
-                                <strong>Important: This is placeholder text. Replace this entire policy with one drafted or reviewed by a legal professional to ensure compliance with applicable laws (like GDPR, CCPA, etc.) and accurately reflect your data handling practices.</strong>
-                            </Typography>
                         </Box>
 
                         <Box sx={{ my: 3 }}>
