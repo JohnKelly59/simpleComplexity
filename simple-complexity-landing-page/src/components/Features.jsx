@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 
 const features = [
@@ -28,6 +29,12 @@ const features = [
         details: 'Supports over 30 languages to ensure that everyone can fill out forms correctly, regardless of their native language.',
     },
     {
+        icon: <VolumeUpOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Audio Support',
+        description: 'Tooltips feature an audio button to read the explanation aloud.',
+        details: 'Enhances accessibility for users with visual impairments or reading difficulties, and supports those who prefer auditory learning.',
+    },
+    {
         icon: <ExtensionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Seamless Integration',
         description: 'Use our browser extension or embed our SDK to deliver a smooth user experience.',
@@ -35,7 +42,7 @@ const features = [
     },
 ];
 
-const FeatureSection = styled(Box)(({ theme }) => ({
+const FeatureSectionContainer = styled(Box)(({ theme }) => ({
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
     overflow: 'hidden',
@@ -52,35 +59,37 @@ const FeatureRow = ({ feature, index }) => {
     const slideDirectionText = isEven ? 'left' : 'right';
 
     return (
-        <FeatureSection ref={ref}>
-            <Grid container spacing={6} alignItems="center" justifyContent="center" sx={{ px: { xs: 2, md: 4 } }}>
-                <Grid item xs={12} md={5} sx={{ textAlign: { xs: 'center', md: isEven ? 'right' : 'left' }, order: { xs: 1, md: isEven ? 1 : 2 } }}>
-                    <Slide direction={slideDirectionIcon} in={inView} timeout={800}>
-                        <Box display="inline-block">
-                            {feature.icon}
-                        </Box>
-                    </Slide>
-                </Grid>
+        <Box ref={ref} sx={{ overflow: 'hidden' }}>
+            <FeatureSectionContainer>
+                <Grid container spacing={6} alignItems="center" justifyContent="center" sx={{ px: { xs: 2, md: 4 } }}>
+                    <Grid item xs={12} md={5} sx={{ textAlign: { xs: 'center', md: isEven ? 'right' : 'left' }, order: { xs: 1, md: isEven ? 1 : 2 } }}>
+                        <Slide direction={slideDirectionIcon} in={inView} timeout={800}>
+                            <Box display="inline-block">
+                                {feature.icon}
+                            </Box>
+                        </Slide>
+                    </Grid>
 
-                <Grid item xs={12} md={5} sx={{ order: { xs: 2, md: isEven ? 2 : 1 } }}>
-                    <Slide direction={slideDirectionText} in={inView} timeout={800}>
-                        <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                            <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 'medium' }}>
-                                {feature.title}
-                            </Typography>
-                            <Typography variant="body1" color="text.secondary" sx={{ mb: 1.5 }}>
-                                {feature.description}
-                            </Typography>
-                            {feature.details && (
-                                <Typography variant="body2" color="text.secondary">
-                                    {feature.details}
+                    <Grid item xs={12} md={5} sx={{ order: { xs: 2, md: isEven ? 2 : 1 } }}>
+                        <Slide direction={slideDirectionText} in={inView} timeout={800}>
+                            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                                <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 'medium' }}>
+                                    {feature.title}
                                 </Typography>
-                            )}
-                        </Box>
-                    </Slide>
+                                <Typography variant="body1" color="text.secondary" sx={{ mb: 1.5 }}>
+                                    {feature.description}
+                                </Typography>
+                                {feature.details && (
+                                    <Typography variant="body2" color="text.secondary">
+                                        {feature.details}
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Slide>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </FeatureSection>
+            </FeatureSectionContainer>
+        </Box>
     );
 };
 
