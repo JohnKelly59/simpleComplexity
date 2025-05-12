@@ -8,6 +8,7 @@ import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'; // Added for Chat feature
 
 const features = [
     {
@@ -34,6 +35,13 @@ const features = [
         description: 'Tooltips feature an audio button to read the explanation aloud.',
         details: 'Enhances accessibility for users with visual impairments or reading difficulties, and supports those who prefer auditory learning.',
     },
+    // New Feature for Chat Box
+    {
+        icon: <QuestionAnswerOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Interactive Question Assistant',
+        description: 'Get direct answers and guidance through an intuitive chat interface.',
+        details: 'Ask specific questions about form fields or general form-filling queries. Our AI-powered assistant provides relevant information, making complex forms easier to navigate.',
+    },
     {
         icon: <ExtensionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Seamless Integration',
@@ -45,34 +53,39 @@ const features = [
 const FeatureSectionContainer = styled(Box)(({ theme }) => ({
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
-    overflow: 'hidden',
+    overflow: 'hidden', // Kept to ensure slide animations don't cause premature scrollbars
 }));
 
 const FeatureRow = ({ feature, index }) => {
     const { ref, inView } = useInView({
         triggerOnce: true,
-        threshold: 0.2,
+        threshold: 0.2, // A bit of the element needs to be in view
     });
 
     const isEven = index % 2 === 0;
+    // Determine slide direction based on whether the index is even or odd
+    // For even rows (0, 2, 4...): Icon slides from right, Text slides from left
+    // For odd rows (1, 3, 5...): Icon slides from left, Text slides from right
     const slideDirectionIcon = isEven ? 'right' : 'left';
     const slideDirectionText = isEven ? 'left' : 'right';
 
     return (
-        <Box ref={ref} sx={{ overflow: 'hidden' }}>
-            <FeatureSectionContainer>
+        <Box ref={ref} sx={{ overflow: 'hidden' }}> {/* Moved overflow hidden here to contain slide */}
+            <FeatureSectionContainer> {/* This container now only handles padding */}
                 <Grid container spacing={6} alignItems="center" justifyContent="center" sx={{ px: { xs: 2, md: 4 } }}>
+                    {/* Icon Grid Item */}
                     <Grid item xs={12} md={5} sx={{ textAlign: { xs: 'center', md: isEven ? 'right' : 'left' }, order: { xs: 1, md: isEven ? 1 : 2 } }}>
                         <Slide direction={slideDirectionIcon} in={inView} timeout={800}>
-                            <Box display="inline-block">
+                            <Box display="inline-block"> {/* Ensures the icon itself is what slides */}
                                 {feature.icon}
                             </Box>
                         </Slide>
                     </Grid>
 
+                    {/* Text Grid Item */}
                     <Grid item xs={12} md={5} sx={{ order: { xs: 2, md: isEven ? 2 : 1 } }}>
                         <Slide direction={slideDirectionText} in={inView} timeout={800}>
-                            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}> {/* Text aligned left on medium screens and up */}
                                 <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 'medium' }}>
                                     {feature.title}
                                 </Typography>
