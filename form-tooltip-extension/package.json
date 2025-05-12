@@ -1,0 +1,14 @@
+{
+  "name": "simpleform",
+  "version": "1.3",
+  "description": "Adds tooltip icons to form fields...",
+  "scripts": {
+    "build:content": "node build.mjs",
+    "build": "node build.mjs",
+    "watch:content": "node build.mjs --watch",
+    "prod": "npm run build && rm -rf production_package && mkdir production_package && cp manifest.json production_package/ && cp -r dist/ production_package/ && cp backgroundScript.js production_package/ && cp popup.html production_package/ && cp popup.js production_package/ && cp *.png production_package/ && echo '✅ Local production package created in production_package/' && rm -rf \"/mnt/c/Users/johnk/OneDrive/Desktop/form-tooltip-extension\" && cp -r production_package/. \"/mnt/c/Users/johnk/OneDrive/Desktop/form-tooltip-extension\" && echo '✅ Production package copied to /mnt/c/Users/johnk/OneDrive/Desktop/form-tooltip-extension'"
+  },
+  "devDependencies": {
+    "esbuild": "^0.x.x"
+  }
+}
