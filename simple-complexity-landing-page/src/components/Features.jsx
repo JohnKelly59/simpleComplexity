@@ -7,8 +7,9 @@ import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
-import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined'; // Added for Chat feature
 
 const features = [
     {
@@ -35,12 +36,17 @@ const features = [
         description: 'Tooltips feature an audio button to read the explanation aloud.',
         details: 'Enhances accessibility for users with visual impairments or reading difficulties, and supports those who prefer auditory learning.',
     },
-    // New Feature for Chat Box
     {
         icon: <QuestionAnswerOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Interactive Question Assistant',
         description: 'Get direct answers and guidance through an intuitive chat interface.',
         details: 'Ask specific questions about form fields or general form-filling queries. Our AI-powered assistant provides relevant information, making complex forms easier to navigate.',
+    },
+    {
+        icon: <HelpOutlineOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Support Assistant',
+        description: 'Reach out for help on any form-related issue at any time.',
+        details: 'Our 24/7 AI-driven support assistant is ready to guide you through troubleshooting, form guidance, and best practices—no waiting required.',
     },
     {
         icon: <ExtensionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
@@ -53,39 +59,33 @@ const features = [
 const FeatureSectionContainer = styled(Box)(({ theme }) => ({
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
-    overflow: 'hidden', // Kept to ensure slide animations don't cause premature scrollbars
+    overflow: 'hidden',
 }));
 
 const FeatureRow = ({ feature, index }) => {
     const { ref, inView } = useInView({
         triggerOnce: true,
-        threshold: 0.2, // A bit of the element needs to be in view
+        threshold: 0.2,
     });
 
     const isEven = index % 2 === 0;
-    // Determine slide direction based on whether the index is even or odd
-    // For even rows (0, 2, 4...): Icon slides from right, Text slides from left
-    // For odd rows (1, 3, 5...): Icon slides from left, Text slides from right
     const slideDirectionIcon = isEven ? 'right' : 'left';
     const slideDirectionText = isEven ? 'left' : 'right';
 
     return (
-        <Box ref={ref} sx={{ overflow: 'hidden' }}> {/* Moved overflow hidden here to contain slide */}
-            <FeatureSectionContainer> {/* This container now only handles padding */}
+        <Box ref={ref} sx={{ overflow: 'hidden' }}>
+            <FeatureSectionContainer>
                 <Grid container spacing={6} alignItems="center" justifyContent="center" sx={{ px: { xs: 2, md: 4 } }}>
-                    {/* Icon Grid Item */}
                     <Grid item xs={12} md={5} sx={{ textAlign: { xs: 'center', md: isEven ? 'right' : 'left' }, order: { xs: 1, md: isEven ? 1 : 2 } }}>
                         <Slide direction={slideDirectionIcon} in={inView} timeout={800}>
-                            <Box display="inline-block"> {/* Ensures the icon itself is what slides */}
+                            <Box display="inline-block">
                                 {feature.icon}
                             </Box>
                         </Slide>
                     </Grid>
-
-                    {/* Text Grid Item */}
                     <Grid item xs={12} md={5} sx={{ order: { xs: 2, md: isEven ? 2 : 1 } }}>
                         <Slide direction={slideDirectionText} in={inView} timeout={800}>
-                            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}> {/* Text aligned left on medium screens and up */}
+                            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
                                 <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 'medium' }}>
                                     {feature.title}
                                 </Typography>
@@ -106,19 +106,17 @@ const FeatureRow = ({ feature, index }) => {
     );
 };
 
-const Features = () => {
-    return (
-        <Box sx={{ py: 6, bgcolor: 'background.paper' }}>
-            <Grow in={true} timeout={500}>
-                <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 4, fontWeight: 'bold' }}>
-                    Features
-                </Typography>
-            </Grow>
-            {features.map((feature, index) => (
-                <FeatureRow key={feature.title} feature={feature} index={index} />
-            ))}
-        </Box>
-    );
-};
+const Features = () => (
+    <Box sx={{ py: 6, bgcolor: 'background.paper' }}>
+        <Grow in timeout={500}>
+            <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 4, fontWeight: 'bold' }}>
+                Features
+            </Typography>
+        </Grow>
+        {features.map((feature, index) => (
+            <FeatureRow key={feature.title} feature={feature} index={index} />
+        ))}
+    </Box>
+);
 
 export default Features;
