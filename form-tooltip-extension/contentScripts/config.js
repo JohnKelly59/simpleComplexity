@@ -1,5 +1,7 @@
 export const API_BASE_URL = "https://app.simple-complexity.com/api";
 export const QUESTION_LOOKUP_ENDPOINT = `${API_BASE_URL}/question-lookup`;
+export const SUPPORT_QUERY_ENDPOINT = `${API_BASE_URL}/support-query`;
+
 
 // SVG Icons remain the same
 export const SVG_SPEAKER = `
@@ -19,6 +21,19 @@ export const SVG_LOADER = `
             </g>
         </g>
     </svg>`;
+
+export const SVG_SUPPORT_ICON = `
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 24 24"
+     width="22" height="22"
+     fill="currentColor">
+  <!-- headset shell -->
+  <path d="M12 1A10 10 0 0 0 2 11v3a2 2 0 0 0 2 2h2v-6H4v-1
+           a8 8 0 0 1 16 0v1h-2v6h2a2 2 0 0 0 2-2v-3
+           A10 10 0 0 0 12 1z"/>
+  <!-- mic/earcup bars -->
+  <path d="M7 13h2v4H7zm8 0h2v4h-2z"/>
+</svg>`;
 
 export const SVG_REFRESH_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4C8.74 4 6 6.03 4.69 9h2.02a6.011 6.011 0 0 1 10.09-1.24l-1.81 1.81H20V4l-2.35 2.35zM6.35 17.65A7.95 7.95 0 0 0 12 20c3.26 0 6-2.03 7.31-5h-2.02a6.011 6.011 0 0 1-10.09 1.24l1.81-1.81H4v4l2.35-2.35z"/></svg>`;
 
