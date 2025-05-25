@@ -1,34 +1,26 @@
-// ────────────────────────────────────────────────────────────────────────────
-// scripts/api.js
-// Handles all network-calls for the extension (tooltips + support assistant)
-// ────────────────────────────────────────────────────────────────────────────
 
 import
-    {
-        QUESTION_LOOKUP_ENDPOINT,
-        SUPPORT_QUERY_ENDPOINT
-    } from './config.js';
+{
+    QUESTION_LOOKUP_ENDPOINT,
+    SUPPORT_QUERY_ENDPOINT
+} from './config.js';
 
 import
-    {
-        state,
-        incrementActiveFetches,
-        decrementActiveFetches
-    } from './mainState.js';
+{
+    state,
+    incrementActiveFetches,
+    decrementActiveFetches
+} from './mainState.js';
 
 import
-    {
-        showLoaderOnSpeedDial,
-        hideLoaderOnSpeedDial
-    } from './speedDial.js';
+{
+    showLoaderOnSpeedDial,
+    hideLoaderOnSpeedDial
+} from './speedDial.js';
 
 /**
- * Generic fetch helper that:
- *   • adds the stored Bearer token (if any)
- *   • shows a loader while in-flight
- *   • keeps a global active-fetch counter
  *
- * @param {string}  url
+ * @param {string}  url
  * @param {object=} options – fetch options
  * @returns {Promise<Response>}
  */
@@ -36,11 +28,9 @@ function fetchWithAuth (url, options = {})
 {
     return new Promise((resolve, reject) =>
     {
-        // kick-off loader
         if (state.activeFetches === 0) showLoaderOnSpeedDial();
         incrementActiveFetches();
 
-        // grab token (may not exist for open APIs)
         chrome.storage.sync.get(['authToken'], storageResult =>
         {
             if (chrome.runtime.lastError)
@@ -90,7 +80,6 @@ export function fetchTooltipsForKeys (keys = [])
 {
     if (!Array.isArray(keys) || keys.length === 0) return Promise.resolve({});
 
-    // dedupe + sanitise
     const uniqueKeys = [...new Set(keys)].filter(
         k => typeof k === 'string' && k.trim() !== ''
     );
@@ -115,7 +104,7 @@ export function fetchTooltipsForKeys (keys = [])
         .catch(err =>
         {
             console.warn('Tooltip lookup failed:', err);
-            return {};                 // graceful fallback
+            return {};
         });
 }
 
@@ -126,17 +115,19 @@ export function fetchTooltipsForKeys (keys = [])
 /**
  * Send a free-form support question about the current page.
  *
- * @param {string} question
+ * @param {string} question - The user's typed question.
+ * @param {string} context - The text content of the page.
  * @returns {Promise<string>} – answer text (empty string on failure)
  */
-export function sendSupportQuery (question)
+export function sendSupportQuery (question, context = '')
 {
     if (typeof question !== 'string' || !question.trim()) return Promise.resolve('');
 
     const payload = {
         question: question.trim(),
-        page: window.location.href      // give backend page-context
+        context: context
     };
+    // --- FIX END ---
 
     return fetchWithAuth(SUPPORT_QUERY_ENDPOINT, {
         method: 'POST',
@@ -152,13 +143,12 @@ export function sendSupportQuery (question)
                     : `API error ${resp.status}`;
                 throw new Error(msg);
             }
-            // expected shape: { answer: "…" }
             const data = await resp.json();
             return typeof data?.answer === 'string' ? data.answer : '';
         })
         .catch(err =>
         {
             console.warn('Support query failed:', err);
-            return '';                  // let UI handle empty answer
+            return '';
         });
 }
