@@ -45,8 +45,8 @@ const features = [
     {
         icon: <HelpOutlineOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
         title: 'Support Assistant',
-        description: 'Reach out for help on any form-related issue at any time.',
-        details: 'Our 24/7 AI-driven support assistant is ready to guide you through troubleshooting, form guidance, and best practices—no waiting required.',
+        description: 'Reach out for help on any issue at any time.',
+        details: 'Our 24/7 AI-driven support assistant is ready to guide you through troubleshooting, web application guidance, and best practices—no waiting required.',
     },
     {
         icon: <ExtensionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
