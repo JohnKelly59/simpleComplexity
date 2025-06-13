@@ -1,3 +1,4 @@
+// contentScripts/api.js
 
 import
 {
@@ -20,11 +21,12 @@ import
 
 /**
  *
- * @param {string}  url
+ * @param {string}  url
  * @param {object=} options – fetch options
  * @returns {Promise<Response>}
  */
-function fetchWithAuth (url, options = {})
+// MODIFICATION: Added 'export' keyword
+export function fetchWithAuth (url, options = {}) 
 {
     return new Promise((resolve, reject) =>
     {
@@ -127,7 +129,6 @@ export function sendSupportQuery (question, context = '')
         question: question.trim(),
         context: context
     };
-    // --- FIX END ---
 
     return fetchWithAuth(SUPPORT_QUERY_ENDPOINT, {
         method: 'POST',

@@ -1,4 +1,4 @@
-// background.js
+// backgroundScript.js
 
 /**
  * Creates the context menu item for selected text.
@@ -15,7 +15,7 @@ function setupContextMenu ()
         // Optional callback function after creation
         if (chrome.runtime.lastError)
         {
-            console.error("Error creating context menu:", chrome.runtime.lastError.message);
+            console.log("Error creating context menu:", chrome.runtime.lastError.message);
         } else
         {
             // console.log("Context menu 'fetchTooltipForSelection' created successfully.");
@@ -88,7 +88,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) =>
             );
         } else
         {
-            console.error("Context menu clicked, but could not get target tab information.");
+            console.log("Context menu clicked, but could not get target tab information.");
         }
     }
 });

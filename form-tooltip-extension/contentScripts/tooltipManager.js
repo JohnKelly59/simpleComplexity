@@ -204,7 +204,7 @@ function _populateAndPositionTooltip (triggerElement, field, forSticky = false)
             .catch((err) =>
             {
                 if (tooltipElement.style.display === 'block' && tooltipElement.contains(textSpan)) textSpan.textContent = "Error refreshing.";
-                console.error("Error during refresh fetch:", err);
+                console.log("Error during refresh fetch:", err);
             })
             .finally(() =>
             {

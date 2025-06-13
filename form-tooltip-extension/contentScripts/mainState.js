@@ -1,20 +1,15 @@
-// scripts/mainState.js
 
-/**
- * @file Manages the shared state for the tooltip application.
- * This includes data fetched from the API, user interaction counts,
- * and references to key DOM elements created by the script.
- */
 
 export const state = {
-    questionMatrix: {},      // Stores tooltip content (key: field identifier, value: tooltip text)
-    refreshCounts: {},       // Tracks refresh attempts per tooltip (key: field identifier, value: count)
-    lastRefreshTimes: {},    // Timestamps of last refresh attempts (key: field identifier, value: timestamp)
-    tooltipsEnabled: true,   // Global flag for enabling/disabling tooltips
-    tooltipRefGlobal: null,  // Reference to the persistent tooltip UI elements
-    speedDialRef: null,      // Reference to the speed dial UI elements
-    temporaryTooltipRef: null, // Reference to the currently displayed temporary tooltip
-    activeFetches: 0,        // Counter for ongoing API requests
+    questionMatrix: {},
+    refreshCounts: {},
+    lastRefreshTimes: {},
+    tooltipsEnabled: true,
+    tooltipRefGlobal: null,
+    speedDialRef: null,
+    temporaryTooltipRef: null,
+    activeFetches: 0,
+    speedDialEnabledGlobal: true
 };
 
 export function updateQuestionMatrix (newData)

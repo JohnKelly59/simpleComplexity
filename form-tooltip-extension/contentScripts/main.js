@@ -2,7 +2,7 @@
 import
 {
     state, updateQuestionMatrix, setTooltipsEnabled as setGlobalTooltipsEnabled,
-    setTooltipRef, setSpeedDialRef, resetRefreshTracking
+    setTooltipRef, setSpeedDialRef, resetRefreshTracking, // Removed setSpeedDialEnabled, will add new state
 } from './mainState.js';
 import { initTTS, cancelSpeech as cancelAllTTS } from './tts.js';
 import { fetchTooltipsForKeys } from './api.js';
@@ -14,7 +14,8 @@ import
     removeAllTooltipIcons,
 } from './fieldProcessor.js';
 import { observeDynamicFields, disconnectObserver } from './domObserver.js';
-import { createSpeedDial, updateSpeedDialAppearance } from './speedDial.js';
+import { createSpeedDial, updateSpeedDialAppearance, toggleSpeedDialVisibility } from './speedDial.js';
+import { startDemo } from './demo.js'; // Import the new demo function
 
 /**
  * @file Main entry point for the content script.
@@ -39,7 +40,7 @@ function toggleTooltipsGlobal (enabled)
         {
             // Force removal if disabled but icons exist
             removeAllTooltipIcons();
-            updateSpeedDialAppearance(enabled);
+            updateSpeedDialAppearance(enabled); // This will also hide speed dial actions if tooltips are off
             return;
         } else if (enabled && document.querySelector(".tooltip-icon-container"))
         {
@@ -52,18 +53,14 @@ function toggleTooltipsGlobal (enabled)
     if (!enabled)
     {   // Hide any active persistent tooltip
         removeAllTooltipIcons();
-        // No need to explicitly hide temporary tooltip here, as it's managed separately
-        // and new ones won't be created if tooltipsEnabled is false.
-        disconnectObserver(); // Stop observing DOM changes when disabled
+        disconnectObserver();
         console.log("Form field tooltips disabled.");
     } else
     {
         console.log("Form field tooltips enabled. Processing fields...");
-        // Re-initialize or refresh everything
-        removeAllTooltipIcons(); // Clear old state
-        resetRefreshTracking();  // Reset refresh counts for a fresh start
+        removeAllTooltipIcons();
+        resetRefreshTracking();
 
-        // Ensure tooltip container exists or is recreated if it was somehow removed
         if (!state.tooltipRefGlobal || !document.getElementById('form-tooltip-container'))
         {
             const tooltipUI = createTooltipContainer();
@@ -77,26 +74,45 @@ function toggleTooltipsGlobal (enabled)
                 .then((data) =>
                 {
                     updateQuestionMatrix(data);
-                    processAllFormFields(); // Add icons based on fetched data
+                    processAllFormFields();
                     console.log(`Processed ${Object.keys(data).length} tooltips on enable.`);
                 })
                 .catch(err =>
                 {
                     console.log("Error fetching tooltips on enable:", err);
-                    // Still process fields, maybe some data is stale but usable, or no data is fine
                     processAllFormFields();
                 })
                 .finally(() =>
                 {
-                    observeDynamicFields(); // Start observing after initial processing
+                    observeDynamicFields();
                 });
         } else
         {
-            processAllFormFields(); // Process even if no keys (e.g. to show "no data" if applicable)
-            observeDynamicFields(); // Start observing
+            processAllFormFields();
+            observeDynamicFields();
         }
     }
+    // Update speed dial appearance (main button opacity, actions menu) based on tooltip state
     updateSpeedDialAppearance(enabled);
+
+    // Additionally, ensure the entire speed dial is shown/hidden based on its own toggle
+    // This needs to be called AFTER updateSpeedDialAppearance if tooltips are disabled,
+    // as updateSpeedDialAppearance might hide it.
+    if (state.speedDialRef)
+    { // Check if speedDialRef exists
+        toggleSpeedDialVisibility(state.speedDialEnabledGlobal);
+    }
+}
+
+// New function to handle speed dial visibility specifically
+function toggleSpeedDialGlobal (enabled)
+{
+    state.speedDialEnabledGlobal = enabled; // Store in global state
+    if (state.speedDialRef)
+    { // Check if speedDialRef exists
+        toggleSpeedDialVisibility(enabled); // Call the function from speedDial.js
+    }
+    console.log("Speed Dial visibility global set to:", enabled);
 }
 
 
@@ -114,10 +130,8 @@ function initialize ()
     }
     console.log("Initializing tooltips system...");
 
-    initTTS(); // Initialize Text-to-Speech engine
+    initTTS();
 
-    // Create persistent tooltip UI
-    // Check if it exists from a previous script run (e.g., extension reloaded)
     let tooltipUI = state.tooltipRefGlobal;
     const existingTooltipContainer = document.getElementById('form-tooltip-container');
     if (!tooltipUI && existingTooltipContainer && existingTooltipContainer.shadowRoot)
@@ -134,26 +148,30 @@ function initialize ()
     if (tooltipUI) setTooltipRef(tooltipUI);
 
 
-    // Create Speed Dial UI
+    // Create Speed Dial UI only if it's enabled or default to enabled
+    // The actual visibility will be handled by toggleSpeedDialGlobal after storage check
     let speedDialUI = state.speedDialRef;
-    const existingSpeedDial = document.getElementById('tooltipSpeedDial');
-    if (!speedDialUI && existingSpeedDial)
+    if (!speedDialUI && (typeof state.speedDialEnabledGlobal === 'undefined' || state.speedDialEnabledGlobal))
     {
-        speedDialUI = {
-            speedDial: existingSpeedDial,
-            mainButton: existingSpeedDial.querySelector('#tooltipSpeedDial_mainButton'),
-            actionsContainer: existingSpeedDial.querySelector('.tooltip-speed-dial-actions'),
-            refreshButton: existingSpeedDial.querySelector('.tooltip-speed-dial-actions button'), // Assumes first button is refresh
-            mainImg: existingSpeedDial.querySelector('#tooltipSpeedDial_mainButton img')
-        };
-    } else if (!speedDialUI)
-    {
-        speedDialUI = createSpeedDial();
+        const existingSpeedDial = document.getElementById('tooltipSpeedDial');
+        if (!existingSpeedDial)
+        { // Only create if it truly doesn't exist
+            speedDialUI = createSpeedDial();
+            if (speedDialUI) setSpeedDialRef(speedDialUI);
+        } else if (existingSpeedDial)
+        { // If it exists, re-assign to state.speedDialRef
+            speedDialUI = {
+                speedDial: existingSpeedDial,
+                mainButton: existingSpeedDial.querySelector('#tooltipSpeedDial_mainButton'),
+                actionsContainer: existingSpeedDial.querySelector('.tooltip-speed-dial-actions'),
+                refreshButton: existingSpeedDial.querySelector('.tooltip-speed-dial-actions button'),
+                mainImg: existingSpeedDial.querySelector('#tooltipSpeedDial_mainButton img')
+            };
+            setSpeedDialRef(speedDialUI);
+        }
     }
-    if (speedDialUI) setSpeedDialRef(speedDialUI);
 
 
-    // Initial state application based on stored preference
     if (state.tooltipsEnabled)
     {
         const initialKeys = gatherKeysFromAllFields();
@@ -170,32 +188,35 @@ function initialize ()
                 .catch(err =>
                 {
                     console.log("Initial tooltip data fetch failed:", err);
-                    processAllFormFields(); // Attempt to process with no data or stale if any
+                    processAllFormFields();
                 })
                 .finally(() =>
                 {
-                    observeDynamicFields(); // Start observing after initial setup
+                    observeDynamicFields();
                 });
         } else
         {
             console.log("No initial fields found requiring tooltips.");
-            processAllFormFields(); // Process fields (e.g. if some have hardcoded keys)
+            processAllFormFields();
             observeDynamicFields();
         }
     } else
     {
         console.log("Tooltips are initially disabled.");
-        removeAllTooltipIcons(); // Ensure no icons are present if disabled
-        // Observer will be started if/when tooltips are enabled.
+        removeAllTooltipIcons();
     }
 
     updateSpeedDialAppearance(state.tooltipsEnabled);
+    // After basic initialization, set speed dial visibility based on its stored state
+    if (state.speedDialRef)
+    {
+        toggleSpeedDialVisibility(state.speedDialEnabledGlobal);
+    }
     console.log("Tooltip system initialization complete.");
 }
 
 // --- Event Listeners and Startup ---
 
-// Listen for messages from the background script or popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
 {
     let responseSent = false;
@@ -209,8 +230,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
                 responseSent = true;
             } catch (e)
             {
-                // This can happen if the message port was closed (e.g. popup closed)
-                // console.warn("Failed to send response (port may have closed):", e.message);
             }
         }
     };
@@ -218,7 +237,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
     if (message.type === "TOGGLE_TOOLTIPS")
     {
         toggleTooltipsGlobal(message.enabled);
-        // Update storage, so it persists across sessions/tabs for this user
         chrome.storage.sync.set({ tooltipsEnabled: message.enabled }, () =>
         {
             if (chrome.runtime.lastError)
@@ -226,10 +244,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
                 console.warn("Error saving tooltip toggle state:", chrome.runtime.lastError.message);
             }
         });
-        sendAsyncResponse({ status: "Updated", enabled: state.tooltipsEnabled });
-    } else if (message.type === "FETCH_SELECTED_TEXT_TOOLTIP")
+        sendAsyncResponse({ status: "Tooltips Updated", enabled: state.tooltipsEnabled });
+    } else if (message.type === "TOGGLE_SPEED_DIAL")
+    { // New message handler
+        toggleSpeedDialGlobal(message.enabled);
+        chrome.storage.sync.set({ speedDialEnabled: message.enabled }, () =>
+        {
+            if (chrome.runtime.lastError)
+            {
+                console.warn("Error saving speed dial state:", chrome.runtime.lastError.message);
+            }
+        });
+        sendAsyncResponse({ status: "Speed Dial Updated", enabled: message.enabled });
+    }
+    else if (message.type === "FETCH_SELECTED_TEXT_TOOLTIP")
     {
-        // This is an async operation, so return true to keep sendResponse alive
         (async () =>
         {
             try
@@ -242,41 +271,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
                 sendAsyncResponse({ status: "Error", error: err.message });
             }
         })();
-        return true; // Indicate async response
-    } else
+        return true;
+    } else if (message.type === "START_DEMO")
+    {
+        startDemo();
+        sendAsyncResponse({ status: "Demo started" });
+    }
+    else
     {
         console.log("Unhandled message received in content script:", message.type);
     }
-    // For synchronous messages or if sendAsyncResponse is called, return false or nothing.
-    // If we returned true above, this path isn't hit for that message.
     return false;
 });
 
-// Initial load: get stored preference and then initialize the system.
-chrome.storage.sync.get(["tooltipsEnabled"], (result) =>
+chrome.storage.sync.get(["tooltipsEnabled", "speedDialEnabled"], (result) =>
 {
     if (chrome.runtime.lastError)
     {
-        console.warn("Error getting 'tooltipsEnabled' from storage:", chrome.runtime.lastError.message);
-        // Default to true if storage fails
-        setGlobalTooltipsEnabled(true);
+        console.warn("Error getting initial states from storage:", chrome.runtime.lastError.message);
+        setGlobalTooltipsEnabled(true); // Default tooltips to true
+        state.speedDialEnabledGlobal = true; // Default speed dial to true
     } else
     {
-        // If tooltipsEnabled is undefined in storage, default to true.
         setGlobalTooltipsEnabled(result.tooltipsEnabled !== false);
+        // Default speedDialEnabled to true if undefined in storage
+        state.speedDialEnabledGlobal = result.speedDialEnabled !== false;
     }
 
-    // Defer initialization until the DOM is fully loaded.
     if (document.readyState === "loading")
     {
         document.addEventListener("DOMContentLoaded", initialize);
     } else
     {
-        initialize(); // DOM is already ready
+        initialize();
     }
 });
 
-// Clean up on page unload (though content scripts are often destroyed anyway)
 window.addEventListener('beforeunload', () =>
 {
     cancelAllTTS();

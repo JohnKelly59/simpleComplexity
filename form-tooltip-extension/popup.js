@@ -11,11 +11,13 @@ document.addEventListener("DOMContentLoaded", function ()
 
 
     const toggleTooltipsCheckbox = document.getElementById("toggleTooltips");
+    const toggleSpeedDialCheckbox = document.getElementById("toggleSpeedDial"); // New checkbox
     const loginBtn = document.getElementById("loginBtn");
     const emailField = document.getElementById("emailField");
     const passwordField = document.getElementById("passwordField");
     const googleSignInBtn = document.getElementById("googleSignInBtn");
     const logoutBtn = document.getElementById("logoutBtn");
+    const helpBtn = document.getElementById("helpBtn");
 
     const loginSection = document.getElementById("loginSection");
     const logoutSection = document.getElementById("logoutSection");
@@ -73,7 +75,35 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     });
 
-    // 3. Email/Password login
+    // 3. Speed Dial toggle
+    chrome.storage.sync.get(["speedDialEnabled"], (result) =>
+    {
+        // Default to true if not set
+        toggleSpeedDialCheckbox.checked = result.speedDialEnabled !== false;
+    });
+
+    toggleSpeedDialCheckbox.addEventListener("change", function ()
+    {
+        const isChecked = toggleSpeedDialCheckbox.checked;
+        chrome.storage.sync.set({ speedDialEnabled: isChecked }, () =>
+        {
+            console.log("Speed Dial visibility set to:", isChecked);
+        });
+
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) =>
+        {
+            if (tabs && tabs[0] && tabs[0].id)
+            {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    type: "TOGGLE_SPEED_DIAL",
+                    enabled: isChecked,
+                });
+            }
+        });
+    });
+
+
+    // 4. Email/Password login
     if (loginBtn)
     {
         loginBtn.addEventListener("click", async function ()
@@ -118,13 +148,13 @@ document.addEventListener("DOMContentLoaded", function ()
                 }
             } catch (err)
             {
-                //console.error("Login error:", err);
+                //console.log("Login error:", err);
                 showPopupMessage("Login failed. Check console for details.");
             }
         });
     }
 
-    // 4. Google Sign In
+    // 5. Google Sign In
     if (googleSignInBtn)
     {
         googleSignInBtn.addEventListener("click", () =>
@@ -142,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function ()
                 {
                     if (chrome.runtime.lastError)
                     {
-                        // console.error(
+                        // console.log(
                         //     "Google auth error:",
                         //     chrome.runtime.lastError.message
                         // );
@@ -171,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     }
 
-    // 5. Logout
+    // 6. Logout
     if (logoutBtn)
     {
         logoutBtn.addEventListener("click", function ()
@@ -182,6 +212,33 @@ document.addEventListener("DOMContentLoaded", function ()
                 // Show login UI again
                 loginSection.style.display = "block";
                 logoutSection.style.display = "none";
+            });
+        });
+    }
+
+    // 7. Help Button
+    if (helpBtn)
+    {
+        helpBtn.addEventListener("click", () =>
+        {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) =>
+            {
+                if (tabs && tabs[0] && tabs[0].id)
+                {
+                    chrome.tabs.sendMessage(tabs[0].id, {
+                        type: "START_DEMO",
+                    }, (response) =>
+                    {
+                        if (chrome.runtime.lastError)
+                        {
+                            console.warn("Could not start demo:", chrome.runtime.lastError.message);
+                        } else
+                        {
+                            console.log("Demo started.");
+                        }
+                    });
+                    window.close(); // Close the popup after starting the demo
+                }
             });
         });
     }
