@@ -1,6 +1,6 @@
 {
     "name": "SimpleForm",
-    "version": "1.6",
+    "version": "1.8",
     "manifest_version": 3,
     "description": "Adds tooltip icons to form fields to show dynamic definitions on hover. Features bulk refresh, toggle visibility, and text lookup.",
     "action": {

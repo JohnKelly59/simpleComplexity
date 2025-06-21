@@ -6,7 +6,7 @@ import
 } from './config.js';
 import { isBackgroundLight } from './utils.js';
 import { gatherKeysFromAllFields, removeAllTooltipIcons as removeIcons, processAllFormFields } from './fieldProcessor.js';
-import { fetchTooltipsForKeys, fetchWithAuth } from './api.js';
+import { fetchTooltipsForKeys, fetchWithAuth, sendSupportQuery } from './api.js';
 import { state, updateQuestionMatrix, resetRefreshTracking } from './mainState.js';
 
 let localSpeedDialRef = null;
@@ -24,26 +24,20 @@ async function handleSupportQuery (question, panelRef)
     const $form = panelRef.host.shadowRoot.getElementById('ss-form');
     const sendButton = $form.querySelector('button[type="submit"]');
 
-    panelRef.addMsg("Thinking...", 'bot');
+    panelRef.addMsg("Thinking...", 'bot'); // Show thinking message
     sendButton.disabled = true;
 
     try
     {
-        const response = await fetchWithAuth(SUPPORT_QUERY_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ question: question }),
-        });
-        const data = await response.json();
+        const pageContext = document.body.innerText;
+        const answer = await sendSupportQuery(question, pageContext);
 
-        if (data && data.answer)
+        if (answer)
         {
-            panelRef.addMsg(data.answer, 'bot');
+            panelRef.addMsg(answer, 'bot');
         } else
         {
-            panelRef.addMsg(data.error || "Sorry, I couldn't find an answer for that.", 'error');
+            panelRef.addMsg("Sorry, I couldn't find an answer for that.", 'error');
         }
     } catch (error)
     {
@@ -54,6 +48,7 @@ async function handleSupportQuery (question, panelRef)
         sendButton.disabled = false;
     }
 }
+
 
 
 function createSupportChatPanel ()

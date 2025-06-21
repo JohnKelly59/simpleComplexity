@@ -198,7 +198,7 @@ function defineTourSteps ()
         },
         {
             selector: '.tooltip-speed-dial-actions button[aria-label="Open Support Chat"]',
-            text: "The <strong>Support Chat</strong> connects you to an assistant that can answer questions about how to fill out the form.",
+            text: "The <strong>Support Chat</strong> connects you to an assistant that can answer questions about the current pafge you are visiting.",
         },
         {
             selector: 'p:not(:empty)', // Find any non-empty paragraph
@@ -215,7 +215,7 @@ function defineTourSteps ()
             }
         },
         {
-            text: "You're all set! You can control all features from the extension icon in your browser toolbar. Enjoy!",
+            text: "You're all set! You can control all features from the SimpleForm extension icon in your browser toolbar. Enjoy!",
         }
     ];
 }

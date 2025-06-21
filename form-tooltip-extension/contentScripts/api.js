@@ -132,7 +132,9 @@ export function sendSupportQuery (question, context = '')
 
     return fetchWithAuth(SUPPORT_QUERY_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify(payload)
     })
         .then(async resp =>
@@ -140,8 +142,8 @@ export function sendSupportQuery (question, context = '')
             if (!resp.ok)
             {
                 const text = await resp.text().catch(() => '');
-                const msg = text ? `API error ${resp.status}: ${text}`
-                    : `API error ${resp.status}`;
+                const msg = text ? `API error ${resp.status}: ${text}` :
+                    `API error ${resp.status}`;
                 throw new Error(msg);
             }
             const data = await resp.json();
