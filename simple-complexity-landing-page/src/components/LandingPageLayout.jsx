@@ -5,6 +5,7 @@ import Features from './Features';
 import Demo from './Demo';
 import Pricing from './Pricing';
 import Footer from './Footer';
+import DownloadExtension from './DownloadExtension';
 
 function LandingPageLayout() {
     return (
@@ -19,6 +20,9 @@ function LandingPageLayout() {
                 </Box>
                 <Box id="features-section">
                     <Features />
+                </Box>
+                <Box id="download-section">
+                    <DownloadExtension />
                 </Box>
                 <Box id="pricing-section">
                     <Pricing />

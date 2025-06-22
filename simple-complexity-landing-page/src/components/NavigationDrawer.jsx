@@ -1,6 +1,6 @@
 // src/components/NavigationDrawer.jsx
 import React, { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     IconButton,
@@ -13,7 +13,6 @@ import {
     Divider,
     Fab,
     useTheme,
-    useMediaQuery,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -25,7 +24,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 const drawerWidth = 280;
 
@@ -64,6 +63,7 @@ function NavigationDrawer({ children }) {
         { text: 'Demo', icon: <OndemandVideoIcon />, path: '/', sectionId: 'demo-section' },
         { text: 'Features', icon: <ChecklistIcon />, path: '/', sectionId: 'features-section' },
         { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section' },
+        { text: 'Download', icon: <GetAppIcon />, path: '/', sectionId: 'download-section' },
         { type: 'divider' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },
         { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
@@ -139,4 +139,4 @@ function NavigationDrawer({ children }) {
     );
 }
 
-export default NavigationDrawer
+export default NavigationDrawer;
