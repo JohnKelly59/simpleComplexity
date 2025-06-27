@@ -12,8 +12,8 @@ const Demo = () => {
   const theme = useTheme();
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleLoadedData = () => {
-    // When the video data has loaded, hide the loading spinner
+  const handleCanPlay = () => {
+    // When the video can start playing, hide the loading spinner
     setIsLoading(false);
   };
 
@@ -42,11 +42,10 @@ const Demo = () => {
           component="video"
           src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/SFDemo.mp4"
           playsInline
+          muted // Mute the video initially to help with autoplay policies on iOS
           controls
           preload="auto"
-          // Optionally include a poster image to show a static frame
-          // poster="/path/to/poster.jpg"
-          onLoadedData={handleLoadedData}
+          onCanPlay={handleCanPlay} // Use onCanPlay for better reliability on iOS
           sx={{
             width: '100%',
             height: { xs: 250, sm: 400 },
