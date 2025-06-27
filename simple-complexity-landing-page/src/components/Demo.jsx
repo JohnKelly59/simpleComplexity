@@ -40,12 +40,9 @@ const Demo = () => {
         {/* Video */}
         <CardMedia
           component="video"
-          src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/Tooltipdemo1.mp4"
-          autoPlay
-          muted
-          loop
+          src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/SFDemo.mp4"
           playsInline
-          controls={false}
+          controls
           preload="auto"
           // Optionally include a poster image to show a static frame
           // poster="/path/to/poster.jpg"
