@@ -12,8 +12,7 @@ const Demo = () => {
   const theme = useTheme();
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleCanPlay = () => {
-    // When the video can start playing, hide the loading spinner
+  const handleLoadedData = () => {
     setIsLoading(false);
   };
 
@@ -34,18 +33,18 @@ const Demo = () => {
           mt: 4,
           overflow: 'hidden',
           borderRadius: 3,
-          position: 'relative', // needed for the absolute spinner overlay
+          position: 'relative',
         }}
       >
-        {/* Video */}
         <CardMedia
           component="video"
           src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/SFDemo.mp4"
           playsInline
-          muted // Mute the video initially to help with autoplay policies on iOS
+          muted
           controls
-          preload="auto"
-          onCanPlay={handleCanPlay} // Use onCanPlay for better reliability on iOS
+          preload="metadata"
+          poster="https://simlplecomplexity.s3.us-east-2.amazonaws.com/SFDemoPoster.jpg"
+          onLoadedData={handleLoadedData}
           sx={{
             width: '100%',
             height: { xs: 250, sm: 400 },
@@ -53,7 +52,6 @@ const Demo = () => {
           }}
         />
 
-        {/* Loading overlay */}
         {isLoading && (
           <Box
             sx={{
@@ -65,7 +63,7 @@ const Demo = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.7)', // semi-transparent overlay
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
             }}
           >
             <CircularProgress />
