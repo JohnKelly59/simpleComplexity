@@ -1,100 +1,120 @@
 // backgroundScript.js
 
-/**
- * Creates the context menu item for selected text.
- */
-function setupContextMenu ()
+// Use a polyfill or a simple check to ensure cross-browser compatibility.
+if (typeof browser === "undefined")
 {
-    // Use chrome.contextMenus.create to add an item to the right-click menu
-    chrome.contextMenus.create({
-        id: "fetchTooltipForSelection", // Unique ID for this menu item
-        title: "Get Definition for \"%s\"", // Text displayed; %s is replaced by selected text
-        contexts: ["selection"] // Show only when text is selected
-    }, () =>
-    {
-        // Optional callback function after creation
-        if (chrome.runtime.lastError)
-        {
-            console.log("Error creating context menu:", chrome.runtime.lastError.message);
-        } else
-        {
-            // console.log("Context menu 'fetchTooltipForSelection' created successfully.");
-        }
-    });
+    var browser = chrome;
 }
 
+// The URL of the page on your website that the user is sent to *after*
+// successfully authenticating with Google and your server.
+const AUTH_SUCCESS_URL = 'https://app.simple-complexity.com/auth/google/extension/success';
+
 /**
- * Handles the initial setup of the context menu when the extension is installed or updated.
- * Also handles browser startup just in case.
+ * Listens for new tabs being created or updated.
+ * When it detects that the user has successfully logged in on your website,
+ * it extracts the token from the URL and closes the auth tab.
  */
-function initializeContextMenu ()
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) =>
 {
-    // Remove any existing menu items this extension created first to avoid duplicates
-    chrome.contextMenus.removeAll(() =>
+    // Check if the tab has finished loading and its URL is the one we expect after a successful login.
+    if (changeInfo.status === 'complete' && tab.url && tab.url.startsWith(AUTH_SUCCESS_URL))
     {
-        // console.log("Removed existing context menus, setting up new one.");
-        setupContextMenu(); // Create the new context menu item
-    });
-}
+        console.log('Authentication success page loaded. Storing token...');
 
-// --- Event Listeners ---
-
-// 1. Run when the extension is first installed or updated
-chrome.runtime.onInstalled.addListener(() =>
-{
-    console.log("Extension installed or updated. Initializing context menu.");
-    initializeContextMenu();
-});
-
-// 2. Run when the browser starts (if the extension is already enabled)
-// This covers cases where the browser was closed and reopened.
-chrome.runtime.onStartup.addListener(() =>
-{
-    console.log("Browser startup detected. Ensuring context menu exists.");
-    initializeContextMenu(); // Re-initialize to be safe
-});
-
-// 3. Listen for clicks on any context menu item created by this extension
-chrome.contextMenus.onClicked.addListener((info, tab) =>
-{
-    // Check if the click was on our specific menu item
-    if (info.menuItemId === "fetchTooltipForSelection")
-    {
-        // Check if we have valid tab information to send the message to
-        if (tab && tab.id)
+        try
         {
-            // console.log(`Context menu clicked for selection: "${info.selectionText}" in tab ${tab.id}`);
+            const urlObj = new URL(tab.url);
+            const token = urlObj.searchParams.get("token");
 
-            // Send a message to the content script in the specific tab where the click occurred
-            chrome.tabs.sendMessage(
-                tab.id,
+            if (token)
+            {
+                // Store the token securely in the extension's storage.
+                browser.storage.sync.set({ authToken: token }, () =>
                 {
-                    type: "FETCH_SELECTED_TEXT_TOOLTIP" // Message type the content script listens for
-                    // selectedText: info.selectionText // Optional: send text, but content script can get it too
-                },
-                (response) =>
-                { // Optional: Callback to handle the response from the content script
-                    if (chrome.runtime.lastError)
-                    {
-                        // Log if sending the message failed (e.g., content script not ready/injected)
-                        console.warn("Could not send message to content script:", chrome.runtime.lastError.message);
-                        // Consider retry logic or notifying the user if this happens often
-                    } else
-                    {
-                        // Log the response received from the content script (if it sends one)
-                        // console.log("Content script responded:", response);
-                    }
-                }
-            );
-        } else
+                    console.log('Auth token successfully stored.');
+                    // Close the now-unneeded authentication tab.
+                    browser.tabs.remove(tabId);
+                });
+            } else
+            {
+                console.warn('Auth success URL detected, but no token was found in the query parameters.');
+                // Still close the tab to avoid leaving it open.
+                browser.tabs.remove(tabId);
+            }
+        } catch (error)
         {
-            console.log("Context menu clicked, but could not get target tab information.");
+            console.error('Error processing auth success URL:', error);
+            browser.tabs.remove(tabId);
         }
     }
 });
 
-// Optional: Keep the service worker alive if needed for frequent events or listeners
-// Usually not necessary just for context menus and messaging.
-// chrome.runtime.onConnect.addListener(port => {
-//   console.log('Keeping service worker alive with port:', port.name);
-// });
+
+/**
+ * iOS/Safari Limitation Note:
+ * The contextMenus API is not supported on iOS. Therefore, the feature
+ * to right-click selected text will not be available on that platform.
+ * This code is kept for compatibility with desktop Safari on macOS.
+ */
+function setupContextMenu ()
+{
+    // Check if contextMenus API is available before using it.
+    if (browser.contextMenus)
+    {
+        browser.contextMenus.create({
+            id: "fetchTooltipForSelection",
+            title: "Get Definition for \"%s\"",
+            contexts: ["selection"]
+        });
+    }
+}
+
+function initializeContextMenu ()
+{
+    if (browser.contextMenus)
+    {
+        browser.contextMenus.removeAll(() =>
+        {
+            setupContextMenu();
+        });
+    }
+}
+
+// --- Event Listeners ---
+
+// Run when the extension is first installed or updated.
+browser.runtime.onInstalled.addListener(() =>
+{
+    console.log("Extension installed/updated. Initializing context menu for desktop Safari.");
+    initializeContextMenu();
+});
+
+// Run when the browser starts.
+browser.runtime.onStartup.addListener(() =>
+{
+    console.log("Browser startup. Initializing context menu for desktop Safari.");
+    initializeContextMenu();
+});
+
+// Listen for clicks on the context menu item.
+if (browser.contextMenus)
+{
+    browser.contextMenus.onClicked.addListener((info, tab) =>
+    {
+        if (info.menuItemId === "fetchTooltipForSelection" && tab?.id)
+        {
+            browser.tabs.sendMessage(
+                tab.id,
+                { type: "FETCH_SELECTED_TEXT_TOOLTIP" },
+                (response) =>
+                {
+                    if (browser.runtime.lastError)
+                    {
+                        console.warn("Could not send message to content script:", browser.runtime.lastError.message);
+                    }
+                }
+            );
+        }
+    });
+}
