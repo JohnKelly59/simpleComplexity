@@ -1,13 +1,36 @@
 // contentScripts/speedDial.js
 import
-{
-    SVG_LOADER, SVG_REFRESH_ICON, SVG_CHAT_ICON, SVG_SEND_ICON, SVG_CLOSE_ICON, SVG_SUPPORT_ICON,
-    SUPPORT_QUERY_ENDPOINT
-} from './config.js';
-import { isBackgroundLight } from './utils.js';
-import { gatherKeysFromAllFields, removeAllTooltipIcons as removeIcons, processAllFormFields } from './fieldProcessor.js';
-import { fetchTooltipsForKeys, fetchWithAuth, sendSupportQuery } from './api.js';
-import { state, updateQuestionMatrix, resetRefreshTracking } from './mainState.js';
+    {
+        SVG_LOADER,
+        SVG_REFRESH_ICON,
+        SVG_CHAT_ICON,
+        SVG_SEND_ICON,
+        SVG_CLOSE_ICON,
+        SVG_SUPPORT_ICON,
+        SUPPORT_QUERY_ENDPOINT
+    } from './config.js';
+import
+    {
+        isBackgroundLight
+    } from './utils.js';
+import
+    {
+        gatherKeysFromAllFields,
+        removeAllTooltipIcons as removeIcons,
+        processAllFormFields
+    } from './fieldProcessor.js';
+import
+    {
+        fetchTooltipsForKeys,
+        fetchWithAuth,
+        sendSupportQuery
+    } from './api.js';
+import
+    {
+        state,
+        updateQuestionMatrix,
+        resetRefreshTracking
+    } from './mainState.js';
 
 let localSpeedDialRef = null;
 let existingChatModalRef = null; // For the original chat modal (definitions)
@@ -58,7 +81,9 @@ function createSupportChatPanel ()
     const panelHost = document.createElement('div');
     panelHost.id = "simple-support-host";
     document.body.appendChild(panelHost);
-    const shadow = panelHost.attachShadow({ mode: 'open' });
+    const shadow = panelHost.attachShadow({
+        mode: 'open'
+    });
 
     shadow.innerHTML = `
     <style>
@@ -249,7 +274,12 @@ function createSupportChatPanel ()
         window.addEventListener('resize', setPanelPosition);
     }, 100);
 
-    return { panel: $panel, toggle: toggleSupportPanel, addMsg: addSupportMessage, host: panelHost };
+    return {
+        panel: $panel,
+        toggle: toggleSupportPanel,
+        addMsg: addSupportMessage,
+        host: panelHost
+    };
 }
 
 export function showLoaderOnSpeedDial ()
@@ -304,30 +334,58 @@ export function createSpeedDial ()
     const speedDialContainer = document.createElement("div");
     speedDialContainer.id = "tooltipSpeedDial";
     Object.assign(speedDialContainer.style, {
-        position: "fixed", bottom: "25px", right: "25px",
-        zIndex: 2147483646, display: "flex", flexDirection: "column-reverse", alignItems: "center"
+        position: "fixed",
+        bottom: "25px",
+        right: "25px",
+        zIndex: 2147483646,
+        display: "flex",
+        flexDirection: "column-reverse",
+        alignItems: "center"
     });
 
     const actionsContainer = document.createElement("div");
     actionsContainer.classList.add("tooltip-speed-dial-actions");
     Object.assign(actionsContainer.style, {
-        display: "none", flexDirection: "column", alignItems: "center",
-        marginBottom: "12px", gap: "12px"
+        display: "none",
+        flexDirection: "column",
+        alignItems: "center",
+        marginBottom: "12px",
+        gap: "12px"
     });
 
     const styleMiniFab = btn => Object.assign(btn.style, {
-        width: "44px", height: "44px", borderRadius: "50%", border: "none", cursor: "pointer",
-        backgroundColor: "#4A5568", color: "#FFFFFF", boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
-        display: "flex", alignItems: "center", justifyContent: "center",
+        width: "44px",
+        height: "44px",
+        borderRadius: "50%",
+        border: "none",
+        cursor: "pointer",
+        backgroundColor: "#4A5568",
+        color: "#FFFFFF",
+        boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         transition: 'background-color 0.2s ease, transform 0.1s ease-out'
     });
 
     const decorateHoverMiniFab = (btn) =>
     {
-        btn.onmouseenter = () => { if (!btn.disabled) btn.style.backgroundColor = '#2D3748'; };
-        btn.onmouseleave = () => { if (!btn.disabled) btn.style.backgroundColor = '#4A5568'; };
-        btn.onmousedown = () => { if (!btn.disabled) btn.style.transform = 'scale(0.95)'; };
-        btn.onmouseup = () => { if (!btn.disabled) btn.style.transform = 'scale(1)'; };
+        btn.onmouseenter = () =>
+        {
+            if (!btn.disabled) btn.style.backgroundColor = '#2D3748';
+        };
+        btn.onmouseleave = () =>
+        {
+            if (!btn.disabled) btn.style.backgroundColor = '#4A5568';
+        };
+        btn.onmousedown = () =>
+        {
+            if (!btn.disabled) btn.style.transform = 'scale(0.95)';
+        };
+        btn.onmouseup = () =>
+        {
+            if (!btn.disabled) btn.style.transform = 'scale(1)';
+        };
     };
 
     const definitionChatButton = document.createElement("button");
@@ -338,7 +396,8 @@ export function createSpeedDial ()
     definitionChatButton.innerHTML = SVG_CHAT_ICON;
     definitionChatButton.addEventListener("click", (event) =>
     {
-        event.preventDefault(); event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
         toggleChatModal(true);
 
@@ -361,7 +420,8 @@ export function createSpeedDial ()
     supportChatBtn.innerHTML = SVG_SUPPORT_ICON; // Using SVG_SUPPORT_ICON now
     supportChatBtn.addEventListener("click", (event) =>
     {
-        event.preventDefault(); event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
         if (!supportChatPanelRef)
         {
             supportChatPanelRef = createSupportChatPanel();
@@ -387,7 +447,8 @@ export function createSpeedDial ()
     refreshButton.innerHTML = SVG_REFRESH_ICON;
     refreshButton.addEventListener("click", (event) =>
     {
-        event.preventDefault(); event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
         if (!state.tooltipsEnabled)
         {
             console.log("Tooltips are disabled, cannot refresh.");
@@ -397,12 +458,19 @@ export function createSpeedDial ()
         }
         console.log("Refreshing all form field tooltips via speed dial...");
         refreshButton.disabled = true;
-        Object.assign(refreshButton.style, { opacity: '0.6', cursor: 'not-allowed', backgroundColor: '#4A5568' });
+        Object.assign(refreshButton.style, {
+            opacity: '0.6',
+            cursor: 'not-allowed',
+            backgroundColor: '#4A5568'
+        });
         const keys = gatherKeysFromAllFields();
         if (keys.length === 0)
         {
             console.log("No fields found to refresh tooltips for.");
-            Object.assign(refreshButton.style, { opacity: '1', cursor: 'pointer' });
+            Object.assign(refreshButton.style, {
+                opacity: '1',
+                cursor: 'pointer'
+            });
             refreshButton.disabled = false;
             if (actionsContainer) actionsContainer.style.display = "none";
             if (localSpeedDialRef?.mainButton) localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
@@ -421,7 +489,10 @@ export function createSpeedDial ()
             .finally(() =>
             {
                 refreshButton.disabled = false;
-                Object.assign(refreshButton.style, { opacity: '1', cursor: 'pointer' });
+                Object.assign(refreshButton.style, {
+                    opacity: '1',
+                    cursor: 'pointer'
+                });
                 if (actionsContainer) actionsContainer.style.display = "none";
                 if (localSpeedDialRef?.mainButton) localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
             });
@@ -433,26 +504,48 @@ export function createSpeedDial ()
     mainButton.setAttribute("aria-label", "Open options");
     mainButton.setAttribute("title", "Options");
     Object.assign(mainButton.style, {
-        width: "56px", height: "56px", borderRadius: "50%", border: "none", cursor: "pointer",
-        backgroundColor: "#1A202C", color: "#FFFFFF", boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-        display: "flex", alignItems: "center", justifyContent: "center",
+        width: "56px",
+        height: "56px",
+        borderRadius: "50%",
+        border: "none",
+        cursor: "pointer",
+        backgroundColor: "#1A202C",
+        color: "#FFFFFF",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         transition: "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, opacity 0.2s ease",
         opacity: '1'
     });
-    mainButton.onmouseenter = () => { if (!mainButton.dataset.isLoading) mainButton.style.backgroundColor = '#2D3748'; };
-    mainButton.onmouseleave = () => { if (!mainButton.dataset.isLoading) mainButton.style.backgroundColor = '#1A202C'; };
+    mainButton.onmouseenter = () =>
+    {
+        if (!mainButton.dataset.isLoading) mainButton.style.backgroundColor = '#2D3748';
+    };
+    mainButton.onmouseleave = () =>
+    {
+        if (!mainButton.dataset.isLoading) mainButton.style.backgroundColor = '#1A202C';
+    };
 
     const mainImg = document.createElement("img");
     mainImg.alt = "Tooltip Icon";
-    Object.assign(mainImg.style, { width: "28px", height: "28px" });
+    Object.assign(mainImg.style, {
+        width: "28px",
+        height: "28px"
+    });
     try
     {
-        mainImg.src = chrome.runtime.getURL(isBackgroundLight() ? "icon128.png" : "SC_COLOR.png");
+        mainImg.src = browser.runtime.getURL(isBackgroundLight() ? "icon128.png" : "SC_COLOR.png");
     } catch (e)
     {
         console.warn("Could not load main FAB icon.", e);
-        try { mainImg.src = chrome.runtime.getURL("icon128.png"); }
-        catch (e2) { console.log("Default FAB icon failed to load:", e2); }
+        try
+        {
+            mainImg.src = browser.runtime.getURL("icon128.png");
+        } catch (e2)
+        {
+            console.log("Default FAB icon failed to load:", e2);
+        }
     }
     mainButton.appendChild(mainImg);
 
@@ -477,7 +570,7 @@ export function createSpeedDial ()
 
         const isOpen = actionsContainer.style.display === "flex";
         actionsContainer.style.display = isOpen ? "none" : "flex";
-        mainButton.style.transform = isOpen ? "rotate(0deg)" : "rotate(135deg)";
+        mainButton.style.transform = isOpen ? "rotate(135deg)" : "rotate(0deg)";
 
         if (!isOpen)
         {
@@ -493,13 +586,19 @@ export function createSpeedDial ()
     if (!supportChatPanelRef) supportChatPanelRef = createSupportChatPanel();
 
     localSpeedDialRef = {
-        speedDial: speedDialContainer, mainButton, actionsContainer, refreshButton,
+        speedDial: speedDialContainer,
+        mainButton,
+        actionsContainer,
+        refreshButton,
         definitionChatButton,
         supportChatButton: supportChatBtn,
         mainImg
     };
     setSpeedDialPosition();
-    new MutationObserver(setSpeedDialPosition).observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(setSpeedDialPosition).observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 
     return localSpeedDialRef;
 }
@@ -615,28 +714,49 @@ function createExistingChatModal ()
     const modalContainer = document.createElement("div");
     modalContainer.id = "simpleform-chat-modal";
     Object.assign(modalContainer.style, {
-        display: "none", position: "fixed", bottom: "95px",
-        width: "330px", height: "480px", backgroundColor: "#ffffff",
-        borderRadius: "16px", boxShadow: "0 12px 30px rgba(0,0,0,0.12), 0 6px 15px rgba(0,0,0,0.08)",
-        zIndex: 2147483647, flexDirection: "column", overflow: "hidden",
+        display: "none",
+        position: "fixed",
+        bottom: "95px",
+        width: "330px",
+        height: "480px",
+        backgroundColor: "#ffffff",
+        borderRadius: "16px",
+        boxShadow: "0 12px 30px rgba(0,0,0,0.12), 0 6px 15px rgba(0,0,0,0.08)",
+        zIndex: 2147483647,
+        flexDirection: "column",
+        overflow: "hidden",
         fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif",
         transition: "opacity 0.25s ease-in-out, transform 0.25s ease-in-out",
-        opacity: "0", transform: "translateY(15px) scale(0.98)"
+        opacity: "0",
+        transform: "translateY(15px) scale(0.98)"
     });
 
     const header = document.createElement("div");
     Object.assign(header.style, {
-        padding: "16px 20px", backgroundColor: "#f7f7f7", borderBottom: "1px solid #e0e0e0",
-        display: "flex", justifyContent: "space-between", alignItems: "center"
+        padding: "16px 20px",
+        backgroundColor: "#f7f7f7",
+        borderBottom: "1px solid #e0e0e0",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center"
     });
     const title = document.createElement("h2");
     title.textContent = "Question Assistant";
-    Object.assign(title.style, { margin: "0", fontSize: "17px", fontWeight: "600", color: "#212529" });
+    Object.assign(title.style, {
+        margin: "0",
+        fontSize: "17px",
+        fontWeight: "600",
+        color: "#212529"
+    });
     const closeButton = document.createElement("button");
     closeButton.innerHTML = SVG_CLOSE_ICON;
     Object.assign(closeButton.style, {
-        background: "transparent", border: "none", cursor: "pointer",
-        color: "#555", padding: "5px", borderRadius: "50%"
+        background: "transparent",
+        border: "none",
+        cursor: "pointer",
+        color: "#555",
+        padding: "5px",
+        borderRadius: "50%"
     });
     closeButton.onmouseenter = () => closeButton.style.backgroundColor = "rgba(0,0,0,0.05)";
     closeButton.onmouseleave = () => closeButton.style.backgroundColor = "transparent";
@@ -647,13 +767,20 @@ function createExistingChatModal ()
     const chatHistory = document.createElement("div");
     chatHistory.id = "simpleform-chat-history";
     Object.assign(chatHistory.style, {
-        flexGrow: "1", padding: "20px", overflowY: "auto", backgroundColor: "#fff",
-        display: "flex", flexDirection: "column", gap: "15px"
+        flexGrow: "1",
+        padding: "20px",
+        overflowY: "auto",
+        backgroundColor: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        gap: "15px"
     });
 
     const inputArea = document.createElement("div");
     Object.assign(inputArea.style, {
-        display: "flex", padding: "16px 20px", borderTop: "1px solid #e0e0e0",
+        display: "flex",
+        padding: "16px 20px",
+        borderTop: "1px solid #e0e0e0",
         backgroundColor: "#f7f7f7"
     });
     const textInput = document.createElement("input");
@@ -661,8 +788,13 @@ function createExistingChatModal ()
     textInput.placeholder = "Type your question...";
     textInput.setAttribute("aria-label", "Chat message input");
     Object.assign(textInput.style, {
-        flexGrow: "1", border: "1px solid #d1d5db", borderRadius: "8px",
-        padding: "10px 14px", fontSize: "14px", marginRight: "10px", outline: "none",
+        flexGrow: "1",
+        border: "1px solid #d1d5db",
+        borderRadius: "8px",
+        padding: "10px 14px",
+        fontSize: "14px",
+        marginRight: "10px",
+        outline: "none",
         transition: "border-color 0.2s ease, box-shadow 0.2s ease"
     });
     textInput.onfocus = () =>
@@ -680,9 +812,15 @@ function createExistingChatModal ()
     sendButton.innerHTML = SVG_SEND_ICON;
     sendButton.setAttribute("aria-label", "Send message");
     Object.assign(sendButton.style, {
-        background: "#D4A017", color: "#000000", border: "none",
-        borderRadius: "8px", padding: "10px 14px", cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center",
+        background: "#D4A017",
+        color: "#000000",
+        border: "none",
+        borderRadius: "8px",
+        padding: "10px 14px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         transition: "background-color 0.2s ease"
     });
     if (sendButton.querySelector("svg")) sendButton.querySelector("svg").style.fill = "#000000";
@@ -696,7 +834,10 @@ function createExistingChatModal ()
         addExistingMessageToChat(messageText, "user");
         textInput.value = "";
         sendButton.disabled = true;
-        Object.assign(sendButton.style, { opacity: "0.7", cursor: "wait" });
+        Object.assign(sendButton.style, {
+            opacity: "0.7",
+            cursor: "wait"
+        });
         addExistingMessageToChat("Thinking...", "bot", true);
         try
         {
@@ -710,13 +851,20 @@ function createExistingChatModal ()
         } finally
         {
             sendButton.disabled = false;
-            Object.assign(sendButton.style, { opacity: "1", cursor: "pointer" });
+            Object.assign(sendButton.style, {
+                opacity: "1",
+                cursor: "pointer"
+            });
         }
     };
     sendButton.onclick = sendMessage;
     textInput.onkeypress = (e) =>
     {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        if (e.key === 'Enter' && !e.shiftKey)
+        {
+            e.preventDefault();
+            sendMessage();
+        }
     };
     inputArea.appendChild(textInput);
     inputArea.appendChild(sendButton);
@@ -725,7 +873,12 @@ function createExistingChatModal ()
     modalContainer.appendChild(inputArea);
 
     document.body.appendChild(modalContainer);
-    existingChatModalRef = { modal: modalContainer, history: chatHistory, input: textInput, sendBtn: sendButton };
+    existingChatModalRef = {
+        modal: modalContainer,
+        history: chatHistory,
+        input: textInput,
+        sendBtn: sendButton
+    };
     setSpeedDialPosition();
 }
 
@@ -734,27 +887,38 @@ function addExistingMessageToChat (text, sender, isPending = false)
     if (!existingChatModalRef || !existingChatModalRef.history) return;
     const messageBubble = document.createElement("div");
     Object.assign(messageBubble.style, {
-        padding: "10px 14px", borderRadius: "12px", maxWidth: "80%",
-        fontSize: "14px", lineHeight: "1.5", wordBreak: "break-word"
+        padding: "10px 14px",
+        borderRadius: "12px",
+        maxWidth: "80%",
+        fontSize: "14px",
+        lineHeight: "1.5",
+        wordBreak: "break-word"
     });
     if (sender === "user")
     {
         messageBubble.textContent = text;
         Object.assign(messageBubble.style, {
-            backgroundColor: "#116530", color: "white",
-            alignSelf: "flex-end", borderBottomRightRadius: "4px"
+            backgroundColor: "#116530",
+            color: "white",
+            alignSelf: "flex-end",
+            borderBottomRightRadius: "4px"
         });
     } else
     {
         messageBubble.textContent = text;
         Object.assign(messageBubble.style, {
-            backgroundColor: "#f0f0f0", color: "#212529",
-            alignSelf: "flex-start", borderBottomLeftRadius: "4px"
+            backgroundColor: "#f0f0f0",
+            color: "#212529",
+            alignSelf: "flex-start",
+            borderBottomLeftRadius: "4px"
         });
         if (isPending)
         {
             messageBubble.classList.add("pending-bot-message");
-            Object.assign(messageBubble.style, { fontStyle: "italic", opacity: "0.8" });
+            Object.assign(messageBubble.style, {
+                fontStyle: "italic",
+                opacity: "0.8"
+            });
         }
     }
     existingChatModalRef.history.appendChild(messageBubble);
@@ -768,7 +932,10 @@ function updateLastExistingBotMessage (text)
     if (pendingMessage)
     {
         pendingMessage.textContent = text;
-        Object.assign(pendingMessage.style, { fontStyle: "normal", opacity: "1" });
+        Object.assign(pendingMessage.style, {
+            fontStyle: "normal",
+            opacity: "1"
+        });
         pendingMessage.classList.remove("pending-bot-message");
     } else
     {
@@ -782,7 +949,8 @@ function toggleChatModal (show)
     if (!existingChatModalRef)
     {
         console.warn("Existing chat modal (definitions) not initialized.");
-        if (show) createExistingChatModal(); else return;
+        if (show) createExistingChatModal();
+        else return;
     }
     if (!existingChatModalRef) return;
 

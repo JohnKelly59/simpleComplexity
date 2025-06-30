@@ -1,21 +1,51 @@
 // scripts/main.js
 import
-{
-    state, updateQuestionMatrix, setTooltipsEnabled as setGlobalTooltipsEnabled,
-    setTooltipRef, setSpeedDialRef, resetRefreshTracking, // Removed setSpeedDialEnabled, will add new state
-} from './mainState.js';
-import { initTTS, cancelSpeech as cancelAllTTS } from './tts.js';
-import { fetchTooltipsForKeys } from './api.js';
-import { createTooltipContainer } from './tooltipManager.js';
-import { fetchAndShowSelectedTextTooltip } from './temporaryTooltip.js';
+    {
+        state,
+        updateQuestionMatrix,
+        setTooltipsEnabled as setGlobalTooltipsEnabled,
+        setTooltipRef,
+        setSpeedDialRef,
+        resetRefreshTracking,
+    } from './mainState.js';
 import
-{
-    processAllFormFields, gatherKeysFromAllFields,
-    removeAllTooltipIcons,
-} from './fieldProcessor.js';
-import { observeDynamicFields, disconnectObserver } from './domObserver.js';
-import { createSpeedDial, updateSpeedDialAppearance, toggleSpeedDialVisibility } from './speedDial.js';
-import { startDemo } from './demo.js'; // Import the new demo function
+    {
+        initTTS,
+        cancelSpeech as cancelAllTTS
+    } from './tts.js';
+import
+    {
+        fetchTooltipsForKeys
+    } from './api.js';
+import
+    {
+        createTooltipContainer
+    } from './tooltipManager.js';
+import
+    {
+        fetchAndShowSelectedTextTooltip
+    } from './temporaryTooltip.js';
+import
+    {
+        processAllFormFields,
+        gatherKeysFromAllFields,
+        removeAllTooltipIcons,
+    } from './fieldProcessor.js';
+import
+    {
+        observeDynamicFields,
+        disconnectObserver
+    } from './domObserver.js';
+import
+    {
+        createSpeedDial,
+        updateSpeedDialAppearance,
+        toggleSpeedDialVisibility
+    } from './speedDial.js';
+import
+    {
+        startDemo
+    } from './demo.js'; // Import the new demo function
 
 /**
  * @file Main entry point for the content script.
@@ -51,7 +81,7 @@ function toggleTooltipsGlobal (enabled)
 
 
     if (!enabled)
-    {   // Hide any active persistent tooltip
+    { // Hide any active persistent tooltip
         removeAllTooltipIcons();
         disconnectObserver();
         console.log("Form field tooltips disabled.");
@@ -217,7 +247,7 @@ function initialize ()
 
 // --- Event Listeners and Startup ---
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
+browser.runtime.onMessage.addListener((message, sender, sendResponse) =>
 {
     let responseSent = false;
     const sendAsyncResponse = (response) =>
@@ -228,35 +258,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
             {
                 sendResponse(response);
                 responseSent = true;
-            } catch (e)
-            {
-            }
+            } catch (e) { }
         }
     };
 
     if (message.type === "TOGGLE_TOOLTIPS")
     {
         toggleTooltipsGlobal(message.enabled);
-        chrome.storage.sync.set({ tooltipsEnabled: message.enabled }, () =>
+        browser.storage.sync.set({
+            tooltipsEnabled: message.enabled
+        }, () =>
         {
-            if (chrome.runtime.lastError)
+            if (browser.runtime.lastError)
             {
-                console.warn("Error saving tooltip toggle state:", chrome.runtime.lastError.message);
+                console.warn("Error saving tooltip toggle state:", browser.runtime.lastError.message);
             }
         });
-        sendAsyncResponse({ status: "Tooltips Updated", enabled: state.tooltipsEnabled });
+        sendAsyncResponse({
+            status: "Tooltips Updated",
+            enabled: state.tooltipsEnabled
+        });
     } else if (message.type === "TOGGLE_SPEED_DIAL")
     { // New message handler
         toggleSpeedDialGlobal(message.enabled);
-        chrome.storage.sync.set({ speedDialEnabled: message.enabled }, () =>
+        browser.storage.sync.set({
+            speedDialEnabled: message.enabled
+        }, () =>
         {
-            if (chrome.runtime.lastError)
+            if (browser.runtime.lastError)
             {
-                console.warn("Error saving speed dial state:", chrome.runtime.lastError.message);
+                console.warn("Error saving speed dial state:", browser.runtime.lastError.message);
             }
         });
-        sendAsyncResponse({ status: "Speed Dial Updated", enabled: message.enabled });
+        sendAsyncResponse({
+            status: "Speed Dial Updated",
+            enabled: message.enabled
+        });
     }
+    // iOS/Safari Limitation: The context menu ("right-click" menu) is not supported.
+    // The "FETCH_SELECTED_TEXT_TOOLTIP" message, which is triggered by the context menu, will not work on iOS.
+    // You will need to create an alternative UI, such as a button in the speed dial, to trigger this functionality.
     else if (message.type === "FETCH_SELECTED_TEXT_TOOLTIP")
     {
         (async () =>
@@ -264,31 +305,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) =>
             try
             {
                 await fetchAndShowSelectedTextTooltip();
-                sendAsyncResponse({ status: "Attempted fetch for selected text" });
+                sendAsyncResponse({
+                    status: "Attempted fetch for selected text"
+                });
             } catch (err)
             {
                 console.log("Error handling FETCH_SELECTED_TEXT_TOOLTIP:", err);
-                sendAsyncResponse({ status: "Error", error: err.message });
+                sendAsyncResponse({
+                    status: "Error",
+                    error: err.message
+                });
             }
         })();
         return true;
     } else if (message.type === "START_DEMO")
     {
         startDemo();
-        sendAsyncResponse({ status: "Demo started" });
-    }
-    else
+        sendAsyncResponse({
+            status: "Demo started"
+        });
+    } else
     {
         console.log("Unhandled message received in content script:", message.type);
     }
     return false;
 });
 
-chrome.storage.sync.get(["tooltipsEnabled", "speedDialEnabled"], (result) =>
+browser.storage.sync.get(["tooltipsEnabled", "speedDialEnabled"], (result) =>
 {
-    if (chrome.runtime.lastError)
+    if (browser.runtime.lastError)
     {
-        console.warn("Error getting initial states from storage:", chrome.runtime.lastError.message);
+        console.warn("Error getting initial states from storage:", browser.runtime.lastError.message);
         setGlobalTooltipsEnabled(true); // Default tooltips to true
         state.speedDialEnabledGlobal = true; // Default speed dial to true
     } else

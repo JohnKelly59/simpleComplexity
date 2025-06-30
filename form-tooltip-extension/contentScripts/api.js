@@ -1,23 +1,23 @@
 // contentScripts/api.js
 
 import
-{
-    QUESTION_LOOKUP_ENDPOINT,
-    SUPPORT_QUERY_ENDPOINT
-} from './config.js';
+    {
+        QUESTION_LOOKUP_ENDPOINT,
+        SUPPORT_QUERY_ENDPOINT
+    } from './config.js';
 
 import
-{
-    state,
-    incrementActiveFetches,
-    decrementActiveFetches
-} from './mainState.js';
+    {
+        state,
+        incrementActiveFetches,
+        decrementActiveFetches
+    } from './mainState.js';
 
 import
-{
-    showLoaderOnSpeedDial,
-    hideLoaderOnSpeedDial
-} from './speedDial.js';
+    {
+        showLoaderOnSpeedDial,
+        hideLoaderOnSpeedDial
+    } from './speedDial.js';
 
 /**
  *
@@ -25,37 +25,41 @@ import
  * @param {object=} options – fetch options
  * @returns {Promise<Response>}
  */
-// MODIFICATION: Added 'export' keyword
-export function fetchWithAuth (url, options = {}) 
+export function fetchWithAuth (url, options = {})
 {
     return new Promise((resolve, reject) =>
     {
         if (state.activeFetches === 0) showLoaderOnSpeedDial();
         incrementActiveFetches();
 
-        chrome.storage.sync.get(['authToken'], storageResult =>
+        browser.storage.sync.get(['authToken'], storageResult =>
         {
-            if (chrome.runtime.lastError)
+            if (browser.runtime.lastError)
             {
                 decrementActiveFetches();
                 if (state.activeFetches === 0) hideLoaderOnSpeedDial();
                 reject(
-                    new Error(`Storage error: ${chrome.runtime.lastError.message}`)
+                    new Error(`Storage error: ${browser.runtime.lastError.message}`)
                 );
                 return;
             }
 
             const bearerToken =
-                typeof storageResult.authToken === 'string'
-                    ? storageResult.authToken
-                    : storageResult.authToken?.token || '';
+                typeof storageResult.authToken === 'string' ?
+                    storageResult.authToken :
+                    storageResult.authToken?.token || '';
 
             const headers = {
                 ...options.headers,
-                ...(bearerToken && { Authorization: `Bearer ${bearerToken}` })
+                ...(bearerToken && {
+                    Authorization: `Bearer ${bearerToken}`
+                })
             };
 
-            fetch(url, { ...options, headers })
+            fetch(url, {
+                ...options,
+                headers
+            })
                 .then(resolve)
                 .catch(reject)
                 .finally(() =>
@@ -89,16 +93,20 @@ export function fetchTooltipsForKeys (keys = [])
 
     return fetchWithAuth(QUESTION_LOOKUP_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ keys: uniqueKeys })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            keys: uniqueKeys
+        })
     })
         .then(async resp =>
         {
             if (!resp.ok)
             {
                 const text = await resp.text().catch(() => '');
-                const msg = text ? `API error ${resp.status}: ${text}`
-                    : `API error ${resp.status}`;
+                const msg = text ? `API error ${resp.status}: ${text}` :
+                    `API error ${resp.status}`;
                 throw new Error(msg);
             }
             return resp.json();
