@@ -5,6 +5,15 @@
  */
 
 /**
+ * Determines if the current browser is Safari.
+ * @returns {boolean} True if the browser is Safari, false otherwise.
+ */
+export function isSafari ()
+{
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
+/**
  * Determines if the document body's background color is light or dark.
  * Used for selecting an appropriate icon color.
  * @returns {boolean} True if the background is light, false otherwise.

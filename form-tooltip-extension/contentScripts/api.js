@@ -1,23 +1,24 @@
 // contentScripts/api.js
 
 import
-    {
-        QUESTION_LOOKUP_ENDPOINT,
-        SUPPORT_QUERY_ENDPOINT
-    } from './config.js';
+{
+    QUESTION_LOOKUP_ENDPOINT,
+    SUPPORT_QUERY_ENDPOINT
+} from './config.js';
 
 import
-    {
-        state,
-        incrementActiveFetches,
-        decrementActiveFetches
-    } from './mainState.js';
+{
+    state,
+    incrementActiveFetches,
+    decrementActiveFetches
+} from './mainState.js';
 
 import
-    {
-        showLoaderOnSpeedDial,
-        hideLoaderOnSpeedDial
-    } from './speedDial.js';
+{
+    showLoaderOnSpeedDial,
+    hideLoaderOnSpeedDial
+} from './speedDial.js';
+import { isSafari } from './utils.js';
 
 /**
  *
@@ -29,7 +30,7 @@ export function fetchWithAuth (url, options = {})
 {
     return new Promise((resolve, reject) =>
     {
-        if (state.activeFetches === 0) showLoaderOnSpeedDial();
+        if (!isSafari() && state.activeFetches === 0) showLoaderOnSpeedDial();
         incrementActiveFetches();
 
         browser.storage.sync.get(['authToken'], storageResult =>
@@ -37,7 +38,7 @@ export function fetchWithAuth (url, options = {})
             if (browser.runtime.lastError)
             {
                 decrementActiveFetches();
-                if (state.activeFetches === 0) hideLoaderOnSpeedDial();
+                if (!isSafari() && state.activeFetches === 0) hideLoaderOnSpeedDial();
                 reject(
                     new Error(`Storage error: ${browser.runtime.lastError.message}`)
                 );
@@ -65,7 +66,7 @@ export function fetchWithAuth (url, options = {})
                 .finally(() =>
                 {
                     decrementActiveFetches();
-                    if (state.activeFetches === 0) hideLoaderOnSpeedDial();
+                    if (!isSafari() && state.activeFetches === 0) hideLoaderOnSpeedDial();
                 });
         });
     });

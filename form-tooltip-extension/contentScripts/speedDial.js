@@ -1,10 +1,10 @@
 // contentScripts/speedDial.js
 import
-    {
-        SVG_LOADER, SVG_REFRESH_ICON, SVG_CHAT_ICON, SVG_SEND_ICON, SVG_CLOSE_ICON, SVG_SUPPORT_ICON,
-        SUPPORT_QUERY_ENDPOINT
-    } from './config.js';
-import { isBackgroundLight } from './utils.js';
+{
+    SVG_LOADER, SVG_REFRESH_ICON, SVG_CHAT_ICON, SVG_SEND_ICON, SVG_CLOSE_ICON, SVG_SUPPORT_ICON,
+    SUPPORT_QUERY_ENDPOINT
+} from './config.js';
+import { isBackgroundLight, isSafari } from './utils.js';
 import { gatherKeysFromAllFields, removeAllTooltipIcons as removeIcons, processAllFormFields } from './fieldProcessor.js';
 import { fetchTooltipsForKeys, fetchWithAuth, sendSupportQuery } from './api.js';
 import { state, updateQuestionMatrix, resetRefreshTracking } from './mainState.js';
@@ -218,7 +218,10 @@ function createSupportChatPanel ()
         if (localSpeedDialRef?.actionsContainer.style.display === 'flex')
         {
             localSpeedDialRef.actionsContainer.style.display = 'none';
-            if (localSpeedDialRef?.mainButton) localSpeedDialRef.mainButton.style.transform = 'rotate(0deg)';
+            if (!isSafari())
+            {
+                if (localSpeedDialRef?.mainButton) localSpeedDialRef.mainButton.style.transform = 'rotate(0deg)';
+            }
         }
     };
 
@@ -341,7 +344,10 @@ export function createSpeedDial ()
         event.preventDefault(); event.stopPropagation();
         toggleChatModal(true);
         actionsContainer.style.display = 'none';
-        mainButton.style.transform = 'rotate(0deg)';
+        if (!isSafari())
+        {
+            mainButton.style.transform = 'rotate(0deg)';
+        }
     });
     actionsContainer.appendChild(definitionChatButton);
 
@@ -364,7 +370,10 @@ export function createSpeedDial ()
             supportChatPanelRef.toggle(true);
         }
         actionsContainer.style.display = 'none';
-        mainButton.style.transform = 'rotate(0deg)';
+        if (!isSafari())
+        {
+            mainButton.style.transform = 'rotate(0deg)';
+        }
     });
     actionsContainer.appendChild(supportChatBtn);
 
@@ -398,7 +407,10 @@ export function createSpeedDial ()
                 refreshButton.disabled = false;
                 Object.assign(refreshButton.style, { opacity: '1', cursor: 'pointer' });
                 actionsContainer.style.display = 'none';
-                mainButton.style.transform = 'rotate(0deg)';
+                if (!isSafari())
+                {
+                    mainButton.style.transform = 'rotate(0deg)';
+                }
             });
     });
     actionsContainer.appendChild(refreshButton);
@@ -445,7 +457,10 @@ export function createSpeedDial ()
             if (isSupportChatOpen) supportChatPanelRef.toggle(false);
             // Also ensure actions are hidden and button is reset
             actionsContainer.style.display = 'none';
-            mainButton.style.transform = 'rotate(0deg)';
+            if (!isSafari())
+            {
+                mainButton.style.transform = 'rotate(0deg)';
+            }
             return;
         }
 
@@ -453,11 +468,17 @@ export function createSpeedDial ()
         if (isActionsOpen)
         {
             actionsContainer.style.display = 'none';
-            mainButton.style.transform = 'rotate(0deg)';
+            if (!isSafari())
+            {
+                mainButton.style.transform = 'rotate(0deg)';
+            }
         } else
         {
             actionsContainer.style.display = 'flex';
-            mainButton.style.transform = 'rotate(135deg)';
+            if (!isSafari())
+            {
+                mainButton.style.transform = 'rotate(135deg)';
+            }
             updateSpeedDialAppearance(state.tooltipsEnabled);
         }
     });
@@ -572,7 +593,10 @@ export function toggleSpeedDialVisibility (visible)
         }
         if (localSpeedDialRef.mainButton)
         {
-            localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
+            if (!isSafari())
+            {
+                localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
+            }
         }
         toggleChatModal(false); // Close definition chat
         if (supportChatPanelRef?.panel.classList.contains('visible'))
@@ -771,7 +795,13 @@ function toggleChatModal (show)
             existingChatModalRef.modal.style.transform = "translateY(0) scale(1)";
         });
         if (localSpeedDialRef?.actionsContainer) localSpeedDialRef.actionsContainer.style.display = "none";
-        if (localSpeedDialRef?.mainButton) localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
+        if (localSpeedDialRef?.mainButton)
+        {
+            if (!isSafari())
+            {
+                localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
+            }
+        }
         if (supportChatPanelRef?.panel.classList.contains('visible'))
         {
             supportChatPanelRef.toggle(false);
