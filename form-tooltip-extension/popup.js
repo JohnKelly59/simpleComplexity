@@ -59,14 +59,11 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     }
 
-    // Tooltip toggle
-    browser.storage.sync.get(["tooltipsEnabled"], (result) =>
-    {
-        toggleTooltipsCheckbox.checked = result.tooltipsEnabled !== false;
-    });
+    // Tooltip toggle listener
     toggleTooltipsCheckbox.addEventListener("change", function ()
     {
         const isChecked = toggleTooltipsCheckbox.checked;
+        browser.storage.sync.set({ tooltipsEnabled: isChecked });
         browser.tabs.query({ active: true, currentWindow: true }, (tabs) =>
         {
             if (tabs[0]?.id)
@@ -76,14 +73,11 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     });
 
-    // Speed Dial toggle
-    browser.storage.sync.get(["speedDialEnabled"], (result) =>
-    {
-        toggleSpeedDialCheckbox.checked = result.speedDialEnabled !== false;
-    });
+    // Speed Dial toggle listener
     toggleSpeedDialCheckbox.addEventListener("change", function ()
     {
         const isChecked = toggleSpeedDialCheckbox.checked;
+        browser.storage.sync.set({ speedDialEnabled: isChecked });
         browser.tabs.query({ active: true, currentWindow: true }, (tabs) =>
         {
             if (tabs[0]?.id)
@@ -136,8 +130,7 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     }
 
-    // **MODIFIED FOR SAFARI/IOS**
-    // Google Sign In now opens a new tab for the web-based auth flow.
+    // Google Sign In (opens a new tab for web-based auth flow)
     if (googleSignInBtn)
     {
         googleSignInBtn.addEventListener("click", () =>
@@ -176,10 +169,18 @@ document.addEventListener("DOMContentLoaded", function ()
         });
     }
 
-    // --- Initial State Check ---
-    // Check login status when the popup opens
-    browser.storage.sync.get(["authToken"], (result) =>
-    {
-        updateAuthUI(!!result.authToken);
-    });
+    // --- FIX: Combined Initial State Check ---
+    // Check login status and checkbox states when the popup opens
+    browser.storage.sync.get(
+        ["authToken", "tooltipsEnabled", "speedDialEnabled"],
+        (result) =>
+        {
+            // Set auth UI based on token
+            updateAuthUI(!!result.authToken);
+            // Set tooltip toggle state, defaulting to true if not set
+            toggleTooltipsCheckbox.checked = result.tooltipsEnabled !== false;
+            // Set speed dial toggle state, defaulting to true if not set
+            toggleSpeedDialCheckbox.checked = result.speedDialEnabled !== false;
+        }
+    );
 });

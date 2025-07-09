@@ -10,27 +10,24 @@
             --primary-main: #116530;
             --secondary-main: #D4A017;
             --bg-default: #1f2937;
-            /* Updated overall background color */
             --card-bg: #1f2937;
-            /* Updated card background color */
             --text-color: #f5f7fa;
-            /* Light text for dark background */
             --border-color: #e0e0e0;
         }
 
+        /* --- FIX: Updated body styles for cross-platform popups --- */
         body {
             background-color: var(--bg-default);
             font-family: "Roboto", sans-serif;
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 80vh;
-            /* Ensure the body takes up the full viewport height */
+            /* Set a fixed width for the popup body */
+            width: 300px;
+            color: var(--text-color);
         }
 
         .card {
-            width: 300px;
+            /* Let the card fill the body width */
+            width: 100%;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -65,7 +62,6 @@
             color: var(--text-color);
         }
 
-        /* Set checkbox accent color to primary color */
         input[type="checkbox"] {
             accent-color: var(--primary-main);
             margin-right: 5px;
@@ -82,7 +78,6 @@
             font-size: 14px;
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
             margin-bottom: 5px;
-            /* Add some spacing between buttons */
         }
 
         button:hover {
@@ -92,13 +87,11 @@
 
         .field-container input {
             width: calc(100% - 16px);
-            /* Adjust width to account for padding */
             padding: 8px;
             border-radius: 4px;
             border: 1px solid var(--border-color);
             margin-bottom: 10px;
             background-color: #374151;
-            /* Dark input background for consistency */
             color: var(--text-color);
         }
 
@@ -108,14 +101,12 @@
 
         #popup-message {
             background-color: #263238;
-            /* Darker background for message */
             color: #fff;
             padding: 10px;
             border-radius: 4px;
             margin-top: 10px;
             text-align: center;
             display: none;
-            /* Initially hidden */
         }
     </style>
 </head>
