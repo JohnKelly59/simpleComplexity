@@ -1,51 +1,52 @@
-// scripts/main.js
+// contentScripts/main.js
 import
-    {
-        state,
-        updateQuestionMatrix,
-        setTooltipsEnabled as setGlobalTooltipsEnabled,
-        setTooltipRef,
-        setSpeedDialRef,
-        resetRefreshTracking,
-    } from './mainState.js';
+{
+    state,
+    updateQuestionMatrix,
+    setTooltipsEnabled as setGlobalTooltipsEnabled,
+    setTooltipRef,
+    setSpeedDialRef,
+    resetRefreshTracking,
+    setRecordingOptions
+} from './mainState.js';
 import
-    {
-        initTTS,
-        cancelSpeech as cancelAllTTS
-    } from './tts.js';
+{
+    initTTS,
+    cancelSpeech as cancelAllTTS
+} from './tts.js';
 import
-    {
-        fetchTooltipsForKeys
-    } from './api.js';
+{
+    fetchTooltipsForKeys
+} from './api.js';
 import
-    {
-        createTooltipContainer
-    } from './tooltipManager.js';
+{
+    createTooltipContainer
+} from './tooltipManager.js';
 import
-    {
-        fetchAndShowSelectedTextTooltip
-    } from './temporaryTooltip.js';
+{
+    fetchAndShowSelectedTextTooltip
+} from './temporaryTooltip.js';
 import
-    {
-        processAllFormFields,
-        gatherKeysFromAllFields,
-        removeAllTooltipIcons,
-    } from './fieldProcessor.js';
+{
+    processAllFormFields,
+    gatherKeysFromAllFields,
+    removeAllTooltipIcons,
+} from './fieldProcessor.js';
 import
-    {
-        observeDynamicFields,
-        disconnectObserver
-    } from './domObserver.js';
+{
+    observeDynamicFields,
+    disconnectObserver
+} from './domObserver.js';
 import
-    {
-        createSpeedDial,
-        updateSpeedDialAppearance,
-        toggleSpeedDialVisibility
-    } from './speedDial.js';
+{
+    createSpeedDial,
+    updateSpeedDialAppearance,
+    toggleSpeedDialVisibility
+} from './speedDial.js';
 import
-    {
-        startDemo
-    } from './demo.js'; // Import the new demo function
+{
+    startDemo
+} from './demo.js'; // Import the new demo function
 
 /**
  * @file Main entry point for the content script.
@@ -331,20 +332,30 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) =>
     return false;
 });
 
-browser.storage.sync.get(["tooltipsEnabled", "speedDialEnabled"], (result) =>
+// Load all settings from storage at once
+browser.storage.sync.get(["tooltipsEnabled", "speedDialEnabled", "cameraEnabled", "micEnabled"], (result) =>
 {
     if (browser.runtime.lastError)
     {
         console.warn("Error getting initial states from storage:", browser.runtime.lastError.message);
-        setGlobalTooltipsEnabled(true); // Default tooltips to true
-        state.speedDialEnabledGlobal = true; // Default speed dial to true
+        // Set default values in case of error
+        setGlobalTooltipsEnabled(true);
+        state.speedDialEnabledGlobal = true;
+        setRecordingOptions({ isCameraEnabled: false, isMicEnabled: false });
     } else
     {
+        // Set global tooltip and speed dial visibility
         setGlobalTooltipsEnabled(result.tooltipsEnabled !== false);
-        // Default speedDialEnabled to true if undefined in storage
         state.speedDialEnabledGlobal = result.speedDialEnabled !== false;
+
+        // Set recording options from storage, defaulting to false if not defined
+        setRecordingOptions({
+            isCameraEnabled: result.cameraEnabled === true,
+            isMicEnabled: result.micEnabled === true
+        });
     }
 
+    // Initialize the application after settings have been loaded
     if (document.readyState === "loading")
     {
         document.addEventListener("DOMContentLoaded", initialize);
@@ -353,6 +364,7 @@ browser.storage.sync.get(["tooltipsEnabled", "speedDialEnabled"], (result) =>
         initialize();
     }
 });
+
 
 window.addEventListener('beforeunload', () =>
 {

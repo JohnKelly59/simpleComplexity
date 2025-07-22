@@ -3,7 +3,8 @@
 import
 {
     QUESTION_LOOKUP_ENDPOINT,
-    SUPPORT_QUERY_ENDPOINT
+    SUPPORT_QUERY_ENDPOINT,
+    VIDEO_UPLOAD_ENDPOINT
 } from './config.js';
 
 import
@@ -162,5 +163,53 @@ export function sendSupportQuery (question, context = '')
         {
             console.warn('Support query failed:', err);
             return '';
+        });
+}
+
+
+// ────────────────────────────────────────────────────────────────────────────
+// 3️⃣ Video Upload
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Sends the recorded video to the backend.
+ *
+ * @param {Blob} videoBlob - The recorded video as a Blob.
+ * @returns {Promise<object>}
+ */
+export function sendVideoRecording (videoBlob)
+{
+    // Safeguard against sending empty data
+    if (!videoBlob || videoBlob.size === 0)
+    {
+        const error = new Error("Cannot send empty video file.");
+        console.error(error);
+        return Promise.reject(error);
+    }
+
+    const formData = new FormData();
+    formData.append('video', videoBlob, 'recording.webm');
+
+    return fetchWithAuth(VIDEO_UPLOAD_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+        },
+        body: formData
+    })
+        .then(async resp =>
+        {
+            if (!resp.ok)
+            {
+                const text = await resp.text().catch(() => '');
+                const msg = text ? `API error ${resp.status}: ${text}` : `API error ${resp.status}`;
+                throw new Error(msg);
+            }
+            return resp.json();
+        })
+        .catch(err =>
+        {
+            console.error('Video upload failed:', err);
+            throw err;
         });
 }

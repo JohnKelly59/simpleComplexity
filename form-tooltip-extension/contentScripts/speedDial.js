@@ -2,16 +2,19 @@
 import
 {
     SVG_LOADER, SVG_REFRESH_ICON, SVG_CHAT_ICON, SVG_SEND_ICON, SVG_CLOSE_ICON, SVG_SUPPORT_ICON,
-    SUPPORT_QUERY_ENDPOINT
+    SVG_PLAY_ICON, SVG_PAUSE_ICON, SVG_DELETE_ICON, SVG_CAMERA_ICON, SVG_MIC_ICON
 } from './config.js';
 import { isBackgroundLight, isSafari } from './utils.js';
 import { gatherKeysFromAllFields, removeAllTooltipIcons as removeIcons, processAllFormFields } from './fieldProcessor.js';
-import { fetchTooltipsForKeys, fetchWithAuth, sendSupportQuery } from './api.js';
+import { fetchTooltipsForKeys, fetchWithAuth, sendSupportQuery, sendVideoRecording } from './api.js';
 import { state, updateQuestionMatrix, resetRefreshTracking } from './mainState.js';
+import { startRecording, pauseRecording, resumeRecording, stopRecording, resetRecording, getCameraPreview } from './screenRecorder.js';
+
 
 let localSpeedDialRef = null;
 let existingChatModalRef = null; // For the original chat modal (definitions)
 let supportChatPanelRef = null; // For the new SimpleSupport panel
+let recordingTimerInterval = null;
 
 const BTN_OFFSET = 20;
 const PANEL_ID = 'ss-panel';
@@ -218,10 +221,6 @@ function createSupportChatPanel ()
         if (localSpeedDialRef?.actionsContainer.style.display === 'flex')
         {
             localSpeedDialRef.actionsContainer.style.display = 'none';
-            if (!isSafari())
-            {
-                if (localSpeedDialRef?.mainButton) localSpeedDialRef.mainButton.style.transform = 'rotate(0deg)';
-            }
         }
     };
 
@@ -257,7 +256,7 @@ function createSupportChatPanel ()
 
 export function showLoaderOnSpeedDial ()
 {
-    if (localSpeedDialRef && localSpeedDialRef.mainButton && localSpeedDialRef.mainImg)
+    if (localSpeedDialRef && localSpeedDialRef.mainButton && localSpeedDialRef.mainButton.dataset.isLoading)
     {
         if (!localSpeedDialRef.mainButton.dataset.isLoading)
         {
@@ -284,23 +283,21 @@ export function hideLoaderOnSpeedDial ()
     }
 }
 
+function updateTimerDisplay ()
+{
+    if (!state.isRecording || !localSpeedDialRef || !localSpeedDialRef.timerDisplay) return;
+
+    const elapsed = Date.now() - state.recordingStartTime;
+    const seconds = Math.floor((elapsed / 1000) % 60).toString().padStart(2, '0');
+    const minutes = Math.floor(elapsed / 60000).toString().padStart(2, '0');
+    localSpeedDialRef.timerDisplay.textContent = `${minutes}:${seconds}`;
+}
+
+
 export function createSpeedDial ()
 {
     if (document.getElementById("tooltipSpeedDial") || !document.body)
     {
-        if (!localSpeedDialRef && document.getElementById('tooltipSpeedDial'))
-        {
-            const existingSpeedDial = document.getElementById('tooltipSpeedDial');
-            localSpeedDialRef = {
-                speedDial: existingSpeedDial,
-                mainButton: existingSpeedDial.querySelector('#tooltipSpeedDial_mainButton'),
-                actionsContainer: existingSpeedDial.querySelector('.tooltip-speed-dial-actions'),
-                refreshButton: existingSpeedDial.querySelector('.tooltip-speed-dial-actions button[aria-label="Refresh tooltips"]'),
-                definitionChatButton: existingSpeedDial.querySelector('.tooltip-speed-dial-actions button[aria-label="Open Question Assistant"]'), // Corrected ref name
-                supportChatButton: existingSpeedDial.querySelector('.tooltip-speed-dial-actions button[aria-label="Open Support Chat"]'), // Corrected ref name
-                mainImg: existingSpeedDial.querySelector('#tooltipSpeedDial_mainButton img')
-            };
-        }
         return localSpeedDialRef;
     }
 
@@ -322,17 +319,201 @@ export function createSpeedDial ()
         width: "44px", height: "44px", borderRadius: "50%", border: "none", cursor: "pointer",
         backgroundColor: "#4A5568", color: "#FFFFFF", boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        transition: 'background-color 0.2s ease, transform 0.1s ease-out'
+        transition: 'background-color 0.2s ease, transform 0.1s ease-out, filter 0.2s ease'
     });
 
     const decorateHoverMiniFab = (btn) =>
     {
-        btn.onmouseenter = () => { if (!btn.disabled) btn.style.backgroundColor = '#2D3748'; };
-        btn.onmouseleave = () => { if (!btn.disabled) btn.style.backgroundColor = '#4A5568'; };
+        btn.onmouseenter = () => { if (!btn.disabled) btn.style.filter = 'brightness(1.2)'; };
+        btn.onmouseleave = () => { if (!btn.disabled) btn.style.filter = 'brightness(1)'; };
         btn.onmousedown = () => { if (!btn.disabled) btn.style.transform = 'scale(0.95)'; };
         btn.onmouseup = () => { if (!btn.disabled) btn.style.transform = 'scale(1)'; };
     };
 
+    // --- Recording Controls ---
+    const recordingControlsContainer = document.createElement('div');
+    Object.assign(recordingControlsContainer.style, {
+        display: 'flex',
+        gap: '12px',
+        alignItems: 'center',
+    });
+
+    const cameraButton = document.createElement('button');
+    cameraButton.id = 'cameraBtn';
+    styleMiniFab(cameraButton);
+    decorateHoverMiniFab(cameraButton);
+
+    const micButton = document.createElement('button');
+    micButton.id = 'micBtn';
+    styleMiniFab(micButton);
+    decorateHoverMiniFab(micButton);
+
+    const playPauseButton = document.createElement('button');
+    playPauseButton.id = 'playPauseBtn';
+    styleMiniFab(playPauseButton);
+    decorateHoverMiniFab(playPauseButton);
+
+    const sendButton = document.createElement('button');
+    sendButton.id = 'sendBtn';
+    sendButton.innerHTML = SVG_SEND_ICON;
+    sendButton.setAttribute('title', 'Finish and Send Recording');
+    styleMiniFab(sendButton);
+    decorateHoverMiniFab(sendButton);
+
+    const eraseButton = document.createElement('button');
+    eraseButton.id = 'eraseBtn';
+    eraseButton.innerHTML = SVG_DELETE_ICON;
+    eraseButton.setAttribute('title', 'Cancel Recording');
+    styleMiniFab(eraseButton);
+    decorateHoverMiniFab(eraseButton);
+
+    const timerDisplay = document.createElement('div');
+    timerDisplay.id = 'timerDisplay';
+    Object.assign(timerDisplay.style, {
+        fontSize: '14px',
+        color: '#FFFFFF',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        padding: '4px 8px',
+        borderRadius: '4px'
+    });
+
+    // Unified toggle button logic
+    const setupToggleButton = (button, stateKey, iconSVG, title, storageKey) =>
+    {
+        button.innerHTML = iconSVG;
+        button.setAttribute('title', title);
+
+        const updateAppearance = () =>
+        {
+            const isActive = state[stateKey];
+            button.style.backgroundColor = isActive ? '#38A169' : '#4A5568'; // Green when active
+        };
+
+        button.addEventListener('click', (event) =>
+        {
+            event.stopPropagation();
+            const newState = !state[stateKey];
+            state[stateKey] = newState; // Toggle state
+
+            // Save the new state to storage
+            browser.storage.sync.set({ [storageKey]: newState });
+
+
+            if (state.isRecording && state.userStream)
+            {
+                const trackType = stateKey === 'isCameraEnabled' ? 'video' : 'audio';
+                const track = state.userStream.getTracks().find(t => t.kind === trackType);
+                if (track)
+                {
+                    track.enabled = state[stateKey];
+                    const cameraPreview = getCameraPreview();
+                    if (cameraPreview && trackType === 'video')
+                    {
+                        cameraPreview.style.display = track.enabled ? 'block' : 'none';
+                    }
+                }
+            }
+            updateAppearance();
+        });
+        return updateAppearance;
+    };
+
+    const updateCameraAppearance = setupToggleButton(cameraButton, 'isCameraEnabled', SVG_CAMERA_ICON, 'Toggle Camera', 'cameraEnabled');
+    const updateMicAppearance = setupToggleButton(micButton, 'isMicEnabled', SVG_MIC_ICON, 'Toggle Microphone', 'micEnabled');
+
+
+    const updateRecordingButtonsVisibility = () =>
+    {
+        const isRecordingActive = state.isRecording || state.isPaused;
+
+        // Show toggles ONLY when recording is active AND the corresponding device stream exists.
+        cameraButton.style.display = isRecordingActive && state.userStream?.getVideoTracks().length > 0 ? 'flex' : 'none';
+        micButton.style.display = isRecordingActive && state.userStream?.getAudioTracks().length > 0 ? 'flex' : 'none';
+
+        // Core controls visibility
+        playPauseButton.style.display = 'flex';
+        sendButton.style.display = state.isPaused ? 'flex' : 'none';
+        eraseButton.style.display = isRecordingActive ? 'flex' : 'none';
+        timerDisplay.style.display = isRecordingActive ? 'block' : 'none';
+    };
+
+    const resetRecordingUI = () =>
+    {
+        if (recordingTimerInterval) clearInterval(recordingTimerInterval);
+        recordingTimerInterval = null;
+        playPauseButton.innerHTML = SVG_PLAY_ICON;
+        playPauseButton.setAttribute('title', 'Start Recording');
+
+        // The state is now loaded from storage, so we don't reset it to false here.
+        // We just ensure the UI reflects the loaded state.
+        updateCameraAppearance();
+        updateMicAppearance();
+
+        updateRecordingButtonsVisibility();
+    };
+
+    playPauseButton.addEventListener('click', async (event) =>
+    {
+        event.stopPropagation();
+        if (!state.isRecording)
+        {
+            try
+            {
+                await startRecording();
+                playPauseButton.innerHTML = SVG_PAUSE_ICON;
+                playPauseButton.setAttribute('title', 'Pause Recording');
+                if (recordingTimerInterval) clearInterval(recordingTimerInterval);
+                recordingTimerInterval = setInterval(updateTimerDisplay, 1000);
+                updateCameraAppearance();
+                updateMicAppearance();
+            } catch (e)
+            {
+                console.error("Failed to start recording from UI:", e);
+                resetRecordingUI();
+                return;
+            }
+        } else if (!state.isPaused)
+        {
+            pauseRecording();
+            playPauseButton.innerHTML = SVG_PLAY_ICON;
+            playPauseButton.setAttribute('title', 'Resume Recording');
+            if (recordingTimerInterval) clearInterval(recordingTimerInterval);
+        } else
+        {
+            resumeRecording();
+            playPauseButton.innerHTML = SVG_PAUSE_ICON;
+            playPauseButton.setAttribute('title', 'Pause Recording');
+            if (recordingTimerInterval) clearInterval(recordingTimerInterval);
+            recordingTimerInterval = setInterval(updateTimerDisplay, 1000);
+        }
+        updateRecordingButtonsVisibility();
+    });
+
+    sendButton.addEventListener('click', (event) =>
+    {
+        event.stopPropagation();
+        stopRecording();
+        resetRecordingUI();
+    });
+
+    eraseButton.addEventListener('click', (event) =>
+    {
+        event.stopPropagation();
+        resetRecording();
+        resetRecordingUI();
+    });
+
+    // Define the layout of the recording controls
+    recordingControlsContainer.appendChild(eraseButton);
+    recordingControlsContainer.appendChild(cameraButton);
+    recordingControlsContainer.appendChild(micButton);
+    recordingControlsContainer.appendChild(playPauseButton);
+    recordingControlsContainer.appendChild(timerDisplay);
+    recordingControlsContainer.appendChild(sendButton);
+    actionsContainer.appendChild(recordingControlsContainer);
+
+
+    // --- Other Action Buttons ---
     const definitionChatButton = document.createElement("button");
     definitionChatButton.setAttribute("aria-label", "Open Question Assistant");
     definitionChatButton.setAttribute("title", "Open Question Assistant (for definitions)");
@@ -341,13 +522,9 @@ export function createSpeedDial ()
     definitionChatButton.innerHTML = SVG_CHAT_ICON;
     definitionChatButton.addEventListener("click", (event) =>
     {
-        event.preventDefault(); event.stopPropagation();
+        event.stopPropagation();
         toggleChatModal(true);
         actionsContainer.style.display = 'none';
-        if (!isSafari())
-        {
-            mainButton.style.transform = 'rotate(0deg)';
-        }
     });
     actionsContainer.appendChild(definitionChatButton);
 
@@ -360,7 +537,7 @@ export function createSpeedDial ()
     supportChatBtn.innerHTML = SVG_SUPPORT_ICON;
     supportChatBtn.addEventListener("click", (event) =>
     {
-        event.preventDefault(); event.stopPropagation();
+        event.stopPropagation();
         if (!supportChatPanelRef)
         {
             supportChatPanelRef = createSupportChatPanel();
@@ -370,10 +547,6 @@ export function createSpeedDial ()
             supportChatPanelRef.toggle(true);
         }
         actionsContainer.style.display = 'none';
-        if (!isSafari())
-        {
-            mainButton.style.transform = 'rotate(0deg)';
-        }
     });
     actionsContainer.appendChild(supportChatBtn);
 
@@ -385,11 +558,9 @@ export function createSpeedDial ()
     refreshButton.innerHTML = SVG_REFRESH_ICON;
     refreshButton.addEventListener("click", (event) =>
     {
-        event.preventDefault(); event.stopPropagation();
-        if (!state.tooltipsEnabled)
-        {
-            return;
-        }
+        event.stopPropagation();
+        if (!state.tooltipsEnabled) return;
+
         refreshButton.disabled = true;
         Object.assign(refreshButton.style, { opacity: '0.6', cursor: 'not-allowed' });
         const keys = gatherKeysFromAllFields();
@@ -407,10 +578,6 @@ export function createSpeedDial ()
                 refreshButton.disabled = false;
                 Object.assign(refreshButton.style, { opacity: '1', cursor: 'pointer' });
                 actionsContainer.style.display = 'none';
-                if (!isSafari())
-                {
-                    mainButton.style.transform = 'rotate(0deg)';
-                }
             });
     });
     actionsContainer.appendChild(refreshButton);
@@ -441,7 +608,6 @@ export function createSpeedDial ()
     }
     mainButton.appendChild(mainImg);
 
-    // --- REWRITTEN CLICK HANDLER ---
     mainButton.addEventListener("click", () =>
     {
         if (mainButton.dataset.isLoading === 'true') return;
@@ -450,37 +616,16 @@ export function createSpeedDial ()
         const isSupportChatOpen = supportChatPanelRef?.panel.classList.contains('visible');
         const isActionsOpen = actionsContainer.style.display === 'flex';
 
-        // Priority 1: If any modal is open, the click should close everything.
         if (isDefChatOpen || isSupportChatOpen)
         {
             if (isDefChatOpen) toggleChatModal(false);
             if (isSupportChatOpen) supportChatPanelRef.toggle(false);
-            // Also ensure actions are hidden and button is reset
             actionsContainer.style.display = 'none';
-            if (!isSafari())
-            {
-                mainButton.style.transform = 'rotate(0deg)';
-            }
             return;
         }
 
-        // Priority 2: If no modals are open, toggle the actions menu.
-        if (isActionsOpen)
-        {
-            actionsContainer.style.display = 'none';
-            if (!isSafari())
-            {
-                mainButton.style.transform = 'rotate(0deg)';
-            }
-        } else
-        {
-            actionsContainer.style.display = 'flex';
-            if (!isSafari())
-            {
-                mainButton.style.transform = 'rotate(135deg)';
-            }
-            updateSpeedDialAppearance(state.tooltipsEnabled);
-        }
+        actionsContainer.style.display = isActionsOpen ? 'none' : 'flex';
+        updateRecordingButtonsVisibility();
     });
 
     speedDialContainer.appendChild(actionsContainer);
@@ -494,8 +639,16 @@ export function createSpeedDial ()
         speedDial: speedDialContainer, mainButton, actionsContainer, refreshButton,
         definitionChatButton,
         supportChatButton: supportChatBtn,
-        mainImg
+        mainImg,
+        playPauseButton,
+        sendButton,
+        eraseButton,
+        timerDisplay,
+        cameraButton,
+        micButton
     };
+
+    resetRecordingUI();
     setSpeedDialPosition();
     new MutationObserver(setSpeedDialPosition).observe(document.body, { childList: true, subtree: true });
 
@@ -570,16 +723,6 @@ export function toggleSpeedDialVisibility (visible)
         {
             const existingDial = document.getElementById("tooltipSpeedDial");
             if (existingDial) existingDial.style.display = "none";
-            if (!localSpeedDialRef && existingDial)
-            {
-                localSpeedDialRef = {
-                    speedDial: existingDial,
-                    mainButton: existingDial.querySelector("#tooltipSpeedDial_mainButton"),
-                    actionsContainer: existingDial.querySelector(".tooltip-speed-dial-actions"),
-                    refreshButton: existingDial.querySelector('.tooltip-speed-dial-actions button[aria-label="Refresh tooltips"]'),
-                    mainImg: existingDial.querySelector('#tooltipSpeedDial_mainButton img')
-                };
-            }
         }
         if (!localSpeedDialRef || !localSpeedDialRef.speedDial) return;
     }
@@ -590,13 +733,6 @@ export function toggleSpeedDialVisibility (visible)
         if (localSpeedDialRef.actionsContainer)
         {
             localSpeedDialRef.actionsContainer.style.display = "none";
-        }
-        if (localSpeedDialRef.mainButton)
-        {
-            if (!isSafari())
-            {
-                localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
-            }
         }
         toggleChatModal(false); // Close definition chat
         if (supportChatPanelRef?.panel.classList.contains('visible'))
@@ -795,13 +931,6 @@ function toggleChatModal (show)
             existingChatModalRef.modal.style.transform = "translateY(0) scale(1)";
         });
         if (localSpeedDialRef?.actionsContainer) localSpeedDialRef.actionsContainer.style.display = "none";
-        if (localSpeedDialRef?.mainButton)
-        {
-            if (!isSafari())
-            {
-                localSpeedDialRef.mainButton.style.transform = "rotate(0deg)";
-            }
-        }
         if (supportChatPanelRef?.panel.classList.contains('visible'))
         {
             supportChatPanelRef.toggle(false);

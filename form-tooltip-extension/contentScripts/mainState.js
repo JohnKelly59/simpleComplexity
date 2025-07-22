@@ -1,4 +1,4 @@
-
+// contentScripts/mainState.js
 
 export const state = {
     questionMatrix: {},
@@ -9,7 +9,18 @@ export const state = {
     speedDialRef: null,
     temporaryTooltipRef: null,
     activeFetches: 0,
-    speedDialEnabledGlobal: true
+    speedDialEnabledGlobal: true,
+    isRecording: false,
+    isPaused: false,
+    recordingStartTime: null,
+    mediaRecorder: null,
+    recordedChunks: [],
+    // Recording options
+    isCameraEnabled: false,
+    isMicEnabled: false,
+    // Live streams
+    userStream: null,
+    screenStream: null
 };
 
 export function updateQuestionMatrix (newData)
@@ -52,6 +63,19 @@ export function setTooltipsEnabled (enabled)
 {
     state.tooltipsEnabled = enabled;
 }
+
+export function setRecordingOptions (options)
+{
+    if (typeof options.isCameraEnabled === 'boolean')
+    {
+        state.isCameraEnabled = options.isCameraEnabled;
+    }
+    if (typeof options.isMicEnabled === 'boolean')
+    {
+        state.isMicEnabled = options.isMicEnabled;
+    }
+}
+
 
 export function setTooltipRef (ref)
 {
