@@ -48,11 +48,16 @@ export async function startRecording ()
             // Camera/mic permissions not granted
         }
 
-        const tracks = [];
+        const tracks = [...state.screenStream.getTracks()];
+        if (state.userStream)
+        {
+            state.userStream.getTracks().forEach(track => tracks.push(track));
+        }
+
+
         const screenVideoTrack = state.screenStream.getVideoTracks()[0];
         if (screenVideoTrack)
         {
-            tracks.push(screenVideoTrack);
             screenVideoTrack.onended = () =>
             {
                 const eraseButton = document.getElementById('eraseBtn');
@@ -60,32 +65,15 @@ export async function startRecording ()
             };
         }
 
-        const screenAudioTrack = state.screenStream.getAudioTracks()[0];
-        if (screenAudioTrack)
-        {
-            tracks.push(screenAudioTrack);
-        }
-
-        // Always add user media tracks to the initial stream
-        const userVideoTrack = state.userStream?.getVideoTracks()[0];
-        if (userVideoTrack)
-        {
-            tracks.push(userVideoTrack);
-        }
-        const userAudioTrack = state.userStream?.getAudioTracks()[0];
-        if (userAudioTrack)
-        {
-            tracks.push(userAudioTrack);
-        }
-
         const combinedStream = new MediaStream(tracks);
         state.mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
 
-        // Set the initial enabled state based on the UI toggles
+        const userVideoTrack = state.userStream?.getVideoTracks()[0];
         if (userVideoTrack)
         {
             userVideoTrack.enabled = state.isCameraEnabled;
         }
+        const userAudioTrack = state.userStream?.getAudioTracks()[0];
         if (userAudioTrack)
         {
             userAudioTrack.enabled = state.isMicEnabled;
@@ -140,6 +128,8 @@ export function stopRecording ()
 {
     if (state.mediaRecorder && state.mediaRecorder.state !== "inactive")
     {
+        // Stop all tracks on the combined stream before stopping the recorder
+        state.mediaRecorder.stream.getTracks().forEach(track => track.stop());
         state.mediaRecorder.stop();
     } else
     {
@@ -171,7 +161,8 @@ export function resetRecording ()
 {
     if (state.mediaRecorder && state.mediaRecorder.state !== "inactive")
     {
-        state.recordedChunks = []; // Clear chunks to prevent upload on stop
+        state.recordedChunks = [];
+        state.mediaRecorder.stream.getTracks().forEach(track => track.stop());
         state.mediaRecorder.stop();
     } else
     {
