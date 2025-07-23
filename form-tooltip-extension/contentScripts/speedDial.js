@@ -377,7 +377,6 @@ export function createSpeedDial ()
         borderRadius: '4px'
     });
 
-    // Unified toggle button logic
     const setupToggleButton = (button, stateKey, iconSVG, title, storageKey) =>
     {
         button.innerHTML = iconSVG;
@@ -398,14 +397,16 @@ export function createSpeedDial ()
             // Save the new state to storage
             browser.storage.sync.set({ [storageKey]: newState });
 
-
+            // This is the correct way to handle toggling tracks mid-recording.
+            // We just enable or disable the track on the existing stream.
+            // The MediaRecorder will automatically start or stop including it in the recording.
             if (state.isRecording && state.userStream)
             {
                 const trackType = stateKey === 'isCameraEnabled' ? 'video' : 'audio';
                 const track = state.userStream.getTracks().find(t => t.kind === trackType);
                 if (track)
                 {
-                    track.enabled = state[stateKey];
+                    track.enabled = newState;
                     const cameraPreview = getCameraPreview();
                     if (cameraPreview && trackType === 'video')
                     {
@@ -415,8 +416,10 @@ export function createSpeedDial ()
             }
             updateAppearance();
         });
+
         return updateAppearance;
     };
+
 
     const updateCameraAppearance = setupToggleButton(cameraButton, 'isCameraEnabled', SVG_CAMERA_ICON, 'Toggle Camera', 'cameraEnabled');
     const updateMicAppearance = setupToggleButton(micButton, 'isMicEnabled', SVG_MIC_ICON, 'Toggle Microphone', 'micEnabled');

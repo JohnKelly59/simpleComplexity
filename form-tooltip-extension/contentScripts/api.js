@@ -179,16 +179,26 @@ export function sendSupportQuery (question, context = '')
  */
 export function sendVideoRecording (videoBlob)
 {
+    console.log('[API] sendVideoRecording called.');
     // Safeguard against sending empty data
     if (!videoBlob || videoBlob.size === 0)
     {
         const error = new Error("Cannot send empty video file.");
-        console.error(error);
+        console.error('[API] Validation failed:', error);
         return Promise.reject(error);
     }
 
+    console.log('[API] Video blob to be sent:', videoBlob);
+
     const formData = new FormData();
     formData.append('video', videoBlob, 'recording.webm');
+
+    console.log('[API] FormData created:', formData);
+    for (let [key, value] of formData.entries())
+    {
+        console.log(`[API] FormData entry: ${key}`, value);
+    }
+
 
     return fetchWithAuth(VIDEO_UPLOAD_ENDPOINT, {
         method: 'POST',

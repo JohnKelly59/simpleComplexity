@@ -10,6 +10,7 @@ import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 
 const features = [
     {
@@ -53,6 +54,12 @@ const features = [
         title: 'Seamless Integration',
         description: 'Use our browser extension or embed our SDK to deliver a smooth user experience.',
         details: 'Quick setup with one line of code and compatibility with most modern web platforms ensures effortless deployment and consistent performance.',
+    },
+    {
+        icon: <VideocamOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Video Recording',
+        description: 'Capture your screen and camera in one go with our built‑in recorder.',
+        details: 'Record both your screen and webcam simultaneously in WebM format, then automatically upload the footage to your backend for processing or storage.',
     },
 ];
 

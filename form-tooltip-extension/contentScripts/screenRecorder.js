@@ -26,12 +26,15 @@ function cleanupStreams ()
 
 export async function startRecording ()
 {
+    // Only clear chunks for a completely new recording session
+    if (!state.isRecording)
+    {
+        state.recordedChunks = [];
+    }
     cleanupStreams();
-    state.recordedChunks = [];
 
     try
     {
-        // Step 1: Get media streams.
         state.screenStream = await navigator.mediaDevices.getDisplayMedia({
             video: { mediaSource: "screen" },
             audio: true
@@ -42,19 +45,14 @@ export async function startRecording ()
             state.userStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         } catch (userMediaError)
         {
-            console.warn("Could not get camera/mic permissions.", userMediaError);
-            // Recording will proceed without camera/mic if permissions are denied.
+            // Camera/mic permissions not granted
         }
 
-        // Step 2: Consolidate all desired tracks into a single array, preventing duplicates.
         const tracks = [];
-
-        // Add screen video track.
         const screenVideoTrack = state.screenStream.getVideoTracks()[0];
         if (screenVideoTrack)
         {
             tracks.push(screenVideoTrack);
-            // Handle the user stopping the recording via the browser's native UI.
             screenVideoTrack.onended = () =>
             {
                 const eraseButton = document.getElementById('eraseBtn');
@@ -62,48 +60,51 @@ export async function startRecording ()
             };
         }
 
-        // Add screen audio track (system audio).
         const screenAudioTrack = state.screenStream.getAudioTracks()[0];
         if (screenAudioTrack)
         {
             tracks.push(screenAudioTrack);
         }
 
-        // Add user video track (camera) if it exists.
+        // Always add user media tracks to the initial stream
         const userVideoTrack = state.userStream?.getVideoTracks()[0];
         if (userVideoTrack)
         {
-            userVideoTrack.enabled = state.isCameraEnabled; // Set initial enabled state.
             tracks.push(userVideoTrack);
         }
-
-        // Add user audio track (microphone) if it exists.
         const userAudioTrack = state.userStream?.getAudioTracks()[0];
         if (userAudioTrack)
         {
-            userAudioTrack.enabled = state.isMicEnabled; // Set initial enabled state.
             tracks.push(userAudioTrack);
         }
 
-        // Step 3: Create camera preview if the camera is available.
+        const combinedStream = new MediaStream(tracks);
+        state.mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+
+        // Set the initial enabled state based on the UI toggles
+        if (userVideoTrack)
+        {
+            userVideoTrack.enabled = state.isCameraEnabled;
+        }
+        if (userAudioTrack)
+        {
+            userAudioTrack.enabled = state.isMicEnabled;
+        }
+
         if (userVideoTrack)
         {
             cameraPreview = document.createElement('video');
-            cameraPreview.srcObject = new MediaStream([userVideoTrack]); // Stream with only the camera track
+            cameraPreview.srcObject = new MediaStream([userVideoTrack]);
             cameraPreview.autoplay = true;
             cameraPreview.muted = true;
             Object.assign(cameraPreview.style, {
                 position: 'fixed', bottom: '20px', left: '20px', width: '200px',
                 height: '150px', borderRadius: '8px', border: '2px solid #fff',
                 boxShadow: '0 4px 15px rgba(0,0,0,0.3)', zIndex: 2147483647, objectFit: 'cover',
-                display: state.isCameraEnabled ? 'block' : 'none' // Visibility based on initial state
+                display: state.isCameraEnabled ? 'block' : 'none'
             });
             document.body.appendChild(cameraPreview);
         }
-
-        // Step 4: Initialize MediaRecorder with the clean, combined stream.
-        const combinedStream = new MediaStream(tracks);
-        state.mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
 
         state.mediaRecorder.ondataavailable = event =>
         {
@@ -116,11 +117,8 @@ export async function startRecording ()
             {
                 const videoBlob = new Blob(state.recordedChunks, { type: 'video/webm' });
                 sendVideoRecording(videoBlob)
-                    .then(response => console.log("Video upload successful:", response))
-                    .catch(err => console.error("Video upload failed:", err));
-            } else
-            {
-                console.log("Recording stopped with no data, likely due to an issue with the media stream.");
+                    .then(response => { })
+                    .catch(err => { });
             }
             cleanupStreams();
             state.isRecording = false;
@@ -133,9 +131,7 @@ export async function startRecording ()
 
     } catch (err)
     {
-        console.error("Error starting screen recording:", err);
         cleanupStreams();
-        // Propagate the error to the UI handler in speedDial.js
         throw err;
     }
 }
