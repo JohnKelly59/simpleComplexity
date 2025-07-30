@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { Link as ScrollLink } from "react-scroll";
 import scColorLogo from "../assets/SC_COLOR.png";
-import BetaBadge from "./BetaBadge";
 
 const Hero = () => {
   const [showVideo, setShowVideo] = useState(false);
@@ -40,7 +39,6 @@ const Hero = () => {
         overflow: "hidden",
       }}
     >
-      <BetaBadge />
       <Box
         sx={{
           position: "absolute",

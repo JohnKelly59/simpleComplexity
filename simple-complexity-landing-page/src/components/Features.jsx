@@ -11,6 +11,7 @@ import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlin
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
+import MovieCreationOutlinedIcon from '@mui/icons-material/MovieCreationOutlined';
 
 const features = [
     {
@@ -60,6 +61,12 @@ const features = [
         title: 'Video Recording',
         description: 'Capture your screen and camera in one go with our built‑in recorder.',
         details: 'Record both your screen and webcam simultaneously in WebM format, then automatically upload the footage to your backend for processing or storage.',
+    },
+    {
+        icon: <MovieCreationOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Demo Creation',
+        description: 'Automatically generate concise demo videos from your recordings.',
+        details: 'Our AI-driven demo creation picks the best segments, trims, styles, and produces a polished video demo—perfect for showcasing features and workflows quickly.',
     },
 ];
 
