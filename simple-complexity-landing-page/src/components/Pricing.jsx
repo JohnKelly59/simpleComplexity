@@ -16,7 +16,7 @@ const pricingPlans = [
   {
     title: 'Free',
     price: '$0',
-    priceDetail: 'Always free',
+    priceDetail: null,
     features: [
       'Unlimited DB‑mapped tooltips',
       'Real‑Time updates',
@@ -87,17 +87,17 @@ const Pricing = () => (
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
-                backgroundColor: plan.isFeatured
-                  ? 'rgba(25,118,210,0.05)' // subtle primary tint
-                  : '#fff',
+                backgroundColor: '#fff',
               }}
             >
               {/* Big, eye‑catching trial badge */}
+              {plan.priceDetail && (
               <Chip
                 label={plan.priceDetail}
                 color="primary"
                 sx={{ alignSelf: 'center', fontWeight: 700, mb: 2 }}
               />
+              )}
 
               <Typography variant="h5" gutterBottom>
                 {plan.title}
