@@ -12,6 +12,10 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import MovieCreationOutlinedIcon from '@mui/icons-material/MovieCreationOutlined';
+import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
+import ClosedCaptionOutlinedIcon from '@mui/icons-material/ClosedCaptionOutlined';
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+
 
 const features = [
     {
@@ -63,10 +67,25 @@ const features = [
         details: 'Record both your screen and webcam simultaneously in WebM format, then automatically upload the footage to your backend for processing or storage.',
     },
     {
+        icon: <VideoLibraryOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Video Creation & Storage',
+        description: 'Easily record, upload, and manage your screen captures and video demos in one secure library.',
+    },
+    {
+        icon: <ClosedCaptionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'AI Caption Creation',
+        description: 'Let our AI analyze your videos and automatically generate engaging, context-aware captions, saving you hours of work.',
+    },
+    {
+        icon: <ShareOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Social Media Sharing',
+        description: 'Post your videos directly to Facebook, X (Twitter), and TikTok with AI-generated captions, all from one place.',
+    },
+    {
         icon: <MovieCreationOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Demo Creation',
-        description: 'Automatically generate concise demo videos from your recordings.',
-        details: 'Our AI-driven demo creation picks the best segments, trims, styles, and produces a polished video demo—perfect for showcasing features and workflows quickly.',
+        title: 'Demo Creation (Coming Soon)',
+        description: 'Soon, you will be able to automatically generate concise demo videos from your recordings.',
+        details: 'Our upcoming AI-driven demo creation will pick the best segments, trim, style, and produce a polished video demo—perfect for showcasing features and workflows quickly.',
     },
 ];
 
