@@ -201,11 +201,50 @@ function defineTourSteps ()
             text: "The <strong>Support Chat</strong> connects you to an assistant that can answer questions about the current pafge you are visiting.",
         },
         {
+            selector: '#playPauseBtn',
+            text: "The recording controls allow you to create a video of your screen. Use this button to <strong>start, pause, and resume</strong> your screen recording.",
+        },
+        {
+            selector: '#cameraBtn',
+            text: "You can <strong>toggle your camera</strong> on or off with this button before you start recording.",
+        },
+        {
+            selector: '#micBtn',
+            text: "Similarly, this button allows you to <strong>toggle your microphone</strong>.",
+        },
+        {
+            selector: '#eraseBtn',
+            text: "If you want to start over, the <strong>erase button</strong> will cancel the current recording. Let's start a recording to see it.",
+            action: () =>
+            {
+                const playPauseBtn = document.querySelector('#playPauseBtn');
+                if (playPauseBtn)
+                {
+                    playPauseBtn.click(); // Start recording
+                }
+            }
+        },
+        {
+            selector: '#sendBtn',
+            text: "Once you're done, click the <strong>send button</strong> to finish and upload your video. This button appears after you've paused a recording. Let's pause now.",
+            action: () =>
+            {
+                const playPauseBtn = document.querySelector('#playPauseBtn');
+                if (playPauseBtn && playPauseBtn.innerHTML.includes('pause')) // if recording
+                {
+                    playPauseBtn.click(); // pause it
+                }
+            }
+        },
+        {
             selector: 'p:not(:empty)', // Find any non-empty paragraph
             text: "You can also <strong>select any text</strong> on the page, right-click it, and choose 'Get Definition for...' to look it up instantly.",
             fallbackText: "You can also select any text on the page, right-click, and ask for a definition via the context menu.",
             action: () =>
-            { // Action to close the speed dial before moving to the next step
+            { // Action to close the speed dial and stop any recording
+                const eraseButton = document.getElementById('eraseBtn');
+                if (eraseButton) eraseButton.click(); // Stop and reset recording
+
                 const mainButton = document.querySelector('#tooltipSpeedDial_mainButton');
                 const actionsContainer = document.querySelector('.tooltip-speed-dial-actions');
                 if (mainButton && actionsContainer && actionsContainer.style.display === 'flex')
@@ -265,6 +304,12 @@ function endDemo ()
     {
         demoOverlay.style.opacity = '0';
         setTimeout(cleanupDemo, 300);
+    }
+    const eraseButton = document.getElementById('eraseBtn');
+    if (eraseButton)
+    {
+        // This button's click handler calls resetRecording()
+        eraseButton.click();
     }
     currentStep = -1;
     tourSteps = [];
