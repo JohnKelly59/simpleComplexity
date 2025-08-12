@@ -4,6 +4,26 @@ import { sendVideoRecording } from './api.js';
 
 let cameraPreview = null;
 
+function getSupportedMimeType ()
+{
+    const videoTypes = [
+        "video/mp4; codecs=avc1",
+        "video/webm; codecs=vp9",
+        "video/webm",
+    ];
+    for (const videoType of videoTypes)
+    {
+        if (MediaRecorder.isTypeSupported(videoType))
+        {
+            const extension = videoType.includes("mp4") ? "mp4" : "webm";
+            return { mimeType: videoType, extension };
+        }
+    }
+    // Fallback if no specific MIME type is supported
+    return { mimeType: "video/webm", extension: "webm" };
+}
+
+
 function cleanupStreams ()
 {
     const streams = [state.screenStream, state.userStream];
@@ -65,8 +85,10 @@ export async function startRecording ()
             };
         }
 
+        const { mimeType, extension } = getSupportedMimeType();
         const combinedStream = new MediaStream(tracks);
-        state.mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+        state.mediaRecorder = new MediaRecorder(combinedStream, { mimeType });
+
 
         const userVideoTrack = state.userStream?.getVideoTracks()[0];
         if (userVideoTrack)
@@ -103,8 +125,8 @@ export async function startRecording ()
         {
             if (state.recordedChunks.length > 0)
             {
-                const videoBlob = new Blob(state.recordedChunks, { type: 'video/webm' });
-                sendVideoRecording(videoBlob)
+                const videoBlob = new Blob(state.recordedChunks, { type: mimeType });
+                sendVideoRecording(videoBlob, `recording.${extension}`)
                     .then(response => { })
                     .catch(err => { });
             }

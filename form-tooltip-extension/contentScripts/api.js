@@ -175,9 +175,10 @@ export function sendSupportQuery (question, context = '')
  * Sends the recorded video to the backend.
  *
  * @param {Blob} videoBlob - The recorded video as a Blob.
+ * @param {string} filename - The desired filename for the upload.
  * @returns {Promise<object>}
  */
-export function sendVideoRecording (videoBlob)
+export function sendVideoRecording (videoBlob, filename = 'recording.webm')
 {
     console.log('[API] sendVideoRecording called.');
     // Safeguard against sending empty data
@@ -188,10 +189,12 @@ export function sendVideoRecording (videoBlob)
         return Promise.reject(error);
     }
 
-    console.log('[API] Video blob to be sent:', videoBlob);
+    console.log(`[API] Video blob to be sent:`, videoBlob);
+    console.log(`[API] Filename: ${filename}`);
+
 
     const formData = new FormData();
-    formData.append('video', videoBlob, 'recording.webm');
+    formData.append('video', videoBlob, filename);
 
     console.log('[API] FormData created:', formData);
     for (let [key, value] of formData.entries())
