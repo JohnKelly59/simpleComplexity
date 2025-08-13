@@ -1,9 +1,10 @@
-import { Box, Container, Link as MuiLink, Typography } from '@mui/material';
+import { Box, Container, Link as MuiLink, Typography, IconButton } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+// Import icons from react-icons (Font Awesome set)
+import { FaXTwitter, FaTiktok, FaInstagram, FaLinkedin } from 'react-icons/fa6';
 import scFlatLogo from '../assets/SC_FLAT.png';
 
-const Footer = ({ variant = 'default' }) =>
-{
+const Footer = ({ variant = 'default' }) => {
 
     const baseSx = {
         py: 4,
@@ -32,6 +33,14 @@ const Footer = ({ variant = 'default' }) =>
         },
     };
 
+    // Updated social links to use react-icons
+    const socials = [
+        { href: 'https://x.com/SComplexityLLC', icon: <FaXTwitter />, label: 'X' },
+        { href: 'https://www.tiktok.com/@simple.complexityllc', icon: <FaTiktok />, label: 'TikTok' },
+        { href: 'https://www.instagram.com/simple_complexity_llc/', icon: <FaInstagram />, label: 'Instagram' },
+        { href: 'https://www.linkedin.com/company/simple-complexity-llc', icon: <FaLinkedin />, label: 'LinkedIn' },
+    ];
+
     return (
         <Box
             component="footer"
@@ -58,6 +67,22 @@ const Footer = ({ variant = 'default' }) =>
                 <Typography variant="body2" color="inherit" sx={{ opacity: variant === 'styled' ? 0.9 : 1 }}>
                     © {new Date().getFullYear()} Simple Complexity. All rights reserved.
                 </Typography>
+
+                <Box mt={2}>
+                    {socials.map((social) => (
+                        <IconButton
+                            key={social.label}
+                            component="a"
+                            href={social.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Visit our ${social.label} page`}
+                            color="inherit"
+                        >
+                            {social.icon}
+                        </IconButton>
+                    ))}
+                </Box>
 
                 <Box mt={1}>
                     <MuiLink component={RouterLink} to="/about" sx={{ mx: 1 }}>
