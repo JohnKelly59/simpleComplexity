@@ -25,7 +25,6 @@ const DownloadExtension = () => {
                                 variant="contained"
                                 color="primary"
                                 size="large"
-                                // Replace with your actual extension link
                                 href="https://chromewebstore.google.com/detail/fdioljldkjdjcpihdnjdakiijdpagljg?utm_source=item-share-cbe"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -33,6 +32,19 @@ const DownloadExtension = () => {
                                 sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '1.1rem', px: 4, py: 1.5 }}
                             >
                                 Download for Chrome
+                            </Button>
+                             <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                href="
+https://microsoftedge.microsoft.com/addons/detail/jahmieadndjhhadbjcofnakpgheodhdn"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                startIcon={<ExtensionIcon />}
+                                sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '1.1rem', px: 4, py: 1.5 }}
+                            >
+                                Download for Edge
                             </Button>
                             <Button
                                 variant="contained"
