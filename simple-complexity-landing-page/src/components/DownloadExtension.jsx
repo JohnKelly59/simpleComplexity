@@ -8,6 +8,15 @@ const DownloadExtension = () => {
         threshold: 0.2,
     });
 
+    const buttonStyles = {
+        textTransform: 'none',
+        fontWeight: 'bold',
+        fontSize: '1.1rem',
+        px: 4,
+        py: 1.5,
+        minWidth: '300px', 
+    };
+
     return (
         <Box ref={ref} id="download-section" sx={{ py: 8, backgroundColor: 'background.default', textAlign: 'center' }}>
             <Container maxWidth="md">
@@ -20,7 +29,7 @@ const DownloadExtension = () => {
                         <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: '700px', mx: 'auto' }}>
                             Start simplifying forms today. Install our browser extension to get instant, AI-powered tooltips directly in your browser.
                         </Typography>
-                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -29,20 +38,31 @@ const DownloadExtension = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 startIcon={<ExtensionIcon />}
-                                sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '1.1rem', px: 4, py: 1.5 }}
+                                sx={buttonStyles}
                             >
                                 Download for Chrome
                             </Button>
-                             <Button
+                            <Button
                                 variant="contained"
                                 color="primary"
                                 size="large"
-                                href="
-https://microsoftedge.microsoft.com/addons/detail/jahmieadndjhhadbjcofnakpgheodhdn"
+                                href="https://addons.mozilla.org/en-US/firefox/addon/simpleform/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 startIcon={<ExtensionIcon />}
-                                sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '1.1rem', px: 4, py: 1.5 }}
+                                sx={buttonStyles}
+                            >
+                                Download for Firefox
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                href="https://microsoftedge.microsoft.com/addons/detail/jahmieadndjhhadbjcofnakpgheodhdn"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                startIcon={<ExtensionIcon />}
+                                sx={buttonStyles}
                             >
                                 Download for Edge
                             </Button>
@@ -54,14 +74,11 @@ https://microsoftedge.microsoft.com/addons/detail/jahmieadndjhhadbjcofnakpgheodh
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 startIcon={<ExtensionIcon />}
-                                sx={{ textTransform: 'none', fontWeight: 'bold', fontSize: '1.1rem', px: 4, py: 1.5 }}
+                                sx={buttonStyles}
                             >
                                 Download for Safari (iOS)
                             </Button>
                         </Box>
-                         <Typography variant="caption" display="block" sx={{ mt: 2, color: 'text.secondary' }}>
-                            Firefox support coming soon!
-                        </Typography>
                     </Box>
                 </Grow>
             </Container>
