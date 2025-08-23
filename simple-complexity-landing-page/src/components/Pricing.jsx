@@ -62,7 +62,7 @@ const pricingPlans = [
 ];
 
 const Pricing = () => (
-  <Box sx={{ py: 10, backgroundColor: '#f9f9f9' }}>
+  <Box sx={{ py: 10,backgroundColor: 'background.default' }}>
     <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
       <Typography variant="h3" fontWeight={700} gutterBottom>
         Simple, Transparent Pricing

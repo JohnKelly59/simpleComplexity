@@ -2,7 +2,7 @@ import { Box, Container, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 const GuidedSetup = () => (
-    <Box sx={{ py: 8, backgroundColor: '#f0f4f8', textAlign: 'center' }}>
+    <Box sx={{ py: 8, backgroundColor: 'background.default', textAlign: 'center' }}>
         <Container maxWidth="md">
             <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Interested in a Guided Setup?

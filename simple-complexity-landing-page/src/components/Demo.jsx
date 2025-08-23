@@ -10,7 +10,7 @@ const Demo = () => {
   const theme = useTheme();
 
   return (
-    <Box sx={{ py: 10, textAlign: 'center', backgroundColor: theme.palette.grey[100] }}>
+    <Box sx={{ py: 10, textAlign: 'center',backgroundColor: 'background.default' }}>
       <Typography variant="h4" gutterBottom>
         See It in Action
       </Typography>
