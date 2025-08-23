@@ -7,6 +7,7 @@ const ContactPage = () =>
     const [formData, setFormData] = useState({
         user_name: '',
         user_email: '',
+        user_phone: '', // Added phone field to state
         message: '',
     });
     const [submitted, setSubmitted] = useState(false);
@@ -57,7 +58,8 @@ const ContactPage = () =>
                 publicKey
             );
             setSubmitted(true);
-            setFormData({ user_name: '', user_email: '', message: '' });
+            // Reset form fields, including the new phone field
+            setFormData({ user_name: '', user_email: '', user_phone: '', message: '' });
         } catch (err)
         {
             console.error('EmailJS Contact Error:', err);
@@ -109,13 +111,26 @@ const ContactPage = () =>
                                 sx={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 1 }}
                                 InputLabelProps={{ style: { color: '#555' } }}
                             />
+                            {/* New optional phone field */}
                             <TextField
-                                label="Message"
+                                label="Phone (Optional)"
+                                variant="outlined"
+                                type="tel"
+                                name="user_phone"
+                                value={formData.user_phone}
+                                onChange={handleChange}
+                                fullWidth
+                                sx={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 1 }}
+                                InputLabelProps={{ style: { color: '#555' } }}
+                            />
+                            <TextField
+                                // Updated label to show it's optional
+                                label="Message (Optional)"
                                 variant="outlined"
                                 name="message"
                                 value={formData.message}
                                 onChange={handleChange}
-                                required
+                                // Removed the 'required' prop
                                 fullWidth
                                 multiline
                                 rows={4}

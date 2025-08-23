@@ -6,12 +6,12 @@ import Demo from './Demo';
 import Pricing from './Pricing';
 import Footer from './Footer';
 import DownloadExtension from './DownloadExtension';
+import GuidedSetup from './GuidedSetup';
 
 function LandingPageLayout() {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Box component="main" sx={{ flexGrow: 1 }}>
-                {/* Add IDs to wrapper Boxes */}
                 <Box id="hero-section">
                     <Hero />
                 </Box>
@@ -23,6 +23,9 @@ function LandingPageLayout() {
                 </Box>
                 <Box id="download-section">
                     <DownloadExtension />
+                </Box>
+                <Box id="guided-setup-section">
+                    <GuidedSetup />
                 </Box>
                 <Box id="pricing-section">
                     <Pricing />

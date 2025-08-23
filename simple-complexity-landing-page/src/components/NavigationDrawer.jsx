@@ -25,6 +25,7 @@ import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import PhoneIcone from '@mui/icons-material/Phone';
 
 const drawerWidth = 280;
 
@@ -63,6 +64,7 @@ function NavigationDrawer({ children }) {
         { text: 'Demo', icon: <OndemandVideoIcon />, path: '/', sectionId: 'demo-section' },
         { text: 'Features', icon: <ChecklistIcon />, path: '/', sectionId: 'features-section' },
         { text: 'Download', icon: <GetAppIcon />, path: '/', sectionId: 'download-section' },
+        { text: 'Guided Setup', icon: <PhoneIcone />, path: '/', sectionId: 'guided-setup-section' },
         { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section' },
         { type: 'divider' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },
