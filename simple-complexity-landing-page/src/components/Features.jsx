@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
 import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
@@ -35,6 +36,12 @@ const features = [
         title: 'Multilingual Support',
         description: 'Overcome language barriers with built-in translations for non-English speakers.',
         details: 'Supports over 30 languages to ensure that everyone can fill out forms correctly, regardless of their native language.',
+    },
+    {
+        icon: <LanguageOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
+        title: 'Full Page Translation',
+        description: 'Instantly translate entire web pages with a single click, preserving layout and functionality.',
+        details: 'Ideal for international users or multilingual teams, this feature removes language barriers completely, offering a seamless browsing experience across different languages.',
     },
     {
         icon: <VolumeUpOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,

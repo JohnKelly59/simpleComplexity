@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import LandingPageLayout from './components/LandingPageLayout';
 import ScrollToTop from './components/ScrollToTop';
 import NavigationDrawer from './components/NavigationDrawer';
+import ShowcaseFormPage from './pages/ShowcaseFormPage';
 
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
@@ -47,6 +48,7 @@ function App() {
                             <Route path="/privacy" element={<PrivacyPolicyPage />} />
                             <Route path="/blog" element={<BlogListPage />} />
                             <Route path="/blog/:slug" element={<BlogPostPage />} />
+                            <Route path="/showcase" element={<ShowcaseFormPage />} />
                         </Route>
                     </Routes>
                 </NavigationDrawer>

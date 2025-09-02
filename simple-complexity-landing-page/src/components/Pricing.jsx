@@ -115,6 +115,7 @@ const businessPlans = [
         priceDetail: '1-Month Free Trial',
         features: [
           'Unlimited AI‑generated tooltips',
+          'Full Page Translation',
           'Dedicated Account Manager',
           'AI Demo creation',
           'Custom Integrations',

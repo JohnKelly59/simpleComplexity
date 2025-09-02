@@ -26,6 +26,7 @@ import ChecklistIcon from '@mui/icons-material/Checklist';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PhoneIcone from '@mui/icons-material/Phone';
+import ShowIcon from '@mui/icons-material/Slideshow';
 
 const drawerWidth = 280;
 
@@ -51,7 +52,7 @@ function NavigationDrawer({ children }) {
             if (window.location.pathname === '/') {
                 scrollToSection(sectionId);
             } else {
-                navigate('/');
+                navigate('/');s
                 setTimeout(() => scrollToSection(sectionId), 100);
             }
         } else {
@@ -68,6 +69,7 @@ function NavigationDrawer({ children }) {
         { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section' },
         { type: 'divider' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },
+        { text: 'Showcase', icon: <ShowIcon />, path: '/showcase' },
         { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
         { text: 'Privacy Policy', icon: <PrivacyTipIcon />, path: '/privacy' },
