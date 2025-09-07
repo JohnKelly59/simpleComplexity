@@ -47,9 +47,19 @@ const PROTECTIVE_DEVICES = [
   { key: 'sprinklers', label: 'Automatic Sprinkler System' }
 ];
 
+// --- Spotlight overlay over bottom-right Speed Dial ---
+const SPEED_DIAL_OFFSET = 24;        // px from bottom/right (typical FAB spacing)
+const SPEED_DIAL_DIAMETER = 56;      // default MUI FAB is 56px
+const SPOTLIGHT_PADDING = 18;        // extra space around the FAB
+
+const HOLE_RADIUS = (SPEED_DIAL_DIAMETER / 2) + SPOTLIGHT_PADDING;
+const HOLE_CENTER_X = `calc(100% - ${SPEED_DIAL_OFFSET + (SPEED_DIAL_DIAMETER / 2)}px)`;
+const HOLE_CENTER_Y = `calc(100% - ${SPEED_DIAL_OFFSET + (SPEED_DIAL_DIAMETER / 2)}px)`;
+
 
 export default function ShowcaseFormPage() {
   const [loaded, setLoaded] = useState(false);
+  const [showSpotlight, setShowSpotlight] = useState(true);
 
   // Form state
   const [form, setForm] = useState({
@@ -87,6 +97,13 @@ export default function ShowcaseFormPage() {
     const t = setTimeout(() => setLoaded(true), 150);
     return () => clearTimeout(t);
   }, []);
+
+
+    useEffect(() => {
+    const timer = setTimeout(() => setShowSpotlight(false), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+  
 
   useEffect(() => {
     // Tell SDK about current route + context for recordings
@@ -139,7 +156,7 @@ export default function ShowcaseFormPage() {
                  Showcase Form
                 </Typography>
                 <Typography sx={{ opacity: 0.9 }}>
-                  This page demonstrates AI field tooltips for complex financial, legal, and medical questions. Highlight any paragraph text below to try on-demand definitions.
+                  This page demonstrates SimpleForm SDK created for businsess to enhance User Experience, AI Support Assitance, Customer SUppoert Video Recording, Full Page Language Translation, and more. You can access these features in the speedial in the right corner of the screen.
                 </Typography>
               </Box>
 
@@ -252,9 +269,9 @@ export default function ShowcaseFormPage() {
 
               {/* Definition demo text */}
               <Box sx={{ p: 2, background: 'rgba(0,0,0,0.04)', borderRadius: 2 }} data-sc-define="true">
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>On‑demand definitions (highlight any term below):</Typography>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>On-demand definitions (highlight any term below):</Typography>
                 <Typography sx={{ opacity: 0.9 }}>
-                  Customers may be subject to <em data-sc-intent="kba">Knowledge‑Based Authentication (KBA)</em> or additional <em data-sc-intent="kyc">KYC</em> checks depending on risk tier and <em data-sc-intent="pci">PCI DSS</em> scope. All information is subject to <em data-sc-intent="aml">AML</em> regulations and <em data-sc-intent="gdpr">GDPR</em> privacy laws.
+                  Customers may be subject to <em data-sc-intent="kba">Knowledge-Based Authentication (KBA)</em> or additional <em data-sc-intent="kyc">KYC</em> checks depending on risk tier and <em data-sc-intent="pci">PCI DSS</em> scope. All information is subject to <em data-sc-intent="aml">AML</em> regulations and <em data-sc-intent="gdpr">GDPR</em> privacy laws.
                 </Typography>
               </Box>
 
@@ -266,6 +283,27 @@ export default function ShowcaseFormPage() {
           </Paper>
         </Fade>
       </Container>
+
+      {/* Dark overlay with a transparent "hole" where the bottom-right Speed Dial/FAB sits */}
+      {showSpotlight && (
+        <Box
+          role="presentation"
+          aria-hidden
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: (theme) => theme.zIndex.modal + 2,
+            pointerEvents: 'none', // allow interaction with the Speed Dial
+            background: `radial-gradient(
+              circle at ${HOLE_CENTER_X} ${HOLE_CENTER_Y},
+              rgba(0,0,0,0) 0,
+              rgba(0,0,0,0) ${HOLE_RADIUS}px,
+              rgba(0,0,0,0.65) ${HOLE_RADIUS + 1}px,
+              rgba(0,0,0,0.65) 100%
+            )`,
+          }}
+        />
+      )}
     </Box>
   );
 }
