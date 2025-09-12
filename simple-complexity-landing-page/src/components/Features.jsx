@@ -1,162 +1,203 @@
-import React from 'react';
-import { Box, Grid, Typography, Slide, Grow } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Grid, Typography, Card, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useInView } from 'react-intersection-observer';
+import { motion, AnimatePresence } from 'framer-motion';
 
+// Icons (assuming they are imported as in your original file)
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
+import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
-import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
-import MovieCreationOutlinedIcon from '@mui/icons-material/MovieCreationOutlined';
-import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
 import ClosedCaptionOutlinedIcon from '@mui/icons-material/ClosedCaptionOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import MovieCreationOutlinedIcon from '@mui/icons-material/MovieCreationOutlined';
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import QueryStatsOutlinedIcon from '@mui/icons-material/QueryStatsOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 
 
-const features = [
+// Your featureCategories data remains the same
+const featureCategories = [
     {
-        icon: <LightbulbOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Instant Clarity',
-        description: 'Automatically simplify confusing form questions using our database of tooltips.',
-        details: 'Ensures users quickly understand and complete forms without frustration. Perfect for standard form fields and common questions.',
+        category: 'Core Features',
+        features: [
+            { icon: <LightbulbOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Instant Clarity', description: 'Automatically simplify confusing form questions using our database of tooltips.' },
+            { icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'AI-Powered Insights', description: 'Real-time AI generation for tooltips when a question isn’t in our database.' },
+            { icon: <ExtensionOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Seamless Integration', description: 'Use our browser extension or embed our SDK to deliver a smooth user experience.' },
+        ]
     },
     {
-        icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'AI-Powered Insights',
-        description: 'Real-time AI generation for tooltips when a question isn’t in our database.',
-        details: 'Our cutting-edge AI analyzes context to generate accurate, plain language tooltips instantly—saving time and reducing confusion.',
+        category: 'Accessibility & Translation',
+        features: [
+            { icon: <TranslateOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Multilingual Support', description: 'Overcome language barriers with built-in translations for non-English speakers.' },
+            { icon: <LanguageOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Full Page Translation', description: 'Instantly translate entire web pages with a single click, preserving layout and functionality.' },
+            { icon: <VolumeUpOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Audio Support', description: 'Tooltips feature an audio button to read the explanation aloud.' },
+        ]
     },
     {
-        icon: <TranslateOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Multilingual Support',
-        description: 'Overcome language barriers with built-in translations for non-English speakers.',
-        details: 'Supports over 30 languages to ensure that everyone can fill out forms correctly, regardless of their native language.',
+        category: 'Content & Media',
+        features: [
+            { icon: <VideocamOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Video Recording', description: 'Capture your screen and camera in one go with our built-in recorder.' },
+            { icon: <ClosedCaptionOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'AI Caption Creation', description: 'Let our AI analyze your videos and automatically generate engaging, context-aware captions.' },
+            { icon: <ShareOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Social Media Sharing', description: 'Post your videos directly to social media with AI-generated captions, all from one place.' },
+        ]
     },
     {
-        icon: <LanguageOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Full Page Translation',
-        description: 'Instantly translate entire web pages with a single click, preserving layout and functionality.',
-        details: 'Ideal for international users or multilingual teams, this feature removes language barriers completely, offering a seamless browsing experience across different languages.',
-    },
-    {
-        icon: <VolumeUpOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Audio Support',
-        description: 'Tooltips feature an audio button to read the explanation aloud.',
-        details: 'Enhances accessibility for users with visual impairments or reading difficulties, and supports those who prefer auditory learning.',
-    },
-    {
-        icon: <QuestionAnswerOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Interactive Question Assistant',
-        description: 'Get direct answers and guidance through an intuitive chat interface.',
-        details: 'Ask specific questions about form fields or general form-filling queries. Our AI-powered assistant provides relevant information, making complex forms easier to navigate.',
-    },
-    {
-        icon: <HelpOutlineOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Support Assistant',
-        description: 'Reach out for help on any issue at any time.',
-        details: 'Our 24/7 AI-driven support assistant is ready to guide you through troubleshooting, web application guidance, and best practices—no waiting required.',
-    },
-    {
-        icon: <ExtensionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Seamless Integration',
-        description: 'Use our browser extension or embed our SDK to deliver a smooth user experience.',
-        details: 'Quick setup with one line of code and compatibility with most modern web platforms ensures effortless deployment and consistent performance.',
-    },
-    {
-        icon: <VideocamOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Video Recording',
-        description: 'Capture your screen and camera in one go with our built‑in recorder.',
-        details: 'Record both your screen and webcam simultaneously in WebM format, then automatically upload the footage to your backend for processing or storage.',
-    },
-    {
-        icon: <VideoLibraryOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Video Creation & Storage',
-        description: 'Easily record, upload, and manage your screen captures and video demos in one secure library.',
-    },
-    {
-        icon: <ClosedCaptionOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'AI Caption Creation',
-        description: 'Let our AI analyze your videos and automatically generate engaging, context-aware captions, saving you hours of work.',
-    },
-    {
-        icon: <ShareOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Social Media Sharing',
-        description: 'Post your videos directly to Facebook, X (Twitter), and TikTok with AI-generated captions, all from one place.',
-    },
-    {
-        icon: <MovieCreationOutlinedIcon sx={{ fontSize: 60 }} color="primary" />,
-        title: 'Demo Creation (Coming Soon)',
-        description: 'Soon, you will be able to automatically generate concise demo videos from your recordings.',
-        details: 'Our upcoming AI-driven demo creation will pick the best segments, trim, style, and produce a polished video demo—perfect for showcasing features and workflows quickly.',
-    },
+        category: 'Support & Analytics',
+        features: [
+            { icon: <QuestionAnswerOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Interactive Question Assistant', description: 'Get direct answers and guidance through an intuitive chat interface.' },
+            { icon: <HelpOutlineOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Support Assistant', description: 'Reach out for help on any issue at any time with our 24/7 AI-driven support.' },
+            { icon: <QueryStatsOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Analytics & Funnels', description: 'Track views, starts, completions, and drop-offs in real time.' },
+            { icon: <ReceiptLongOutlinedIcon sx={{ fontSize: 40 }} color="primary" />, title: 'Event Logs & Auditing', description: 'Centralized logs for SDK actions, translations, AI tooltips, and recordings.' },
+        ]
+    }
 ];
 
-const FeatureSectionContainer = styled(Box)(({ theme }) => ({
-    paddingTop: theme.spacing(8),
-    paddingBottom: theme.spacing(8),
-    overflow: 'hidden',
+const StyledCard = styled(Card)(({ theme }) => ({
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    textAlign: 'center',
+    padding: theme.spacing(2),
+    width: '100%',
+    minHeight: 200, // Ensure cards have a consistent height
 }));
 
-const FeatureRow = ({ feature, index }) => {
-    const { ref, inView } = useInView({
-        triggerOnce: true,
-        threshold: 0.2,
-    });
+// A simple feature card, stripped of animation logic which is now handled by the parent
+const FeatureCard = ({ feature }) => (
+    <StyledCard>
+        <CardContent>
+            {feature.icon}
+            <Typography variant="h6" component="h4" gutterBottom sx={{ fontWeight: 'medium', mt: 2 }}>
+                {feature.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+                {feature.description}
+            </Typography>
+        </CardContent>
+    </StyledCard>
+);
 
-    const isEven = index % 2 === 0;
-    const slideDirectionIcon = isEven ? 'right' : 'left';
-    const slideDirectionText = isEven ? 'left' : 'right';
+const FeatureCategorySection = ({ category }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const MotionGrid = motion(Grid);
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+            },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1 },
+    };
 
     return (
-        <Box ref={ref} sx={{ overflow: 'hidden' }}>
-            <FeatureSectionContainer>
-                <Grid container spacing={6} alignItems="center" justifyContent="center" sx={{ px: { xs: 2, md: 4 } }}>
-                    <Grid item xs={12} md={5} sx={{ textAlign: { xs: 'center', md: isEven ? 'right' : 'left' }, order: { xs: 1, md: isEven ? 1 : 2 } }}>
-                        <Slide direction={slideDirectionIcon} in={inView} timeout={800}>
-                            <Box display="inline-block">
-                                {feature.icon}
-                            </Box>
-                        </Slide>
-                    </Grid>
-                    <Grid item xs={12} md={5} sx={{ order: { xs: 2, md: isEven ? 2 : 1 } }}>
-                        <Slide direction={slideDirectionText} in={inView} timeout={800}>
-                            <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-                                <Typography variant="h4" component="h3" gutterBottom sx={{ fontWeight: 'medium' }}>
-                                    {feature.title}
-                                </Typography>
-                                <Typography variant="body1" color="text.secondary" sx={{ mb: 1.5 }}>
-                                    {feature.description}
-                                </Typography>
-                                {feature.details && (
-                                    <Typography variant="body2" color="text.secondary">
-                                        {feature.details}
-                                    </Typography>
-                                )}
-                            </Box>
-                        </Slide>
-                    </Grid>
-                </Grid>
-            </FeatureSectionContainer>
+        // THIS IS THE FIX: Set a minimum height in the collapsed state
+        <Box
+            sx={{
+                mb: 6,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minHeight: isExpanded ? 'auto' : 350, // Reserve space when collapsed
+                transition: 'min-height 0.4s ease-out', // Smooth height transition
+            }}
+        >
+            <motion.div
+                layout
+                onClick={() => setIsExpanded(!isExpanded)}
+                style={{
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
+                <Typography variant="h4" component="h3" textAlign="center" sx={{ mb: 4, fontWeight: 'medium' }}>
+                    {category.category}
+                </Typography>
+
+                <AnimatePresence>
+                    {!isExpanded && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            style={{ position: 'relative', width: 300, height: 200, display: 'flex', justifyContent: 'center' }}
+                        >
+                            {category.features.slice(0, 3).map((feature, index) => (
+                                <motion.div
+                                    key={index}
+                                    whileHover={{
+                                        rotate: (index - 1) * 10,
+                                        y: -20,
+                                        scale: 1.05
+                                    }}
+                                    style={{
+                                        position: 'absolute',
+                                        width: '80%',
+                                        originX: 0.5,
+                                        originY: 1,
+                                        rotate: (index - 1) * 3,
+                                        zIndex: 3 - index,
+                                    }}
+                                >
+                                    <FeatureCard feature={feature} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+
+            <AnimatePresence>
+                {isExpanded && (
+                    <MotionGrid
+                        container
+                        spacing={4}
+                        justifyContent="center"
+                        sx={{ px: { xs: 2, md: 4 }, width: '100%' }}
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                    >
+                        {category.features.map((feature, featureIndex) => (
+                            <MotionGrid item xs={12} sm={6} md={4} key={featureIndex} variants={itemVariants}>
+                                <FeatureCard feature={feature} />
+                            </MotionGrid>
+                        ))}
+                    </MotionGrid>
+                )}
+            </AnimatePresence>
         </Box>
     );
 };
 
-const Features = () => (
-    <Box sx={{ py: 6, bgcolor: 'background.paper' }}>
-        <Grow in timeout={500}>
-            <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 4, fontWeight: 'bold' }}>
-                Features
+
+const Features = () => {
+    return (
+        <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
+            <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 6, fontWeight: 'bold' }}>
+                Everything You Need to Simplify Complexity
             </Typography>
-        </Grow>
-        {features.map((feature, index) => (
-            <FeatureRow key={feature.title} feature={feature} index={index} />
-        ))}
-    </Box>
-);
+
+            {featureCategories.map((category, index) => (
+                <FeatureCategorySection key={index} category={category} />
+            ))}
+        </Box>
+    );
+};
 
 export default Features;
