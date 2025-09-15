@@ -241,9 +241,16 @@ const Pricing = () => {
                     ))}
                 </Grid>
 
-                <Typography variant="caption" display="block" sx={{ mt: 6, color: 'text.secondary' }}>
-                    Downgrade or cancel at any time directly from your dashboard.
-                </Typography>
+                <Box sx={{ mt: 6 }}>
+                    <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
+                        Downgrade or cancel at any time directly from your dashboard.
+                    </Typography>
+                    {value === 1 && (
+                        <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary', fontWeight: 'bold' }}>
+                            Not satisfied? All our paid business plans come with a 30-day money-back guarantee.
+                        </Typography>
+                    )}
+                </Box>
             </Container>
         </Box>
     );
