@@ -7,6 +7,7 @@ import Pricing from './Pricing';
 import Footer from './Footer';
 import DownloadExtension from './DownloadExtension';
 import GuidedSetup from './GuidedSetup';
+import Testimonials from './Testimonials'; // Import the new component
 
 function LandingPageLayout() {
     return (
@@ -26,6 +27,9 @@ function LandingPageLayout() {
                 </Box>
                 <Box id="guided-setup-section">
                     <GuidedSetup />
+                </Box>
+                <Box id="testimonials-section"> {/* Add the new Testimonials section here */}
+                    <Testimonials />
                 </Box>
                 <Box id="pricing-section">
                     <Pricing />

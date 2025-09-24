@@ -140,21 +140,21 @@ const Pricing = () => {
         setValue(newValue);
     };
 
-    const plansToDisplay = value === 0 ? individualPlans : businessPlans;
+    const plansToDisplay = value === 0 ? businessPlans : individualPlans;
 
     return (
-        <Box sx={{ py: 10, backgroundColor: 'background.default' }}>
+        <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
             <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
                 <Typography variant="h3" fontWeight={700} gutterBottom>
-                    Simple, Transparent Pricing
+                    Integrate Our SDK in Minutes
                 </Typography>
 
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-                    Every paid plan starts with a&nbsp;
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: '800px', mx:'auto' }}>
+                    Choose the right plan for your business and start improving your user experience today. Every paid plan starts with a&nbsp;
                     <Typography component="span" fontWeight="bold" color="primary.main">
                         1‑month free&nbsp;trial
                     </Typography>
-                    . Cancel any time—no questions asked.
+                    .
                 </Typography>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
@@ -165,8 +165,8 @@ const Pricing = () => {
                         textColor="primary"
                         variant="standard"
                     >
-                        <Tab label="For Individuals" sx={{ fontWeight: 'bold' }} />
                         <Tab label="For Business" sx={{ fontWeight: 'bold' }} />
+                        <Tab label="For Individuals" sx={{ fontWeight: 'bold' }} />
                     </Tabs>
                 </Box>
 

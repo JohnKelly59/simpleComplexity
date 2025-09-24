@@ -106,14 +106,14 @@ const Hero = () => {
               gutterBottom
               sx={{ fontWeight: 700 }}
             >
-              Understand Any Form. Instantly.
+              Simplify Your Forms. Grow Your Business.
             </Typography>
             <Typography
               variant="h6"
-              sx={{ mb: 4, maxWidth: "650px", mx: "auto" }}
+              sx={{ mb: 4, maxWidth: "600px", mx: "auto" }}
             >
-              Auto-generated tooltips that simplify and translate confusing form
-              questions—in real time.
+              Reduce support tickets and boost form completion rates with our
+              AI-assisted SDK.
             </Typography>
             <ScrollLink to="demo-section" smooth={true} duration={500}>
               <Button variant="contained" color="secondary" size="large">
