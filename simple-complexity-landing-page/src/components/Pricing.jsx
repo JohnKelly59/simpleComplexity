@@ -110,7 +110,7 @@ const businessPlans = [
         href: 'https://app.simple-complexity.com/',
       },
       {
-        title: 'Business',
+        title: 'Executive',
         price: 'Contact Us',
         priceDetail: '1-Month Free Trial',
         features: [
