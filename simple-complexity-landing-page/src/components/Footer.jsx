@@ -1,7 +1,7 @@
 import { Box, Container, Link as MuiLink, Typography, IconButton } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 // Import icons from react-icons (Font Awesome set)
-import { FaXTwitter, FaTiktok, FaInstagram, FaLinkedin } from 'react-icons/fa6';
+import { FaXTwitter, FaTiktok, FaInstagram, FaLinkedin, FaFacebook } from 'react-icons/fa6';
 import scFlatLogo from '../assets/SC_FLAT.png';
 
 const Footer = ({ variant = 'default' }) => {
@@ -39,6 +39,7 @@ const Footer = ({ variant = 'default' }) => {
         { href: 'https://www.tiktok.com/@simple.complexityllc', icon: <FaTiktok />, label: 'TikTok' },
         { href: 'https://www.instagram.com/simple_complexity_llc/', icon: <FaInstagram />, label: 'Instagram' },
         { href: 'https://www.linkedin.com/company/simple-complexity-llc', icon: <FaLinkedin />, label: 'LinkedIn' },
+        { href: 'https://www.facebook.com/share/1BBEF4rned/', icon: <FaFacebook />, label: 'Facebook' },
     ];
 
     return (
