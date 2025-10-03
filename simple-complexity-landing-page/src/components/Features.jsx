@@ -1,7 +1,10 @@
+// src/components/Features.jsx
 import React from 'react';
-import { Box, Grid, Typography, Card, CardContent, Button, Container } from '@mui/material';
+import { Box, Typography, Card, CardContent, Container } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 // Import relevant business-oriented icons
 import SdkIcon from '@mui/icons-material/DataObject';
@@ -60,20 +63,46 @@ const StyledCard = styled(Card)(({ theme }) => ({
 }));
 
 const FeatureCard = ({ feature }) => (
-    <StyledCard>
-        <CardContent>
-            {feature.icon}
-            <Typography variant="h6" component="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 2 }}>
-                {feature.title}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-                {feature.description}
-            </Typography>
-        </CardContent>
-    </StyledCard>
+    <Box sx={{ px: 2, height: '100%' }}>
+        <StyledCard>
+            <CardContent>
+                {feature.icon}
+                <Typography variant="h6" component="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 2 }}>
+                    {feature.title}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    {feature.description}
+                </Typography>
+            </CardContent>
+        </StyledCard>
+    </Box>
 );
 
 const Features = () => {
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 5000,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1,
+                }
+            }
+        ]
+    };
+
     return (
         <Box sx={{ py: 10, bgcolor: 'background.default' }}>
             <Container maxWidth="lg">
@@ -89,13 +118,11 @@ const Features = () => {
                         <Typography variant="h4" component="h3" textAlign="center" sx={{ mb: 5, fontWeight: 'medium' }}>
                             {category.category}
                         </Typography>
-                        <Grid container spacing={4} justifyContent="center">
+                        <Slider {...settings}>
                             {category.features.map((feature, featureIndex) => (
-                                <Grid item xs={12} sm={6} md={4} key={featureIndex}>
-                                    <FeatureCard feature={feature} />
-                                </Grid>
+                                <FeatureCard feature={feature} key={featureIndex} />
                             ))}
-                        </Grid>
+                        </Slider>
                     </Box>
                 ))}
 

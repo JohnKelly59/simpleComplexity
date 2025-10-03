@@ -1,30 +1,15 @@
-import { useState, useEffect } from "react";
+// src/components/Hero.jsx
 import {
   Box,
   Typography,
   Button,
   Container,
   Grow,
-  useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import { Link as ScrollLink } from "react-scroll";
 import scColorLogo from "../assets/SC_COLOR.png";
 
 const Hero = () => {
-  const [showVideo, setShowVideo] = useState(false);
-  const theme = useTheme();
-  const isNotMobile = useMediaQuery(theme.breakpoints.up("sm"));
-
-  useEffect(() => {
-    if (isNotMobile) {
-      const timer = setTimeout(() => {
-        setShowVideo(true);
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [isNotMobile]);
-
   return (
     <Box
       sx={{
@@ -37,57 +22,9 @@ const Hero = () => {
         position: "relative",
         p: 4,
         overflow: "hidden",
+        background: "linear-gradient(to right, #116530, #134E8E)",
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          background: "linear-gradient(to right, #116530, #134E8E)",
-          zIndex: 1,
-          opacity: showVideo ? 0 : 1,
-          transition: "opacity 1s ease-in-out",
-        }}
-      />
-      {showVideo && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            top: "50%",
-            left: "50%",
-            objectFit: "cover",
-            transform: "translate(-50%, -50%)",
-            zIndex: 1,
-            opacity: showVideo ? 1 : 0,
-            transition: "opacity 1s ease-in-out",
-          }}
-          src="https://simlplecomplexity.s3.us-east-2.amazonaws.com/Tooltipdemo1.mp4"
-        />
-      )}
-      {showVideo && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            zIndex: 2,
-            transition: "background-color 1s ease-in-out",
-          }}
-        />
-      )}
-
       <Container maxWidth="md" sx={{ position: "relative", zIndex: 3 }}>
         <Grow in={true} timeout={1000}>
           <Box>
@@ -115,11 +52,9 @@ const Hero = () => {
               Reduce support tickets and boost form completion rates with our
               AI-assisted SDK.
             </Typography>
-            <ScrollLink to="demo-section" smooth={true} duration={500}>
-              <Button variant="contained" color="secondary" size="large">
+              <Button variant="contained" color="secondary" size="large" href="/showcase">
                 See How It Works
               </Button>
-            </ScrollLink>
           </Box>
         </Grow>
       </Container>
