@@ -11,19 +11,19 @@ import ExtensionIcon from '@mui/icons-material/Extension';
 
 const videos = [
   {
-    title: 'Business Dashboard Video',
+    title: 'Business Dashboard',
     src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/dashboarddemo.mp4',
     icon: <DashboardIcon fontSize="large" color="primary" />,
   },
-  {
-    title: 'SDK Showcase Video',
-    src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/landingpagedemo.mp4',
-    icon: <DataObjectIcon fontSize="large" color="primary" />,
-  },
-  {
+   {
     title: 'Chrome Extension Walkthrough',
     src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/SFDemo.mp4',
     icon: <ExtensionIcon fontSize="large" color="primary" />,
+  },
+  {
+    title: 'SDK Showcase',
+    src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/landingpagedemo.mp4',
+    icon: <DataObjectIcon fontSize="large" color="primary" />,
   },
 ];
 
