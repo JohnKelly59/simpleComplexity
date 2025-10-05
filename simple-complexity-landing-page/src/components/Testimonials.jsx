@@ -1,12 +1,14 @@
+// src/components/Testimonials.jsx
 import React from 'react';
 import { Box, Container, Typography, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Slider from 'react-slick';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 
-// Import slick-carousel styles
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+// 1. Import Swiper components and styles
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const testimonials = [
     {
@@ -55,40 +57,40 @@ const QuoteIcon = styled(FormatQuoteIcon)(({ theme }) => ({
 }));
 
 const Testimonials = () => {
-    const settings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        autoplay: true,
-        autoplaySpeed: 5000,
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 2,
-                }
-            },
-            {
-                breakpoint: 600,
-                settings: {
-                    slidesToShow: 1,
-                }
-            }
-        ]
-    };
-
     return (
         <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
             <Container maxWidth="lg">
                 <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 8, fontWeight: 'bold' }}>
                     Trusted by Innovators
                 </Typography>
-                <Slider {...settings}>
+
+                {/* 2. Replace Slider with Swiper */}
+                <Swiper
+                    modules={[Pagination, Autoplay]} // Enable required modules
+                    spaceBetween={30} // Space between slides
+                    slidesPerView={1} // Default slides to show
+                    pagination={{ clickable: true }} // Make dots clickable
+                    autoplay={{
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    }}
+                    breakpoints={{
+                        400: {
+                            slidesPerView: 1,
+                        },
+                        600: {
+                            slidesPerView: 2,
+                        },
+                        1024: {
+                            slidesPerView: 3,
+                        },
+                    }}
+                    style={{ paddingBottom: '40px',   '--swiper-pagination-color':'#116530' }} // Add padding for pagination dots
+                >
                     {testimonials.map((testimonial, index) => (
-                        <Box key={index} sx={{ px: 2 }}>
-                             <TestimonialCard elevation={3}>
+                        // 4. Wrap each item in a SwiperSlide
+                        <SwiperSlide key={index}>
+                            <TestimonialCard elevation={3} sx={{ height: '100%' }}>
                                 <Box>
                                     <QuoteIcon />
                                     <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 3, minHeight: '120px' }}>
@@ -101,9 +103,9 @@ const Testimonials = () => {
                                     </Typography>
                                 </Box>
                             </TestimonialCard>
-                        </Box>
+                        </SwiperSlide>
                     ))}
-                </Slider>
+                </Swiper>
             </Container>
         </Box>
     );
