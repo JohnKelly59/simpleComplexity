@@ -20,6 +20,7 @@ import AccessibilityIcon from '@mui/icons-material/AccessibilityNew';
 import FunnelIcon from '@mui/icons-material/FilterAlt';
 import LogsIcon from '@mui/icons-material/ReceiptLong';
 import FeedbackIcon from '@mui/icons-material/Feedback';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
 const featureCategories = [
   {
@@ -45,6 +46,7 @@ const featureCategories = [
       { icon: <FunnelIcon fontSize="large" color="primary" />, title: 'Conversion Funnels', description: 'Track and optimize your conversion funnels with real-time data, identifying friction points and improving your user onboarding process.' },
       { icon: <LogsIcon fontSize="large" color="primary" />, title: 'Audit & Event Logs', description: 'Maintain a complete record of all SDK actions, including AI-generated tooltips, translations, and user interactions, for auditing and compliance.' },
       { icon: <FeedbackIcon fontSize="large" color="primary" />, title: 'Video Feedback Loop', description: 'Allow users to record and submit video feedback directly from your app to your dashboard, providing clear insights for customer service and developers.' },
+      { icon: <ConfirmationNumberIcon fontSize="large" color="primary" />, title: 'Integrated Ticketing System', description: 'Enable users to submit support tickets directly through the SDK, either as a written request or a video recording, which are automatically created and organized in your business dashboard.' },
     ]
   }
 ];
