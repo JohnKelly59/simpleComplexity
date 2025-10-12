@@ -25,6 +25,17 @@ const Hero = () => {
         background: "linear-gradient(to right, #116530, #134E8E)",
       }}
     >
+      <Box sx={{ position: 'absolute', top: 16, right: 16, zIndex: 4 }}>
+        <Button
+         variant="contained" color="secondary" size="large"
+          sx={{ color: 'white' }}
+          href="https://app.simple-complexity.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Go to App
+        </Button>
+      </Box>
       <Container maxWidth="md" sx={{ position: "relative", zIndex: 3 }}>
         <Grow in={true} timeout={1000}>
           <Box>
@@ -52,7 +63,7 @@ const Hero = () => {
               Reduce support tickets and boost form completion rates with our
               AI-assisted SDK.
             </Typography>
-              <Button variant="contained" color="secondary" size="large" href="/showcase">
+              <Button variant="contained" color="secondary" size="large" href="/showcase"  sx={{ color: 'white' }}>
                 See How It Works
               </Button>
           </Box>
