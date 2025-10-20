@@ -7,7 +7,7 @@ import {
   Grow,
 } from "@mui/material";
 import { Link as ScrollLink } from "react-scroll";
-import scColorLogo from "../assets/SC_COLOR.png";
+import scColorLogo from "../../public/SC_COLOR.png";
 
 const Hero = () => {
   return (
