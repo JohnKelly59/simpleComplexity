@@ -27,16 +27,16 @@ export const blogPosts = [
         summary: 'A deep dive into how well-implemented tooltips can significantly improve form completion rates and user satisfaction.',
         content: `Online forms are everywhere, but they can often be confusing. One of the simplest yet most effective ways to help users is through informative tooltips.\n\nGood tooltips provide context exactly when needed, clarifying ambiguous labels or explaining required data formats without cluttering the main interface.\n\nConsider a field labeled "Authorization Code". What is that? Where does the user find it? A simple tooltip can answer these questions instantly, preventing user frustration and abandonment.\n\nFurthermore, when designed accessibly, tooltips can be read by screen readers, ensuring that users with visual impairments also benefit from the additional information. At Simple Complexity, we focus on generating tooltips that are not only helpful but also adhere to accessibility standards.`,
     },
-    // Add more blog post objects here as needed
-    // {
-    //   id: 3,
-    //   slug: 'future-feature-preview',
-    //   title: 'Sneak Peek: Upcoming Features',
-    //   date: formatDate('2025-04-15'),
-    //   author: 'SC Team',
-    //   summary: 'A quick look at what we\'re working on next to make Simple Complexity even better.',
-    //   content: `We're always working on improving Simple Complexity...\n\n[More details here]`,
-    // },
+    // --- NEW BLOG POST ADDED BELOW ---
+    {
+        id: 3,
+        slug: 'ai-driven-proactive-support',
+        title: 'Stop Answering Questions: How AI Can Prevent Customer Support Tickets',
+        date: formatDate('2025-10-20'), // Today's date
+        author: 'The Simple Complexity Team',
+        summary: 'Traditional customer support is reactive. We explore how AI tools can provide proactive assistance, answering user questions *before* they have to ask.',
+        content: `In customer support, most companies are stuck in a reactive loop: a user gets confused, they search for a "Help" button, they open a chat or submit a ticket, and then they wait.\n\nWhat if we could solve the user's problem before they even realize they have it? This is the power of proactive, AI-driven support.\n\nTools like intelligent tooltips, which provide instant clarity on confusing form fields, are the first line of defense. By answering "What does this mean?" right at the source, you prevent the user from ever needing to leave the page to find an answer. This not only cuts down on support ticket volume but also dramatically improves form completion rates.\n\nFurthermore, by analyzing *which* tooltips are being used most, businesses can gather invaluable data. If 1,000 users are clicking the tooltip for "Beneficiary Name," that's a clear signal that the label is confusing and should be changed. This transforms your support from a cost center into a powerful engine for product improvement.`,
+    },
 ];
 
 export default blogPosts; // Export the array
