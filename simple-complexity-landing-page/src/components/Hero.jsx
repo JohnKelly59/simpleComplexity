@@ -7,7 +7,6 @@ import {
   Grow,
 } from "@mui/material";
 import { Link as ScrollLink } from "react-scroll";
-import scColorLogo from "../../public/SC_COLOR.png";
 
 const Hero = () => {
   return (
@@ -41,7 +40,7 @@ const Hero = () => {
           <Box>
             <Box
               component="img"
-              src={scColorLogo}
+              src={"/SC_COLOR.png"}
               alt="Simple Complexity Logo"
               sx={{
                 width: { xs: "180px", sm: "240px" },
