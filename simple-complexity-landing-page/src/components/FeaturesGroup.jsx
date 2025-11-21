@@ -1,6 +1,6 @@
 // src/components/FeaturesGroup.jsx
 import React from 'react';
-import { Box, Typography, Card, CardContent, Container } from '@mui/material';
+import { Box, Typography, Card, CardContent, Container, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 // 1. Import Swiper components and styles
@@ -20,31 +20,36 @@ import VisitIcon from '@mui/icons-material/Home';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import NotificationIcon from '@mui/icons-material/Notifications';
 import SecurityIcon from '@mui/icons-material/Security';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import DescriptionIcon from '@mui/icons-material/Description';
+import EventIcon from '@mui/icons-material/Event';
 
 const featureCategories = [
     {
-        category: 'Core Care Management',
+        category: 'Clinical & Care',
         features: [
-            { icon: <FamilyIcon fontSize="large" color="primary" />, title: 'Family Management', description: 'Centralize family member information, medical history, and care preferences in one secure platform for easy access and coordination.' },
-            { icon: <CalendarIcon fontSize="large" color="primary" />, title: 'Care Scheduling', description: 'Schedule and manage care visits, appointments, and events with real-time updates and notifications for all family members.' },
-            { icon: <MedicationIcon fontSize="large" color="primary" />, title: 'Medication Tracking', description: 'Track medications, dosages, and administration schedules with automated reminders and comprehensive medication logs.' },
+            { icon: <MedicationIcon fontSize="large" color="primary" />, title: 'Medication Management', description: 'Track medications, dosages, and administration schedules with automated reminders and comprehensive logs.' },
+            { icon: <HealthIcon fontSize="large" color="primary" />, title: 'Vitals Tracking', description: 'Monitor and record vital signs, health metrics, and wellness data with visual trends and historical tracking.' },
+            { icon: <ReportProblemIcon fontSize="large" color="primary" />, title: 'Incident Reporting', description: 'Log and track incidents with detailed reports, ensuring compliance and timely follow-up actions.' },
+            { icon: <AnalyticsIcon fontSize="large" color="primary" />, title: 'Care Analytics', description: 'Gain insights into care patterns, medication adherence, and health trends with comprehensive analytics.' },
         ]
     },
     {
-        category: 'Communication & Coordination',
+        category: 'Coordination & Operations',
         features: [
-            { icon: <MessageIcon fontSize="large" color="primary" />, title: 'Family Messaging', description: 'Facilitate seamless communication between family members, caregivers, and care facilities through secure messaging channels.' },
             { icon: <TaskIcon fontSize="large" color="primary" />, title: 'Task Management', description: 'Assign and track care tasks, responsibilities, and to-dos with clear assignments and completion tracking.' },
-            { icon: <VisitIcon fontSize="large" color="primary" />, title: 'Visit Documentation', description: 'Document care visits, observations, and important updates with photos, notes, and timestamps for comprehensive care records.' },
+            { icon: <DescriptionIcon fontSize="large" color="primary" />, title: 'Document Management', description: 'Centralize important documents, care plans, and legal forms in a secure, accessible digital repository.' },
+            { icon: <EventIcon fontSize="large" color="primary" />, title: 'Events & Activities', description: 'Plan and schedule facility events, activities, and outings to keep residents engaged and active.' },
+            { icon: <SecurityIcon fontSize="large" color="primary" />, title: 'Role-Based Access', description: 'Ensure appropriate information sharing with granular access controls for staff, family, and administrators.' },
         ]
     },
     {
-        category: 'Health & Analytics',
+        category: 'Family & Communication',
         features: [
-            { icon: <HealthIcon fontSize="large" color="primary" />, title: 'Vital Signs Tracking', description: 'Monitor and record vital signs, health metrics, and wellness data with visual trends and historical tracking.' },
-            { icon: <AnalyticsIcon fontSize="large" color="primary" />, title: 'Care Analytics', description: 'Gain insights into care patterns, medication adherence, and health trends with comprehensive analytics and reporting.' },
-            { icon: <NotificationIcon fontSize="large" color="primary" />, title: 'Smart Notifications', description: 'Receive timely alerts and notifications for medications, appointments, tasks, and important care updates.' },
-            { icon: <SecurityIcon fontSize="large" color="primary" />, title: 'Secure & Compliant', description: 'Enterprise-grade security with HIPAA-compliant data handling, role-based access control, and comprehensive audit logs.' },
+            { icon: <FamilyIcon fontSize="large" color="primary" />, title: 'Family Connections', description: 'Centralize family member information and care preferences for easy access and coordination.' },
+            { icon: <MessageIcon fontSize="large" color="primary" />, title: 'Secure Messaging', description: 'Facilitate seamless, secure communication between family members, caregivers, and care facilities.' },
+            { icon: <CalendarIcon fontSize="large" color="primary" />, title: 'Shared Calendar', description: 'Keep everyone in sync with a shared calendar for appointments, visits, and important dates.' },
+            { icon: <VisitIcon fontSize="large" color="primary" />, title: 'Visit Documentation', description: 'Document care visits and observations with photos and notes for comprehensive care records.' },
         ]
     }
 ];
@@ -58,21 +63,41 @@ const StyledCard = styled(Card)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius * 2,
     boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    border: '1px solid rgba(0,0,0,0.05)',
     '&:hover': {
         transform: 'translateY(-5px)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+        boxShadow: '0 12px 30px rgba(0,0,0,0.1)',
+        borderColor: theme.palette.primary.main,
     }
 }));
 
 const FeatureCard = ({ feature }) => (
-    <Box sx={{ px: 2, height: '100%' }}>
+    <Box sx={{ px: 2, height: '100%', pb: 2 }}>
         <StyledCard>
-            <CardContent>
-                {feature.icon}
-                <Typography variant="h6" component="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 2 }}>
+            <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Box sx={{
+                    p: 2,
+                    borderRadius: '50%',
+                    bgcolor: 'primary.light',
+                    color: 'primary.main',
+                    mb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 64,
+                    height: 64,
+                    opacity: 0.1 // Background opacity
+                }}>
+                    {/* Icon is rendered separately to avoid opacity inheritance if using bgcolor with opacity */}
+                </Box>
+                <Box sx={{ mt: -10, mb: 2 }}>
+                    {feature.icon}
+                </Box>
+
+                <Typography variant="h6" component="h4" gutterBottom sx={{ fontWeight: 'bold', mt: 1 }}>
                     {feature.title}
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
                     {feature.description}
                 </Typography>
             </CardContent>
@@ -83,18 +108,21 @@ const FeatureCard = ({ feature }) => (
 const FeaturesGroup = () =>
 {
     return (
-        <Box sx={{ py: 10, bgcolor: 'background.default' }}>
+        <Box sx={{ py: 10, bgcolor: '#f8fcf9' }}>
             <Container maxWidth="lg">
-                <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 2, fontWeight: 'bold' }}>
-                    A Comprehensive Platform for Care Management
-                </Typography>
-                <Typography variant="h6" color="text.secondary" textAlign="center" sx={{ mb: 8, maxWidth: '700px', mx: 'auto' }}>
-                    SimpleGroup provides a complete suite of tools to streamline care coordination, enhance family communication, and improve health outcomes.
-                </Typography>
+                <Box textAlign="center" mb={8}>
+                    <Chip label="Features" color="primary" sx={{ mb: 2, fontWeight: 600 }} />
+                    <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 800, color: '#1a1a1a' }}>
+                        Everything You Need to Manage Care
+                    </Typography>
+                    <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '700px', mx: 'auto', fontWeight: 400 }}>
+                        SimpleGroup provides a complete suite of tools to streamline care coordination, enhance family communication, and improve health outcomes.
+                    </Typography>
+                </Box>
 
                 {featureCategories.map((category, index) => (
                     <Box key={index} sx={{ mb: 8 }}>
-                        <Typography variant="h4" component="h3" textAlign="center" sx={{ mb: 5, fontWeight: 'medium' }}>
+                        <Typography variant="h5" component="h3" sx={{ mb: 4, fontWeight: 700, borderLeft: '4px solid #1B5E20', pl: 2, color: '#1B5E20' }}>
                             {category.category}
                         </Typography>
                         <Swiper
@@ -103,7 +131,7 @@ const FeaturesGroup = () =>
                             slidesPerView={1}
                             pagination={{ clickable: true }}
                             autoplay={{
-                                delay: 5000,
+                                delay: 6000,
                                 disableOnInteraction: false,
                             }}
                             breakpoints={{
@@ -111,13 +139,13 @@ const FeaturesGroup = () =>
                                     slidesPerView: 2,
                                 },
                                 1024: {
-                                    slidesPerView: 3,
+                                    slidesPerView: 4,
                                 },
                             }}
-                            style={{ paddingBottom: '40px', '--swiper-pagination-color': '#116530' }}
+                            style={{ paddingBottom: '50px', '--swiper-pagination-color': '#1B5E20' }}
                         >
                             {category.features.map((feature, featureIndex) => (
-                                <SwiperSlide key={featureIndex}>
+                                <SwiperSlide key={featureIndex} style={{ height: 'auto' }}>
                                     <FeatureCard feature={feature} />
                                 </SwiperSlide>
                             ))}

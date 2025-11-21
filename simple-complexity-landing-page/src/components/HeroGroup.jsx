@@ -6,15 +6,16 @@ import
     Button,
     Container,
     Grow,
+    Stack,
 } from "@mui/material";
-import { Link as ScrollLink } from "react-scroll";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const HeroGroup = () =>
 {
     return (
         <Box
             sx={{
-                minHeight: "100vh",
+                minHeight: "90vh",
                 color: "#fff",
                 display: "flex",
                 alignItems: "center",
@@ -23,49 +24,122 @@ const HeroGroup = () =>
                 position: "relative",
                 p: 4,
                 overflow: "hidden",
-                background: "linear-gradient(to right, #116530, #134E8E)",
+                background: "linear-gradient(135deg, #0D47A1 0%, #1B5E20 100%)", // Deep Blue to Forest Green
             }}
         >
-            <Box sx={{ position: 'absolute', top: 16, right: 16, zIndex: 4 }}>
+            {/* Background Overlay for texture/depth */}
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    opacity: 0.1,
+                    backgroundImage: 'radial-gradient(circle at 20% 50%, #ffffff 0%, transparent 25%), radial-gradient(circle at 80% 50%, #ffffff 0%, transparent 25%)',
+                    zIndex: 1,
+                }}
+            />
+
+            <Box sx={{ position: 'absolute', top: 24, right: 24, zIndex: 4 }}>
                 <Button
-                    variant="contained" color="secondary" size="large"
-                    sx={{ color: 'white' }}
-                    href="https://platform.simple-complexity.com"
+                    variant="outlined"
+                    color="inherit"
+                    size="large"
+                    href="https://simplegroup.simple-complexity.com"
                     target="_blank"
                     rel="noopener noreferrer"
+                    sx={{
+                        borderColor: 'rgba(255,255,255,0.5)',
+                        '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,0.1)' }
+                    }}
                 >
-                    Go to App
+                    Login
                 </Button>
             </Box>
-            <Container maxWidth="md" sx={{ position: "relative", zIndex: 3 }}>
+
+            <Container maxWidth="lg" sx={{ position: "relative", zIndex: 3 }}>
                 <Grow in={true} timeout={1000}>
-                    <Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                             component="img"
                             src={"/SC_COLOR.png"}
-                            alt="Simple Group Logo"
+                            alt="SimpleGroup Logo"
                             sx={{
-                                width: { xs: "180px", sm: "240px" },
-                                mb: 1,
+                                width: { xs: "120px", sm: "160px" },
+                                mb: 4,
+                                filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
                             }}
                         />
                         <Typography
-                            variant="h2"
+                            variant="h1"
                             component="h1"
                             gutterBottom
-                            sx={{ fontWeight: 700 }}
+                            sx={{
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '4rem' },
+                                letterSpacing: '-0.02em',
+                                lineHeight: 1.2,
+                                mb: 3,
+                                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                            }}
                         >
-                            Connecting Families, Simplifying Care.
+                            The Complete Platform for<br />
+                            <Box component="span" sx={{ color: '#4CAF50' }}>Healthcare Management</Box>
                         </Typography>
                         <Typography
-                            variant="h6"
-                            sx={{ mb: 4, maxWidth: "600px", mx: "auto" }}
+                            variant="h5"
+                            sx={{
+                                mb: 6,
+                                maxWidth: "800px",
+                                mx: "auto",
+                                lineHeight: 1.6,
+                                color: 'rgba(255,255,255,0.9)',
+                                fontWeight: 400
+                            }}
                         >
-                            Streamline care coordination and enhance family connections with our comprehensive care management platform.
+                            Connect residents, families, and staff in one unified ecosystem.
+                            Streamline operations, enhance communication, and deliver superior care with SimpleGroup.
                         </Typography>
-                        <Button variant="contained" color="secondary" size="large" href="/showcase" sx={{ color: 'white' }}>
-                            See How It Works
-                        </Button>
+
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                size="large"
+                                href="#features-section-group"
+                                endIcon={<ArrowForwardIcon />}
+                                sx={{
+                                    py: 1.5,
+                                    px: 4,
+                                    fontSize: '1.1rem',
+                                    fontWeight: 600,
+                                    borderRadius: 2,
+                                    boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+                                    '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 12px 20px rgba(0,0,0,0.3)' },
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                Explore Features
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                size="large"
+                                href="#contact"
+                                sx={{
+                                    py: 1.5,
+                                    px: 4,
+                                    fontSize: '1.1rem',
+                                    fontWeight: 600,
+                                    borderRadius: 2,
+                                    borderWidth: 2,
+                                    '&:hover': { borderWidth: 2, bgcolor: 'rgba(255,255,255,0.1)' }
+                                }}
+                            >
+                                Contact Sales
+                            </Button>
+                        </Stack>
                     </Box>
                 </Grow>
             </Container>

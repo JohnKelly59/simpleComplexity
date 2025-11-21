@@ -1,10 +1,12 @@
 import { Box, Container, Typography, Fade } from "@mui/material";
 import { useState, useEffect } from "react";
 
-const PrivacyPolicyPage = () => {
+const PrivacyPolicyPage = () =>
+{
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     const timeout = setTimeout(() => setLoaded(true), 200);
     return () => clearTimeout(timeout);
   }, []);
@@ -44,7 +46,7 @@ const PrivacyPolicyPage = () => {
                 gutterBottom
                 sx={{ textAlign: "center", opacity: 0.8 }}
               >
-                Last Updated: April 7, 2025
+                Last Updated: November 20, 2025
               </Typography>
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>

@@ -28,7 +28,7 @@ const individualPlans = [
             'Basic support',
         ],
         ctaText: 'Get Started Free',
-        href: 'https://platform.simple-complexity.com',
+        href: 'https://simplegroup.simple-complexity.com',
     },
     {
         title: 'Family',
@@ -48,7 +48,7 @@ const individualPlans = [
         ],
         ctaText: 'Start Family Plan',
         isFeatured: true,
-        href: 'https://platform.simple-complexity.com/',
+        href: 'https://simplegroup.simple-complexity.com/',
     },
     {
         title: 'Extended Family',
@@ -69,7 +69,7 @@ const individualPlans = [
             'Dedicated account manager',
         ],
         ctaText: 'Go Extended Free',
-        href: 'https://platform.simple-complexity.com/',
+        href: 'https://simplegroup.simple-complexity.com/',
     },
 ];
 
@@ -92,7 +92,7 @@ const facilityPlans = [
         ],
         ctaText: 'Start Engagement Plan',
         isFeatured: false,
-        href: 'https://platform.simple-complexity.com/',
+        href: 'https://simplegroup.simple-complexity.com/',
     },
     {
         title: 'Care & Operations',
@@ -113,7 +113,7 @@ const facilityPlans = [
         ],
         ctaText: 'Start Care & Operations Plan',
         isFeatured: true,
-        href: 'https://platform.simple-complexity.com/',
+        href: 'https://simplegroup.simple-complexity.com/',
     },
 ];
 

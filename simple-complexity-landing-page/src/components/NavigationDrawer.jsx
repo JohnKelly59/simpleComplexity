@@ -1,19 +1,20 @@
 // src/components/NavigationDrawer.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Box,
-    IconButton,
-    Drawer,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    ListItemIcon,
-    Divider,
-    Fab,
-    useTheme,
-} from '@mui/material';
+import
+    {
+        Box,
+        IconButton,
+        Drawer,
+        List,
+        ListItem,
+        ListItemButton,
+        ListItemText,
+        ListItemIcon,
+        Divider,
+        Fab,
+        useTheme,
+    } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
@@ -31,47 +32,55 @@ import ShowIcon from '@mui/icons-material/Slideshow';
 
 const drawerWidth = 280;
 
-const scrollToSection = (sectionId) => {
+const scrollToSection = (sectionId) =>
+{
     const section = document.getElementById(sectionId);
-    if (section) {
+    if (section)
+    {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 };
 
-function NavigationDrawer({ children }) {
+function NavigationDrawer ({ children })
+{
     const [mobileOpen, setMobileOpen] = useState(false);
     const navigate = useNavigate();
     const theme = useTheme();
 
-    const handleDrawerToggle = () => {
+    const handleDrawerToggle = () =>
+    {
         setMobileOpen(!mobileOpen);
     };
 
-    const handleNavigation = (path, sectionId = null) => {
+    const handleNavigation = (path, sectionId = null) =>
+    {
         setMobileOpen(false);
-        if (path === '/' && sectionId) {
-            if (window.location.pathname === '/') {
+        if (path === '/' && sectionId)
+        {
+            if (window.location.pathname === '/')
+            {
                 scrollToSection(sectionId);
-            } else {
-                navigate('/');s
+            } else
+            {
+                navigate('/'); s
                 setTimeout(() => scrollToSection(sectionId), 100);
             }
-        } else {
+        } else
+        {
             navigate(path);
         }
     };
 
     const menuItems = [
-        { text: 'Home', icon: <HomeIcon />, path: '/', sectionId: 'hero-section' },
-        { text: 'Demo', icon: <OndemandVideoIcon />, path: '/', sectionId: 'demo-section' },
-        { text: 'Features', icon: <ChecklistIcon />, path: '/', sectionId: 'features-section' },
-        { text: 'Download', icon: <GetAppIcon />, path: '/', sectionId: 'download-section' },
-        { text: 'Guided Setup', icon: <PhoneIcone />, path: '/', sectionId: 'guided-setup-section' },
-        { text: 'Testimonials', icon: <InfoIcon />, path: '/', sectionId: 'testimonials-section' },
-        { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section' },
+        { text: 'Home', icon: <HomeIcon />, path: '/', sectionId: 'hero-section-group' },
+        { text: 'Demo', icon: <OndemandVideoIcon />, path: '/', sectionId: 'demo-section-group' },
+        { text: 'Features', icon: <ChecklistIcon />, path: '/', sectionId: 'features-section-group' },
+        { text: 'Download', icon: <GetAppIcon />, path: '/', sectionId: 'download-section-group' },
+        { text: 'Guided Setup', icon: <PhoneIcone />, path: '/', sectionId: 'guided-setup-section-group' },
+        { text: 'Testimonials', icon: <InfoIcon />, path: '/', sectionId: 'testimonials-section-group' },
+        { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section-group' },
         { type: 'divider' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },
-        { text: 'Showcase', icon: <ShowIcon />, path: '/showcase' },
         { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
         { text: 'Privacy Policy', icon: <PrivacyTipIcon />, path: '/privacy' },
@@ -86,8 +95,10 @@ function NavigationDrawer({ children }) {
             </Box>
             <Divider />
             <List>
-                {menuItems.map((item, index) => {
-                    if (item.type === 'divider') {
+                {menuItems.map((item, index) =>
+                {
+                    if (item.type === 'divider')
+                    {
                         return <Divider key={`divider-${index}`} sx={{ my: 1 }} />;
                     }
                     return (
@@ -119,7 +130,7 @@ function NavigationDrawer({ children }) {
                     backgroundColor: 'rgba(255, 255, 255, 0.8)',
                     color: theme.palette.primary.main,
                     '&:hover': {
-                         backgroundColor: 'rgba(255, 255, 255, 1)',
+                        backgroundColor: 'rgba(255, 255, 255, 1)',
                     }
                 }}
             >
