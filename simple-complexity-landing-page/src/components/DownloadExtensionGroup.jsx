@@ -34,7 +34,7 @@ const DownloadExtensionGroup = () =>
                         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap', mb: 4 }}>
                             <Button
                                 component={RouterLink}
-                                to="/showcase"
+                                to="https://simplegroup.simple-complexity.com"
                                 variant="contained"
                                 color="primary"
                                 size="large"
