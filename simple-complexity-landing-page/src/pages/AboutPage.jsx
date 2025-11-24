@@ -14,7 +14,7 @@ const AboutPage = () => {
       <title>About Simple Complexity | Our Mission</title>
       <meta
         name="description"
-        content="Learn about Simple Complexity's mission: Making the complex simple by providing an intelligent tooltip and AI solution to clarify online forms."
+        content="Learn about SimpleGroup's mission: To enhance communication and streamline care coordination in assisted living and memory care communities."
       />
       <Box
         sx={{
@@ -35,14 +35,14 @@ const AboutPage = () => {
                 gutterBottom
                 sx={{ fontWeight: 700 }}
               >
-                About Simple Complexity
+                About SimpleGroup
               </Typography>
               <Typography
                 variant="h5"
                 component="p"
                 sx={{ mb: 4, opacity: 0.9 }}
               >
-                Making the complex simple, one tooltip at a time.
+                Enhancing care through seamless communication.
               </Typography>
 
               <Box sx={{ mb: 4, textAlign: "left" }}>
@@ -54,13 +54,13 @@ const AboutPage = () => {
                   Our Mission
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  At Simple Complexity, we believe that accessing information
-                  and services online should be straightforward for everyone. We
-                  saw a common frustration: confusing online forms filled with
-                  jargon or unclear questions. This complexity leads to errors,
-                  abandoned forms, and unnecessary stress for users. Our mission
-                  is to eliminate this barrier by providing instant clarity
-                  exactly when and where it's needed.
+                  At SimpleGroup, we are dedicated to solving the most pressing
+                  operational challenges for Assisted Living and Memory Care
+                  communities. We believe that by unifying care coordination and
+                  providing transparent, real-time updates, we can build trust,
+                  reduce liability, and free up valuable staff time. Our mission
+                  is to create a connected care ecosystem that benefits
+                  residents, families, and facilities alike.
                 </Typography>
               </Box>
 
@@ -73,32 +73,36 @@ const AboutPage = () => {
                   What We Do
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  Simple Complexity offers an intelligent tooltip solution
-                  designed to simplify online forms. We leverage a combination
-                  of a curated database and cutting-edge AI to provide clear,
-                  plain-language explanations for form fields.
+                  SimpleGroup provides a centralized platform designed to
+                  streamline communication and documentation for care
+                  facilities. We empower staff to coordinate seamlessly with
+                  external caregivers and family members, ensuring everyone is on
+                  the same page.
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  <strong>Key Features:</strong>
+                  <strong>Key Benefits:</strong>
                   <ul>
                     <li>
-                      <strong>Instant Clarity:</strong> Access our vast database
-                      of pre-defined tooltips for common form questions.
+                      <strong>Increase Occupancy Retention:</strong> By
+                      fostering trust and transparency with families through
+                      real-time updates, we help keep residents happy and beds
+                      full.
                     </li>
                     <li>
-                      <strong>AI-Powered Insights:</strong> For unique or
-                      complex questions, our AI generates helpful explanations
-                      in real-time.
+                      <strong>Reduce Liability Risk:</strong> Our comprehensive
+                      digital documentation creates an audit-proof trail of all
+                      care activities, protecting your facility.
                     </li>
                     <li>
-                      <strong>Multilingual Support:</strong> We break down
-                      language barriers by offering tooltips in over 30
-                      languages.
+                      <strong>Save Staff Time:</strong> Automated notifications
+                      and a family portal significantly reduce inbound calls,
+                      allowing your staff to focus on what matters most—resident
+                      care.
                     </li>
                     <li>
-                      <strong>Seamless Integration:</strong> Easily add Simple
-                      Complexity to your website or application using our
-                      browser extension or a simple SDK embed.
+                      <strong>Unify Care Coordination:</strong> Eliminate
+                      miscommunication and care gaps by bringing all
+                      stakeholders together on a single, easy-to-use platform.
                     </li>
                   </ul>
                 </Typography>
@@ -113,12 +117,13 @@ const AboutPage = () => {
                   Why Choose Us?
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  We are dedicated to improving user experience and
-                  accessibility. By simplifying forms, we help businesses
-                  increase completion rates, reduce support requests, and build
-                  more inclusive digital environments. Whether through our free
-                  plan or our powerful pro options, Simple Complexity is here to
-                  make the web a little less complex for everyone.
+                  We are committed to improving the quality of care and
+                  operational efficiency in senior living communities. SimpleGroup
+                  is more than just a software solution; it's a partnership
+                  dedicated to helping you provide the best possible experience
+                  for your residents and their families. By simplifying complex
+                  processes, we help you build a stronger, more resilient
+                  community.
                 </Typography>
               </Box>
             </Box>

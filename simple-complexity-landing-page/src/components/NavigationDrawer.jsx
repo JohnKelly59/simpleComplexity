@@ -81,7 +81,7 @@ function NavigationDrawer ({ children })
         { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section-group' },
         { type: 'divider' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },
-        { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
+        // { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
         { text: 'Privacy Policy', icon: <PrivacyTipIcon />, path: '/privacy' },
     ];

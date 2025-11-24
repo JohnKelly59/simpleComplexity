@@ -13,10 +13,10 @@ const PrivacyPolicyPage = () =>
 
   return (
     <>
-      <title>Privacy Policy | Simple Complexity</title>
+      <title>Privacy Policy | SimpleGroup</title>
       <meta
         name="description"
-        content="Read the official Simple Complexity privacy policy to understand how we collect, use, disclose, and safeguard your information when you use our service."
+        content="Read the official SimpleGroup privacy policy to understand how we collect, use, disclose, and safeguard your information when you use our care management platform."
       />
       <Box
         sx={{
@@ -46,19 +46,18 @@ const PrivacyPolicyPage = () =>
                 gutterBottom
                 sx={{ textAlign: "center", opacity: 0.8 }}
               >
-                Last Updated: November 20, 2025
+                Last Updated: November 23, 2025
               </Typography>
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
                   Introduction
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  Welcome to Simple Complexity ("we", "us", "our"). We are
-                  committed to protecting your privacy. This Privacy Policy
+                  Welcome to SimpleGroup ("we", "us", "our"). We are
+                  committed to protecting your privacy and the sensitive data entrusted to us. This Privacy Policy
                   explains how we collect, use, disclose, and safeguard your
-                  information when you use our website, browser extension, and
-                  services (collectively, the "Service"). Please read this
-                  policy carefully. If you do not agree with the terms of this
+                  information when you use our website and care management platform (collectively, the "Service"). 
+                  Please read this policy carefully. If you do not agree with the terms of this
                   privacy policy, please do not access the Service.
                 </Typography>
               </Box>
@@ -73,30 +72,22 @@ const PrivacyPolicyPage = () =>
                   <ul>
                     <li>
                       <strong>Personal Data:</strong> Personally identifiable
-                      information, such as your name, email address, that you
+                      information, such as your name, email address, and phone number that you
                       voluntarily give to us when you register for the Service,
-                      join a waitlist, or contact us.
+                      request a demo, or contact us.
                     </li>
                     <li>
                       <strong>Usage Data:</strong> Information automatically
                       collected when you access the Service, such as your IP
                       address, browser type, operating system, access times, and
                       the pages you have viewed directly before and after
-                      accessing the Service. If using our extension or SDK, we
-                      may collect anonymized data about the forms you interact
-                      with (e.g., field types, question text length, tooltip
-                      usage frequency) solely to provide and improve the tooltip
-                      functionality and our AI models. We do not intentionally
-                      collect the *content* you enter into form fields.
+                      accessing the Service.
                     </li>
                     <li>
-                      <strong>Data Processed for Tooltips:</strong> When using
-                      AI-generated tooltips, the text of the form field label or
-                      question *may* be processed by our AI model (or a
-                      third-party AI provider subject to strict data processing
-                      agreements) to generate an explanation. We strive to
-                      minimize collection and processing of any potentially
-                      sensitive data within these questions.
+                      <strong>Facility & Resident Data:</strong> In the course of providing our care management services, 
+                      we process data regarding facility operations, staff activities, and resident care. 
+                      This information is processed in strict accordance with applicable healthcare privacy regulations 
+                      (including HIPAA where applicable) and our Data Processing Agreements with your facility.
                     </li>
                   </ul>
                 </Typography>
@@ -111,13 +102,12 @@ const PrivacyPolicyPage = () =>
                   smooth, efficient, and customized experience. Specifically, we
                   may use information collected about you via the Service to:
                   <ul>
-                    <li>Create and manage your account.</li>
+                    <li>Create and manage your account and facility access.</li>
                     <li>
-                      Provide, operate, and maintain the Service, including
-                      generating tooltips.
+                      Provide, operate, and maintain the Service, including care coordination and documentation features.
                     </li>
                     <li>Improve, personalize, and expand the Service.</li>
-                    <li>Understand and analyze how you use the Service.</li>
+                    <li>Understand and analyze how you use the Service to improve workflows.</li>
                     <li>
                       Develop new products, services, features, and
                       functionality.
@@ -131,11 +121,10 @@ const PrivacyPolicyPage = () =>
                     </li>
                     <li>Process your transactions (if applicable).</li>
                     <li>
-                      Send you emails (e.g., waitlist confirmation, account
-                      notifications, responses to inquiries).
+                      Send you emails (e.g., account notifications, security alerts, responses to inquiries).
                     </li>
-                    <li>Find and prevent fraud.</li>
-                    <li>Comply with legal obligations.</li>
+                    <li>Find and prevent fraud and ensure data security.</li>
+                    <li>Comply with legal obligations and healthcare regulations.</li>
                   </ul>
                 </Typography>
               </Box>
@@ -161,10 +150,9 @@ const PrivacyPolicyPage = () =>
                       <strong>Third-Party Service Providers:</strong> We may
                       share your information with third parties that perform
                       services for us or on our behalf, including payment
-                      processing (if applicable), data analysis, email delivery,
-                      hosting services, customer service, AI model providers
-                      (for tooltip generation, under strict confidentiality and
-                      data processing agreements), and marketing assistance.
+                      processing, data analysis, email delivery,
+                      hosting services, customer service, and marketing assistance. 
+                      All providers are vetted for security and compliance.
                     </li>
                     <li>
                       <strong>Business Transfers:</strong> We may share or

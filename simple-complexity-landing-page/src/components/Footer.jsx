@@ -21,7 +21,7 @@ const Footer = ({ variant = 'default' }) => {
             },
         },
         styled: {
-            background: 'linear-gradient(to right, #116530, #134E8E)',
+            background: 'transparent',
             color: '#fff',
             '& a': {
                 color: '#fff',
@@ -89,7 +89,7 @@ const Footer = ({ variant = 'default' }) => {
                     <MuiLink component={RouterLink} to="/about" sx={{ mx: 1 }}>
                         About
                     </MuiLink>
-                    <MuiLink component={RouterLink} to="/blog" sx={{ mx: 1 }}>Blog</MuiLink>
+                    {/* <MuiLink component={RouterLink} to="/blog" sx={{ mx: 1 }}>Blog</MuiLink> */}
                     <MuiLink component={RouterLink} to="/contact" sx={{ mx: 1 }}>
                         Contact
                     </MuiLink>
