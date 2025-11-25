@@ -88,10 +88,16 @@ function NavigationDrawer ({ children })
 
     const drawerContent = (
         <Box sx={{ width: drawerWidth }} role="presentation">
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
-                <IconButton onClick={handleDrawerToggle}>
-                    <CloseIcon />
-                </IconButton>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', p: 1, pr: 2 }}>
+                <Box
+                    component="img"
+                    src="/SC_COLOR.png"
+                    alt="Simple Complexity Logo"
+                    sx={{
+                        height: '80px',
+                        width: 'auto',
+                    }}
+                />
             </Box>
             <Divider />
             <List>

@@ -63,11 +63,11 @@ const HeroGroup = () =>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box
                             component="img"
-                            src={"/SC_COLOR.png"}
+                            src={"/simplegroup-logo.png"}
                             alt="SimpleGroup Logo"
                             sx={{
-                                width: { xs: "120px", sm: "160px" },
-                                mb: 4,
+                                width: { xs: "300px", sm: "300px" },
+                                mb: 1,
                                 filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
                             }}
                         />
