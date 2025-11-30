@@ -12,28 +12,28 @@ import 'swiper/css/pagination';
 
 const testimonials = [
     {
-        quote: "Integrating the SDK was straightforward. We saw a 15% reduction in support tickets related to form questions within the first month. The video feedback feature is a game-changer for our dev team.",
-        role: "Head of Product",
+        quote: "Testing the SDK integration was straightforward. We can already see the potential for reducing support tickets. The video feedback feature is going to be a game-changer.",
+        role: "Head of Product (Beta Tester)",
     },
     {
-        quote: "This tool provides clarity for any forms or documents that may seem confusing. The interface is discreet yet very effective when it comes to providing information.",
-        role: "Educator",
+        quote: "I've been testing the tool on confusing documents, and it provides great clarity. The interface is discreet and effective. A very promising beta.",
+        role: "Educator (Beta Participant)",
     },
     {
-        quote: "SimpleForm has significantly improved our user onboarding. The AI tooltips help new users complete complex setup forms much faster, leading to a measurable lift in our activation rate.",
-        role: "Chief Technology Officer",
+        quote: "We joined the beta to see if it could improve onboarding. The AI tooltips are already helping users complete forms faster in our test environment.",
+        role: "CTO (Early Access User)",
     },
     {
-        quote: "It serves as a one-stop shop is tailored to better user experiences for businesses or educational institutions. Having all of these functions in one software allows you to stand out.",
-        role: "UX Specialist",
+        quote: "Testing this as a one-stop shop for user experience has been great. It's tailored for businesses and education, and the feature set is impressive for a beta.",
+        role: "UX Specialist (Beta Tester)",
     },
     {
-        quote: "The analytics dashboard gives us clear insights into where users struggle on our application forms. We've used this data to simplify our forms and improve our completion rates.",
-        role: "Chief Executive Officer",
+        quote: "The beta analytics dashboard is giving us early insights into user struggles. We're using this test data to plan our form simplifications.",
+        role: "CEO (Beta Partner)",
     },
     {
-        quote: "It combines AI with a lot of other tools, making it like a Swiss Army knife type of app. The language features and SDK are what make it stand out.",
-        role: "Developer",
+        quote: "It combines AI with a lot of tools. Testing the language features and SDK showed us how it stands out. Excited for the stable release.",
+        role: "Developer (Beta Tester)",
     }
 ];
 
@@ -61,7 +61,7 @@ const Testimonials = () => {
         <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
             <Container maxWidth="lg">
                 <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 8, fontWeight: 'bold' }}>
-                    Trusted by Innovators
+                    Feedback from our Beta Testers
                 </Typography>
 
                 {/* 2. Replace Slider with Swiper */}

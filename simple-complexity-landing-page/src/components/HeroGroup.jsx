@@ -7,6 +7,7 @@ import
     Container,
     Grow,
     Stack,
+    Chip,
 } from "@mui/material";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
@@ -67,10 +68,11 @@ const HeroGroup = () =>
                             alt="SimpleGroup Logo"
                             sx={{
                                 width: { xs: "300px", sm: "300px" },
-                                mb: 1,
+                                mb: 0,
                                 filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
                             }}
                         />
+                        <Chip label="Beta" color="secondary" size="small" sx={{ mt : -5, mb: 2 }} />
                         <Typography
                             variant="h1"
                             component="h1"

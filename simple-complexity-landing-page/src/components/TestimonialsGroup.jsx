@@ -12,28 +12,28 @@ import 'swiper/css/pagination';
 
 const testimonials = [
     {
-        quote: "SimpleGroup has transformed how our family coordinates care for our aging parents. We can all stay updated on medications, appointments, and care visits in real-time. It's been a game-changer.",
-        role: "Family Caregiver",
+        quote: "Testing the SimpleGroup beta has transformed how our family coordinates care. Even in early access, we can stay updated on medications and visits. It's already a game-changer.",
+        role: "Family Caregiver (Beta Tester)",
     },
     {
-        quote: "As a care facility administrator, SimpleGroup has streamlined our communication with families significantly. The medication tracking and visit documentation features are essential tools for our daily operations.",
-        role: "Care Facility Administrator",
+        quote: "Participating in the beta trial, SimpleGroup has shown it can streamline our communication. The medication tracking features we tested are essential tools.",
+        role: "Care Facility Administrator (Beta Partner)",
     },
     {
-        quote: "The platform makes it so easy to manage my mother's care schedule. I can coordinate with my siblings, track medications, and ensure nothing falls through the cracks. Highly recommend!",
-        role: "Daughter & Primary Caregiver",
+        quote: "The beta platform makes it easy to manage my mother's care schedule. Testing the coordination features with my siblings has been great. Highly recommend joining the beta!",
+        role: "Daughter & Primary Caregiver (Beta User)",
     },
     {
-        quote: "SimpleGroup's messaging feature has improved our family communication dramatically. We can share updates, photos, and coordinate care responsibilities seamlessly.",
-        role: "Family Member",
+        quote: "Testing the messaging feature in the beta has improved our family communication. We've been able to share updates and coordinate seamlessly during the trial.",
+        role: "Family Member (Beta Tester)",
     },
     {
-        quote: "The vital signs tracking and health analytics have helped us monitor my father's condition more effectively. The visual trends make it easy to spot changes and share with healthcare providers.",
-        role: "Son & Care Coordinator",
+        quote: "The beta's vital signs tracking helped us monitor my father's condition. Seeing the visual trends in this early version makes it easy to spot changes.",
+        role: "Son & Care Coordinator (Beta Participant)",
     },
     {
-        quote: "SimpleGroup combines all the tools we need for comprehensive care management in one platform. The secure messaging, task management, and visit documentation are all we need.",
-        role: "Care Manager",
+        quote: "SimpleGroup's beta combines all the tools we need. We've been testing the secure messaging and task management, and it's exactly what we need.",
+        role: "Care Manager (Beta Tester)",
     }
 ];
 
@@ -62,7 +62,7 @@ const TestimonialsGroup = () =>
         <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
             <Container maxWidth="lg">
                 <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 8, fontWeight: 'bold' }}>
-                    Trusted by Families and Care Providers
+                    Beta Feedback from Families and Care Providers
                 </Typography>
 
                 {/* 2. Replace Slider with Swiper */}
