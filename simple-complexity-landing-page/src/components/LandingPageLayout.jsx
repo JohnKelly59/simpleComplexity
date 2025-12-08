@@ -5,6 +5,7 @@ import Footer from "./Footer";
 import HeroGroup from "./HeroGroup";
 import FeaturesGroup from "./FeaturesGroup";
 import DemoGroup from "./DemoGroup";
+import VideoSectionGroup from "./VideoSectionGroup";
 // import PricingGroup from "./PricingGroup";
 import DownloadExtensionGroup from "./DownloadExtensionGroup";
 import GuidedSetupGroup from "./GuidedSetupGroup";
@@ -22,6 +23,9 @@ function LandingPageLayout() {
           </Box>
           <Box id="demo-section-group">
             <DemoGroup />
+          </Box>
+          <Box id="video-section-group">
+            <VideoSectionGroup />
           </Box>
           <Box id="features-section-group">
             <FeaturesGroup />
