@@ -128,7 +128,7 @@ const HeroGroup = () =>
                                 variant="outlined"
                                 color="inherit"
                                 size="large"
-                                href="#contact"
+                                href="contact"
                                 sx={{
                                     py: 1.5,
                                     px: 4,
