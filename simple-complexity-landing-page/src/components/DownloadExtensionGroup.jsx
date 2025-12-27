@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Box, Button, Container, Typography, Grow } from '@mui/material';
 import MobileIcon from '@mui/icons-material/PhoneAndroid';
 import { useInView } from 'react-intersection-observer';
@@ -5,6 +6,9 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const DownloadExtensionGroup = () =>
 {
+    const [iosHover, setIosHover] = useState(false);
+    const [androidHover, setAndroidHover] = useState(false);
+
     const { ref, inView } = useInView({
         triggerOnce: true,
         threshold: 0.2,
@@ -51,25 +55,27 @@ const DownloadExtensionGroup = () =>
                                 variant="outlined"
                                 color="primary"
                                 size="large"
-                                href="https://apps.apple.com/app/simplegroup"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                startIcon={<MobileIcon />}
+                                startIcon={!iosHover ? <MobileIcon /> : null}
                                 sx={buttonStyles}
+                                onMouseEnter={() => setIosHover(true)}
+                                onMouseLeave={() => setIosHover(false)}
                             >
-                                Download for iOS
+                                {iosHover ? "Coming Soon" : "Download for iOS"}
                             </Button>
                             <Button
                                 variant="outlined"
                                 color="primary"
-                                size="large"
-                                href="https://play.google.com/store/apps/details?id=com.simplegroup"
+                                size="large"                   
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                startIcon={<MobileIcon />}
+                                startIcon={!androidHover ? <MobileIcon /> : null}
                                 sx={buttonStyles}
+                                onMouseEnter={() => setAndroidHover(true)}
+                                onMouseLeave={() => setAndroidHover(false)}
                             >
-                                Download for Android
+                                {androidHover ? "Coming Soon" : "Download for Android"}
                             </Button>
                         </Box>
                     </Box>
