@@ -6,7 +6,6 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const DownloadExtensionGroup = () =>
 {
-    const [iosHover, setIosHover] = useState(false);
     const [androidHover, setAndroidHover] = useState(false);
 
     const { ref, inView } = useInView({
@@ -55,14 +54,13 @@ const DownloadExtensionGroup = () =>
                                 variant="outlined"
                                 color="primary"
                                 size="large"
+                                href="https://apps.apple.com/us/app/simplegroup/id6755089694"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                startIcon={!iosHover ? <MobileIcon /> : null}
+                                startIcon={<MobileIcon />}
                                 sx={buttonStyles}
-                                onMouseEnter={() => setIosHover(true)}
-                                onMouseLeave={() => setIosHover(false)}
                             >
-                                {iosHover ? "Coming Soon" : "Download for iOS"}
+                                {"Download for iOS"}
                             </Button>
                             <Button
                                 variant="outlined"
