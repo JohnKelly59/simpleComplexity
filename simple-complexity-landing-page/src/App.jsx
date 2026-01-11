@@ -11,6 +11,7 @@ import NavigationDrawer from './components/NavigationDrawer';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import FeaturesPage from './pages/FeaturesPage';
 // import BlogListPage from './pages/BlogListPage';
 // import BlogPostPage from './pages/BlogPostPage';
 
@@ -68,6 +69,7 @@ function App ()
                             <Route path="/about" element={<AboutPage />} />
                             <Route path="/contact" element={<ContactPage />} />
                             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                            <Route path="/features" element={<FeaturesPage />} />
                             {/* <Route path="/blog" element={<BlogListPage />} /> */}
                             {/* <Route path="/blog/:slug" element={<BlogPostPage />} /> */}
 

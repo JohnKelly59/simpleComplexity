@@ -28,6 +28,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import PhoneIcone from '@mui/icons-material/Phone';
 import ShowIcon from '@mui/icons-material/Slideshow';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 
 const drawerWidth = 280;
@@ -74,12 +75,13 @@ function NavigationDrawer ({ children })
     const menuItems = [
         { text: 'Home', icon: <HomeIcon />, path: '/', sectionId: 'hero-section-group' },
         { text: 'Demo', icon: <OndemandVideoIcon />, path: '/', sectionId: 'demo-section-group' },
-        { text: 'Features', icon: <ChecklistIcon />, path: '/', sectionId: 'features-section-group' },
+       { text: 'Highlights', icon: <ChecklistIcon />, path: '/', sectionId: 'features-section-group' },
         { text: 'Download', icon: <GetAppIcon />, path: '/', sectionId: 'download-section-group' },
         { text: 'Guided Setup', icon: <PhoneIcone />, path: '/', sectionId: 'guided-setup-section-group' },
         { text: 'Testimonials', icon: <InfoIcon />, path: '/', sectionId: 'testimonials-section-group' },
         // { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section-group' },
         { type: 'divider' },
+        { text: 'Full Features', icon: <FormatListBulletedIcon />, path: '/features' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },
         // { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
