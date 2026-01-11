@@ -63,7 +63,7 @@ function NavigationDrawer ({ children })
                 scrollToSection(sectionId);
             } else
             {
-                navigate('/'); s
+                navigate('/');
                 setTimeout(() => scrollToSection(sectionId), 100);
             }
         } else
