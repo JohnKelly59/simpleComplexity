@@ -72,7 +72,7 @@ const HeroGroup = () =>
                                 filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
                             }}
                         />
-                        <Chip label="Beta" color="secondary" size="small" sx={{ mt : -5, mb: 2 }} />
+                        {/* <Chip label="Beta" color="secondary" size="small" sx={{ mt : -5, mb: 2 }} /> */}
                         <Typography
                             variant="h1"
                             component="h1"

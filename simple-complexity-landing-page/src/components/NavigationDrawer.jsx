@@ -79,7 +79,7 @@ function NavigationDrawer ({ children })
         { text: 'Download', icon: <GetAppIcon />, path: '/', sectionId: 'download-section-group' },
         { text: 'Guided Setup', icon: <PhoneIcone />, path: '/', sectionId: 'guided-setup-section-group' },
         { text: 'Testimonials', icon: <InfoIcon />, path: '/', sectionId: 'testimonials-section-group' },
-        // { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section-group' },
+        { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section-group' },
         { type: 'divider' },
         { text: 'Full Features', icon: <FormatListBulletedIcon />, path: '/features' },
         { text: 'About', icon: <InfoIcon />, path: '/about' },

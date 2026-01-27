@@ -6,7 +6,7 @@ import HeroGroup from "./HeroGroup";
 import FeaturesGroup from "./FeaturesGroup";
 import DemoGroup from "./DemoGroup";
 import VideoSectionGroup from "./VideoSectionGroup";
-// import PricingGroup from "./PricingGroup";
+ import PricingGroup from "./PricingGroup";
 import DownloadExtensionGroup from "./DownloadExtensionGroup";
 import GuidedSetupGroup from "./GuidedSetupGroup";
 import TestimonialsGroup from "./TestimonialsGroup";
@@ -39,9 +39,9 @@ function LandingPageLayout() {
           <Box id="testimonials-section-group">
             <TestimonialsGroup />
           </Box>
-          {/* <Box id="pricing-section-group">
+          <Box id="pricing-section-group">
             <PricingGroup />
-          </Box> */}
+          </Box>
         </Box>
         <Footer variant="default" />
       </Box>
