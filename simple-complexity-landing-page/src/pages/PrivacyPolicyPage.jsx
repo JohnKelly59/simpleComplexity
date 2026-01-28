@@ -1,12 +1,10 @@
-import { Box, Container, Typography, Fade } from "@mui/material";
+import { Box, Container, Typography, Fade, Link } from "@mui/material";
 import { useState, useEffect } from "react";
 
-const PrivacyPolicyPage = () =>
-{
+const PrivacyPolicyPage = () => {
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     const timeout = setTimeout(() => setLoaded(true), 200);
     return () => clearTimeout(timeout);
   }, []);
@@ -16,7 +14,7 @@ const PrivacyPolicyPage = () =>
       <title>Privacy Policy | SimpleGroup</title>
       <meta
         name="description"
-        content="Read the official SimpleGroup privacy policy to understand how we collect, use, disclose, and safeguard your information when you use our care management platform."
+        content="Read the official SimpleGroup privacy policy. Learn about our data protection, Google user data usage, retention policies, and how to request data deletion."
       />
       <Box
         sx={{
@@ -46,48 +44,50 @@ const PrivacyPolicyPage = () =>
                 gutterBottom
                 sx={{ textAlign: "center", opacity: 0.8 }}
               >
-                Last Updated: November 23, 2025
+                Last Updated: January 28, 2026
               </Typography>
+              
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                  Introduction
+                  1. Introduction
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  Welcome to SimpleGroup ("we", "us", "our"). We are
-                  committed to protecting your privacy and the sensitive data entrusted to us. This Privacy Policy
-                  explains how we collect, use, disclose, and safeguard your
-                  information when you use our website and care management platform (collectively, the "Service"). 
-                  Please read this policy carefully. If you do not agree with the terms of this
-                  privacy policy, please do not access the Service.
+                  Welcome to SimpleGroup ("we", "us", "our"). We are committed to
+                  protecting your privacy and the sensitive data entrusted to us.
+                  This Privacy Policy explains how we collect, use, disclose, and
+                  safeguard your information when you use our website and care
+                  management platform (collectively, the "Service").
                 </Typography>
               </Box>
 
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                  Information We Collect
+                  2. Information We Collect
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  We may collect information about you in a variety of ways. The
-                  information we may collect via the Service includes:
+                  We may collect information about you in a variety of ways:
                   <ul>
                     <li>
                       <strong>Personal Data:</strong> Personally identifiable
-                      information, such as your name, email address, and phone number that you
-                      voluntarily give to us when you register for the Service,
-                      request a demo, or contact us.
+                      information, such as your name, email address, and phone
+                      number that you voluntarily give to us when you register.
+                    </li>
+                    <li>
+                      <strong>Google User Data:</strong> If you choose to connect
+                      your Google Account, we access your basic profile information
+                      (name, email, profile picture) to facilitate login. If you enable
+                      Calendar syncing, we access your Google Calendar data to sync
+                      SimpleGroup events with your personal schedule.
                     </li>
                     <li>
                       <strong>Usage Data:</strong> Information automatically
-                      collected when you access the Service, such as your IP
-                      address, browser type, operating system, access times, and
-                      the pages you have viewed directly before and after
-                      accessing the Service.
+                      collected regarding your IP address, browser type, and
+                      operating system.
                     </li>
                     <li>
-                      <strong>Facility & Resident Data:</strong> In the course of providing our care management services, 
-                      we process data regarding facility operations, staff activities, and resident care. 
-                      This information is processed in strict accordance with applicable healthcare privacy regulations 
-                      (including HIPAA where applicable) and our Data Processing Agreements with your facility.
+                      <strong>Facility & Resident Data:</strong> Data regarding
+                      facility operations and resident care, processed in
+                      accordance with HIPAA and Data Processing Agreements.
                     </li>
                   </ul>
                 </Typography>
@@ -95,71 +95,46 @@ const PrivacyPolicyPage = () =>
 
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                  How We Use Your Information
+                  3. How We Use Your Information
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  Having accurate information permits us to provide you with a
-                  smooth, efficient, and customized experience. Specifically, we
-                  may use information collected about you via the Service to:
+                  We use the information we collect to:
                   <ul>
-                    <li>Create and manage your account and facility access.</li>
+                    <li>Create and manage your account.</li>
+                    <li>Provide care coordination and documentation features.</li>
                     <li>
-                      Provide, operate, and maintain the Service, including care coordination and documentation features.
+                      <strong>Google Calendar Integration:</strong> We use read/write
+                      access to your Google Calendar solely to allow you to view
+                      SimpleGroup shifts/events in your Google Calendar and to
+                      prevent scheduling conflicts. We do not use this data for
+                      advertising purposes.
                     </li>
-                    <li>Improve, personalize, and expand the Service.</li>
-                    <li>Understand and analyze how you use the Service to improve workflows.</li>
-                    <li>
-                      Develop new products, services, features, and
-                      functionality.
-                    </li>
-                    <li>
-                      Communicate with you, either directly or through one of
-                      our partners, including for customer service, to provide
-                      you with updates and other information relating to the
-                      Service, and for marketing and promotional purposes (where
-                      permitted by law and with your consent where required).
-                    </li>
-                    <li>Process your transactions (if applicable).</li>
-                    <li>
-                      Send you emails (e.g., account notifications, security alerts, responses to inquiries).
-                    </li>
-                    <li>Find and prevent fraud and ensure data security.</li>
+                    <li>Send you emails regarding account security and updates.</li>
                     <li>Comply with legal obligations and healthcare regulations.</li>
                   </ul>
                 </Typography>
               </Box>
+
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                  Disclosure of Your Information
+                  4. Data Protection and Security
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  We may share information we have collected about you in
-                  certain situations. Your information may be disclosed as
-                  follows:
+                  We implement robust security measures to protect your personal information:
                   <ul>
                     <li>
-                      <strong>By Law or to Protect Rights:</strong> If we
-                      believe the release of information about you is necessary
-                      to respond to legal process, to investigate or remedy
-                      potential violations of our policies, or to protect the
-                      rights, property, and safety of others, we may share your
-                      information as permitted or required by any applicable
-                      law, rule, or regulation.
+                      <strong>Encryption:</strong> All data transmitted between your 
+                      browser and our servers is encrypted using Secure Socket Layer (SSL) 
+                      technology. Sensitive data at rest is encrypted using industry-standard standards.
                     </li>
                     <li>
-                      <strong>Third-Party Service Providers:</strong> We may
-                      share your information with third parties that perform
-                      services for us or on our behalf, including payment
-                      processing, data analysis, email delivery,
-                      hosting services, customer service, and marketing assistance. 
-                      All providers are vetted for security and compliance.
+                      <strong>Access Controls:</strong> Access to sensitive personal and 
+                      facility data is restricted to authorized personnel who need to know 
+                      that information to operate, develop, or improve our Service.
                     </li>
                     <li>
-                      <strong>Business Transfers:</strong> We may share or
-                      transfer your information in connection with, or during
-                      negotiations of, any merger, sale of company assets,
-                      financing, or acquisition of all or a portion of our
-                      business to another company.
+                      <strong>Security Audits:</strong> We conduct regular security assessments 
+                      to identify and mitigate potential vulnerabilities.
                     </li>
                   </ul>
                 </Typography>
@@ -167,12 +142,82 @@ const PrivacyPolicyPage = () =>
 
               <Box sx={{ my: 3 }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                  Contact Us
+                  5. Data Retention and Deletion
                 </Typography>
                 <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
-                  If you have questions or comments about this Privacy Policy,
-                  please contact us using the contact form on our website or by
-                  emailing us at privacy@simple-complexity.com
+                  <strong>Retention Policy:</strong> We retain your personal data and 
+                  Google user data only for as long as your account is active or as needed 
+                  to provide you with the Service. Facility and resident data is retained 
+                  in accordance with applicable healthcare laws (e.g., HIPAA retention requirements).
+                </Typography>
+                <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
+                  <strong>Deletion Request:</strong> You have the right to request the 
+                  deletion of your personal data.
+                  <ul>
+                    <li>
+                      <strong>Self-Service:</strong> You may disconnect your Google Account 
+                      at any time via your User Profile settings. This immediately revokes 
+                      our access to your Google data.
+                    </li>
+                    <li>
+                      <strong>Manual Request:</strong> To request permanent deletion of 
+                      your account and associated data, please email us at{' '}
+                      <Link href="mailto:privacy@simple-complexity.com" color="inherit" sx={{ fontWeight: 'bold' }}>
+                        privacy@simple-complexity.com
+                      </Link>. We will process your request within 30 days, subject to 
+                      any legal obligations to retain certain records.
+                    </li>
+                  </ul>
+                </Typography>
+              </Box>
+
+              <Box sx={{ my: 3 }}>
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                  6. Google Limited Use Disclosure
+                </Typography>
+                <Typography variant="body1" paragraph sx={{ opacity: 0.9, fontStyle: 'italic', borderLeft: '4px solid #fff', pl: 2 }}>
+                  SimpleGroup's use and transfer to any other app of information received 
+                  from Google APIs will adhere to the{' '}
+                  <Link 
+                    href="https://developers.google.com/terms/api-services-user-data-policy" 
+                    target="_blank" 
+                    rel="noopener"
+                    color="inherit" 
+                    sx={{ textDecoration: 'underline' }}
+                  >
+                    Google API Services User Data Policy
+                  </Link>, including the Limited Use requirements.
+                </Typography>
+              </Box>
+
+              <Box sx={{ my: 3 }}>
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                  7. Disclosure of Your Information
+                </Typography>
+                <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
+                  We do not sell your personal data. We may share information with:
+                  <ul>
+                    <li>
+                      <strong>Service Providers:</strong> Third-party vendors (e.g., hosting, 
+                      payment processing) who perform services on our behalf and are bound 
+                      by confidentiality agreements.
+                    </li>
+                    <li>
+                      <strong>Legal Requirements:</strong> If required by law or to protect 
+                      the rights and safety of others.
+                    </li>
+                  </ul>
+                </Typography>
+              </Box>
+
+              <Box sx={{ my: 3 }}>
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                  8. Contact Us
+                </Typography>
+                <Typography variant="body1" paragraph sx={{ opacity: 0.9 }}>
+                  If you have questions about this Privacy Policy or our data practices, 
+                  please contact us at: <br />
+                  <strong>Email:</strong> privacy@simple-complexity.com
                 </Typography>
               </Box>
             </Box>
