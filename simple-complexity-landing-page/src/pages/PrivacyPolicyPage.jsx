@@ -105,7 +105,7 @@ const PrivacyPolicyPage = () => {
                     <li>
                       <strong>Google Calendar Integration:</strong> We use read/write
                       access to your Google Calendar solely to allow you to view
-                      SimpleGroup shifts/events in your Google Calendar and to
+                      SimpleGroup shifts/events/tasks in your Google Calendar and to
                       prevent scheduling conflicts. We do not use this data for
                       advertising purposes.
                     </li>
