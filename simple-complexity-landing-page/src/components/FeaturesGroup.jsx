@@ -23,6 +23,8 @@ import SecurityIcon from '@mui/icons-material/Security';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EventIcon from '@mui/icons-material/Event';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 const featureCategories = [
     {
@@ -40,7 +42,8 @@ const featureCategories = [
             { icon: <TaskIcon fontSize="large" color="primary" />, title: 'Task Management', description: 'Assign and track care tasks, responsibilities, and to-dos with clear assignments and completion tracking.' },
             { icon: <DescriptionIcon fontSize="large" color="primary" />, title: 'Document Management', description: 'Centralize important documents, care plans, and legal forms in a secure, accessible digital repository.' },
             { icon: <EventIcon fontSize="large" color="primary" />, title: 'Events & Activities', description: 'Plan and schedule facility events, activities, and outings to keep residents engaged and active.' },
-            { icon: <SecurityIcon fontSize="large" color="primary" />, title: 'Role-Based Access', description: 'Ensure appropriate information sharing with granular access controls for staff, family, and administrators.' },
+            { icon: <SecurityIcon fontSize="large" color="primary" />, title: 'Facility Access Controls', description: 'Enforce facility-scoped access so staff and partners only see residents, records, and workflows tied to their assigned location.' },
+            { icon: <AdminPanelSettingsIcon fontSize="large" color="primary" />, title: 'Permission Governance', description: 'Apply role-based read/write permissions across messaging, documents, incidents, medications, and scheduling for tighter operational control.' },
         ]
     },
     {
@@ -50,6 +53,15 @@ const featureCategories = [
             { icon: <MessageIcon fontSize="large" color="primary" />, title: 'Secure Messaging', description: 'Facilitate seamless, secure communication between family members, caregivers, and care facilities.' },
             { icon: <CalendarIcon fontSize="large" color="primary" />, title: 'Shared Calendar', description: 'Keep everyone in sync with a shared calendar for appointments, visits, and important dates.' },
             { icon: <VisitIcon fontSize="large" color="primary" />, title: 'Visit Documentation', description: 'Document care visits and observations with photos and notes for comprehensive care records.' },
+        ]
+    },
+    {
+        category: 'AI & Intelligence',
+        features: [
+            { icon: <AutoAwesomeIcon fontSize="large" color="primary" />, title: 'AI Summary Drafts', description: 'Generate fast, editable summaries from communication and care activity to reduce documentation burden and improve shift handoffs.' },
+            { icon: <AnalyticsIcon fontSize="large" color="primary" />, title: 'Operational Insights', description: 'Surface trends and high-priority context from platform activity so teams can make faster, better-informed care and operations decisions.' },
+            { icon: <NotificationIcon fontSize="large" color="primary" />, title: 'Smart Notification Context', description: 'Pair alerts with relevant context to help staff understand why an action matters and what should happen next.' },
+            { icon: <MessageIcon fontSize="large" color="primary" />, title: 'Human-in-the-Loop AI', description: 'Keep teams in control by reviewing and finalizing AI-assisted outputs before they become part of workflows or records.' },
         ]
     }
 ];

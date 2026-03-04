@@ -22,6 +22,7 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 const featureData = [
     {
@@ -33,18 +34,22 @@ const featureData = [
             "Password Management: Forgot and reset flows.",
             "Onboarding: Dedicated user onboarding flow.",
             "Profile: Edit details and user attributes.",
-            "Roles: Admin, Staff, Family, and Resident."
+            "Roles: Admin, Staff, Family, and Resident.",
+            "Session Security: Verified login and protected account workflows."
         ]
     },
     {
-        category: "Facility Management",
+        category: "Facility Management & Access Controls",
         icon: <ApartmentIcon fontSize="large" />,
         items: [
             "Operations: CRUD for care facilities.",
-            "Staffing: Manage users and permissions.",
+            "Staffing: Manage users, teams, and assignments.",
             "Invitations: Search and invite users easily.",
-            "Schedule: Centralized staffing calendar.",
-            "Visibility: Role-based data access."
+            "Scoped Access: Facility-level access segmentation.",
+            "Role Permissions: Fine-grained read/write controls by module.",
+            "Clinical Restrictions: Limit medication, vitals, and incident access.",
+            "Communication Controls: Restrict conversation and feed visibility by role.",
+            "Approval Boundaries: Delegate privileged actions to approved administrators."
         ]
     },
     {
@@ -55,38 +60,53 @@ const featureData = [
             "Care Teams: Dedicated group channels.",
             "History: Full conversation archives.",
             "Family Connections: Manage relationships.",
-            "Social Feed: Community news and posts."
+            "Social Feed: Community news and posts.",
+            "Escalation Ready: Trigger urgent communication for time-sensitive events."
         ]
     },
     {
-        category: "Calendar & Scheduling",
+        category: "Calendar, Scheduling & Visits",
         icon: <EventAvailableIcon fontSize="large" />,
         items: [
             "Events: Manage facility-wide activities.",
             "Unified View: Staff, activity, and personal events.",
             "Google Sync: Sync with personal calendars.",
             "Visits: Family request and approval system.",
-            "Shifts: Staff shift management."
+            "Shifts: Staff shift management.",
+            "Coverage Visibility: Improve handoff planning and staffing continuity."
         ]
     },
     {
-        category: "Care & Health Management",
+        category: "Care & Clinical Workflows",
         icon: <MonitorHeartIcon fontSize="large" />,
         items: [
             "Medications: Track prescriptions & schedules.",
             "eMAR: Electronic Administration Records.",
             "Tasks: Daily care task tracking.",
             "Vitals: Monitor BP, heart rate, and more.",
-            "Incidents: Log and track reports."
+            "Incidents: Log and track reports.",
+            "Care Accountability: Time-stamped activity and completion records."
         ]
     },
     {
-        category: "Files & Documents",
+        category: "Files, Records & Documents",
         icon: <FolderSharedIcon fontSize="large" />,
         items: [
             "Storage: Secure cloud file storage.",
             "Management: Associate docs with residents.",
-            "Access: Centralized repository."
+            "Access: Centralized repository.",
+            "Permissioned Visibility: Limit sensitive document access to approved roles."
+        ]
+    },
+    {
+        category: "AI Assistant & Automation",
+        icon: <AutoAwesomeIcon fontSize="large" />,
+        items: [
+            "AI Summaries: Generate fast drafts from care communications and activity.",
+            "Operational Insights: Surface trends and key context for staff decisions.",
+            "Reduced Admin Load: Speed up repetitive documentation workflows.",
+            "Action Support: Help teams prioritize follow-up tasks and communication.",
+            "Human-in-the-Loop: Teams review and finalize AI-supported output."
         ]
     },
     {
@@ -100,22 +120,24 @@ const featureData = [
         ]
     },
     {
-        category: "Notifications",
+        category: "Notifications & Escalations",
         icon: <NotificationsActiveIcon fontSize="large" />,
         items: [
             "Push: Real-time mobile and web alerts.",
             "Smart Alerts: For messages and incidents.",
             "Email: Summaries and urgent notifications.",
-            "Preferences: Granular user control."
+            "Preferences: Granular user control.",
+            "Role-Aware Delivery: Notify the right teams based on responsibility and urgency."
         ]
     },
     {
-        category: "Admin & System",
+        category: "Admin, Audit & System",
         icon: <AdminPanelSettingsIcon fontSize="large" />,
         items: [
             "Audit Logs: Full compliance tracking.",
             "Dashboard: High-level system oversight.",
-            "Data Control: Address and master data."
+            "Data Control: Address and master data.",
+            "Operational Oversight: Cross-functional visibility into platform usage."
         ]
     }
 ];

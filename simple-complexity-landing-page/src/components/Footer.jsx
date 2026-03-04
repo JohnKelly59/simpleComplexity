@@ -93,6 +93,9 @@ const Footer = ({ variant = 'default' }) => {
                     <MuiLink component={RouterLink} to="/contact" sx={{ mx: 1 }}>
                         Contact
                     </MuiLink>
+                    <MuiLink component={RouterLink} to="/faq" sx={{ mx: 1 }}>
+                        FAQ
+                    </MuiLink>
                     <MuiLink component={RouterLink} to="/privacy" sx={{ mx: 1 }}>
                         Privacy Policy
                     </MuiLink>

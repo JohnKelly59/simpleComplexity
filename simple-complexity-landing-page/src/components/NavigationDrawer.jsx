@@ -29,6 +29,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import PhoneIcone from '@mui/icons-material/Phone';
 import ShowIcon from '@mui/icons-material/Slideshow';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import QuizIcon from '@mui/icons-material/Quiz';
 
 
 const drawerWidth = 280;
@@ -85,6 +86,7 @@ function NavigationDrawer ({ children })
         { text: 'About', icon: <InfoIcon />, path: '/about' },
         // { text: 'Blog', icon: <ArticleIcon />, path: '/blog' },
         { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
+            { text: 'FAQ', icon: <QuizIcon />, path: '/faq' },
         { text: 'Privacy Policy', icon: <PrivacyTipIcon />, path: '/privacy' },
     ];
 
