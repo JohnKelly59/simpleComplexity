@@ -1,5 +1,7 @@
 // src/components/LandingPageLayout.jsx
 import { Box } from "@mui/material";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Footer from "./Footer";
 // Simple Group components
 import HeroGroup from "./HeroGroup";
@@ -10,8 +12,27 @@ import VideoSectionGroup from "./VideoSectionGroup";
 import DownloadExtensionGroup from "./DownloadExtensionGroup";
 import GuidedSetupGroup from "./GuidedSetupGroup";
 import TestimonialsGroup from "./TestimonialsGroup";
+import FormsCapabilityGroup from "./FormsCapabilityGroup";
 
 function LandingPageLayout() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const sectionId = location.hash?.replace('#', '');
+    if (!sectionId) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }, [location.hash]);
+
   return (
     <>
       <Box
@@ -29,6 +50,9 @@ function LandingPageLayout() {
           </Box>
           <Box id="features-section-group">
             <FeaturesGroup />
+          </Box>
+          <Box id="forms-section-group">
+            <FormsCapabilityGroup />
           </Box>
           <Box id="download-section-group">
             <DownloadExtensionGroup />
