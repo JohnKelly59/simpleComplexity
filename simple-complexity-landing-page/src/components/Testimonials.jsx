@@ -13,27 +13,27 @@ import 'swiper/css/pagination';
 const testimonials = [
     {
         quote: "Testing the SDK integration was straightforward. We can already see the potential for reducing support tickets. The video feedback feature is going to be a game-changer.",
-        role: "Head of Product (Beta Tester)",
+        role: "Head of Product",
     },
     {
-        quote: "I've been testing the tool on confusing documents, and it provides great clarity. The interface is discreet and effective. A very promising beta.",
-        role: "Educator (Beta Participant)",
+        quote: "I've been testing the tool on confusing documents, and it provides great clarity. The interface is discreet and effective. A very promising product.",
+        role: "Educator",
     },
     {
-        quote: "We joined the beta to see if it could improve onboarding. The AI tooltips are already helping users complete forms faster in our test environment.",
+        quote: "We tried the platform to see if it could improve onboarding. The AI tooltips are already helping users complete forms faster in our test environment.",
         role: "CTO (Early Access User)",
     },
     {
-        quote: "Testing this as a one-stop shop for user experience has been great. It's tailored for businesses and education, and the feature set is impressive for a beta.",
-        role: "UX Specialist (Beta Tester)",
+        quote: "Testing this as a one-stop shop for user experience has been great. It's tailored for businesses and education, and the feature set is impressive.",
+        role: "UX Specialist",
     },
     {
-        quote: "The beta analytics dashboard is giving us early insights into user struggles. We're using this test data to plan our form simplifications.",
-        role: "CEO (Beta Partner)",
+        quote: "The analytics dashboard is giving us early insights into user struggles. We're using this test data to plan our form simplifications.",
+        role: "CEO",
     },
     {
         quote: "It combines AI with a lot of tools. Testing the language features and SDK showed us how it stands out. Excited for the stable release.",
-        role: "Developer (Beta Tester)",
+        role: "Developer",
     }
 ];
 
@@ -61,7 +61,7 @@ const Testimonials = () => {
         <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
             <Container maxWidth="lg">
                 <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 8, fontWeight: 'bold' }}>
-                    Feedback from our Beta Testers
+                    Feedback from Our Testers
                 </Typography>
 
                 {/* 2. Replace Slider with Swiper */}
