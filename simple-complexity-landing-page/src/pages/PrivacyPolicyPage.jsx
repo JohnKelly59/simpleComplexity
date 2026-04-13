@@ -24,7 +24,8 @@ const PrivacyPolicyPage = () => {
           justifyContent: "center",
           py: 8,
           px: 4,
-          color: "#fff",
+          color: "#1a1a2e",
+          bgcolor: "#f8fafc",
         }}
       >
         <Container maxWidth="md">
@@ -175,7 +176,7 @@ const PrivacyPolicyPage = () => {
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
                   6. Google Limited Use Disclosure
                 </Typography>
-                <Typography variant="body1" paragraph sx={{ opacity: 0.9, fontStyle: 'italic', borderLeft: '4px solid #fff', pl: 2 }}>
+                <Typography variant="body1" paragraph sx={{ opacity: 0.9, fontStyle: 'italic', borderLeft: '4px solid #1a1a2e', pl: 2 }}>
                   SimpleGroup's use and transfer to any other app of information received 
                   from Google APIs will adhere to the{' '}
                   <Link 

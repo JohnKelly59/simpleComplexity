@@ -3,12 +3,10 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import SecurityIcon from '@mui/icons-material/Security';
-import ShieldIcon from '@mui/icons-material/Shield';
 import screenshot1 from '../assets/screenshots/screenshot1.png';
 
 const trustBadges = [
   { icon: <SecurityIcon sx={{ fontSize: 18 }} />, label: 'HIPAA Compliant' },
-  { icon: <ShieldIcon sx={{ fontSize: 18 }} />, label: 'SOC 2 Ready' },
   { icon: <VerifiedIcon sx={{ fontSize: 18 }} />, label: '256-bit Encryption' },
   { icon: <PhoneAndroidIcon sx={{ fontSize: 18 }} />, label: 'Web, iOS & Android' },
 ];
