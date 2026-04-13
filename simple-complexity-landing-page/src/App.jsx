@@ -13,6 +13,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import FeaturesPage from './pages/FeaturesPage';
 import FAQPage from './pages/FAQPage';
 import SimpleGroupFormsPage from './pages/SimpleGroupFormsPage';
+import HipaaCompliancePage from './pages/HipaaCompliancePage';
 
 const SubPageLayout = () => (
   <Box
@@ -55,6 +56,7 @@ function App() {
               <Route path="/features" element={<FeaturesPage />} />
               <Route path="/simple-group-forms" element={<SimpleGroupFormsPage />} />
               <Route path="/faq" element={<FAQPage />} />
+              <Route path="/hipaa" element={<HipaaCompliancePage />} />
             </Route>
           </Routes>
         </NavigationDrawer>

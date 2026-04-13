@@ -31,6 +31,7 @@ const columns = [
   {
     title: 'Legal',
     links: [
+      { to: '/hipaa', label: 'HIPAA Compliance' },
       { to: '/privacy', label: 'Privacy Policy' },
     ],
   },

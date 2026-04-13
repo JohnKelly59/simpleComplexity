@@ -31,6 +31,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import QuizIcon from '@mui/icons-material/Quiz';
 import DescriptionIcon from '@mui/icons-material/Description';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
+import SecurityIcon from '@mui/icons-material/Security';
 
 const drawerWidth = 280;
 
@@ -63,6 +64,7 @@ const drawerItems = [
   { text: 'About', icon: <InfoIcon />, path: '/about' },
   { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
   { text: 'FAQ', icon: <QuizIcon />, path: '/faq' },
+  { text: 'HIPAA Compliance', icon: <SecurityIcon />, path: '/hipaa' },
   { text: 'Privacy Policy', icon: <PrivacyTipIcon />, path: '/privacy' },
 ];
 
