@@ -1,81 +1,86 @@
-import {
-  Box,
-  Typography,
-  Card,
-  CardMedia,
-  Container,
-} from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import DataObjectIcon from '@mui/icons-material/DataObject';
-import ExtensionIcon from '@mui/icons-material/Extension';
+import { Box, Typography, Container, Card, CardMedia } from '@mui/material';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Autoplay, EffectCoverflow } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/effect-coverflow';
 
-const videos = [
-  {
-    title: 'Business Dashboard',
-    src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/dashboarddemo.mp4',
-    icon: <DashboardIcon fontSize="large" color="primary" />,
-  },
-   {
-    title: 'Chrome Extension Walkthrough',
-    src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/SFDemo.mp4',
-    icon: <ExtensionIcon fontSize="large" color="primary" />,
-  },
-  {
-    title: 'SDK Showcase',
-    src: 'https://simlplecomplexity.s3.us-east-2.amazonaws.com/landingpagedemo.mp4',
-    icon: <DataObjectIcon fontSize="large" color="primary" />,
-  },
+import screenshot1 from '../assets/screenshots/screenshot1.png';
+import screenshot2 from '../assets/screenshots/screenshot2.png';
+import screenshot3 from '../assets/screenshots/screenshot3.png';
+import screenshot4 from '../assets/screenshots/screenshot4.png';
+import screenshot5 from '../assets/screenshots/screenshot5.png';
+import screenshot6 from '../assets/screenshots/screenshot6.png';
+import screenshot7 from '../assets/screenshots/screenshot7.png';
+
+const screenshots = [
+  { src: screenshot1, alt: 'Dashboard Overview' },
+  { src: screenshot2, alt: 'Resident Care View' },
+  { src: screenshot3, alt: 'Messaging Interface' },
+  { src: screenshot4, alt: 'Calendar & Scheduling' },
+  { src: screenshot5, alt: 'Medication Tracking' },
+  { src: screenshot6, alt: 'Forms Builder' },
+  { src: screenshot7, alt: 'Reports & Analytics' },
 ];
 
-const Demo = () => {
-  return (
-    <Box sx={{ py: 10, textAlign: 'center', backgroundColor: 'background.default' }}>
-      <Container maxWidth="lg">
-        <Typography variant="h4" gutterBottom>
-          See It in Action
+const Demo = () => (
+  <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#ffffff', overflow: 'hidden' }}>
+    <Container maxWidth="lg">
+      <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+        <Typography
+          variant="overline"
+          sx={{ color: '#116530', fontWeight: 700, letterSpacing: 2, mb: 1, display: 'block' }}
+        >
+          Product Preview
         </Typography>
-        <Typography variant="body1" color="text.secondary" gutterBottom>
-          Watch how SimpleForm turns complex forms into clear, user-friendly experiences.
+        <Typography
+          variant="h3"
+          component="h2"
+          sx={{ fontWeight: 800, color: '#1a1a2e', mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}
+        >
+          See the Platform in Action
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, mt: 4, flexWrap: 'wrap' }}>
-          {videos.map((video, index) => (
+        <Typography
+          variant="body1"
+          sx={{ color: '#4a5568', maxWidth: 600, mx: 'auto', fontSize: '1.05rem', lineHeight: 1.7 }}
+        >
+          An intuitive interface designed for care teams of all technical levels.
+        </Typography>
+      </Box>
+
+      <Swiper
+        effect="coverflow"
+        grabCursor
+        centeredSlides
+        slidesPerView="auto"
+        coverflowEffect={{ rotate: 30, stretch: 0, depth: 120, modifier: 1, slideShadows: true }}
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        modules={[EffectCoverflow, Pagination, Autoplay]}
+        style={{ paddingBottom: '50px', '--swiper-pagination-color': '#116530' }}
+      >
+        {screenshots.map((shot, index) => (
+          <SwiperSlide key={index} style={{ width: '300px', height: 'auto' }}>
             <Card
-              key={index}
-              elevation={4}
+              elevation={0}
               sx={{
-                overflow: 'hidden',
                 borderRadius: 3,
-                width: { xs: '100%', sm: 'calc(50% - 16px)', md: 'calc(33.333% - 22px)' },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
+                overflow: 'hidden',
+                border: '1px solid #e2e8f0',
               }}
             >
-              <Box sx={{ p: 2 }}>
-                {video.icon}
-                <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
-                  {video.title}
-                </Typography>
-              </Box>
               <CardMedia
-                component="video"
-                src={video.src}
-                playsInline
-                muted
-                controls
-                preload="metadata"
-                sx={{
-                  width: '100%',
-                  height: 250,
-                  objectFit: 'cover',
-                }}
+                component="img"
+                image={shot.src}
+                alt={shot.alt}
+                sx={{ width: '100%', height: 'auto', display: 'block' }}
               />
             </Card>
-          ))}
-        </Box>
-      </Container>
-    </Box>
-  );
-};
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </Container>
+  </Box>
+);
 
 export default Demo;

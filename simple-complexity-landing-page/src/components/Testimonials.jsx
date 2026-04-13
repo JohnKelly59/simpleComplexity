@@ -1,114 +1,124 @@
-// src/components/Testimonials.jsx
-import React from 'react';
 import { Box, Container, Typography, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-
-// 1. Import Swiper components and styles
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
 const testimonials = [
-    {
-        quote: "Testing the SDK integration was straightforward. We can already see the potential for reducing support tickets. The video feedback feature is going to be a game-changer.",
-        role: "Head of Product",
-    },
-    {
-        quote: "I've been testing the tool on confusing documents, and it provides great clarity. The interface is discreet and effective. A very promising product.",
-        role: "Educator",
-    },
-    {
-        quote: "We tried the platform to see if it could improve onboarding. The AI tooltips are already helping users complete forms faster in our test environment.",
-        role: "CTO (Early Access User)",
-    },
-    {
-        quote: "Testing this as a one-stop shop for user experience has been great. It's tailored for businesses and education, and the feature set is impressive.",
-        role: "UX Specialist",
-    },
-    {
-        quote: "The analytics dashboard is giving us early insights into user struggles. We're using this test data to plan our form simplifications.",
-        role: "CEO",
-    },
-    {
-        quote: "It combines AI with a lot of tools. Testing the language features and SDK showed us how it stands out. Excited for the stable release.",
-        role: "Developer",
-    }
+  {
+    quote:
+      'SimpleGroup has transformed how our facility coordinates care. Medications, incidents, and visits are tracked in real time. Our operational efficiency improved noticeably within the first quarter.',
+    name: 'Margaret D.',
+    role: 'Executive Director',
+    facility: 'Sunrise Assisted Living',
+  },
+  {
+    quote:
+      'The family portal gives us peace of mind. We can see our mother\'s medication schedule, upcoming visits, and communicate securely with her care team — all from one app.',
+    name: 'David R.',
+    role: 'Primary Caregiver',
+    facility: 'Family Member',
+  },
+  {
+    quote:
+      'The admission workflow system cut our intake processing time by over half. AI-powered form extraction and data mapping means less manual entry and fewer errors during onboarding.',
+    name: 'Patricia K.',
+    role: 'Director of Admissions',
+    facility: 'Meadowbrook Senior Living',
+  },
+  {
+    quote:
+      'Incident reporting used to take ages. Now staff document everything in minutes, and the AI summary drafts help us maintain consistent, thorough records for state surveys.',
+    name: 'Thomas B.',
+    role: 'Compliance Officer',
+    facility: 'Heritage Health & Rehabilitation',
+  },
+  {
+    quote:
+      'Having messaging, scheduling, and task management in one place eliminated constant phone calls and paper trails. Our staff can focus on residents instead of chasing information.',
+    name: 'Linda M.',
+    role: 'Director of Nursing',
+    facility: 'Oakwood Memory Care',
+  },
+  {
+    quote:
+      'The role-based permissions give us the control we need. Each staff member sees exactly what they should — no more, no less. It\'s the kind of access management we expected from a mature platform.',
+    name: 'James W.',
+    role: 'IT Administrator',
+    facility: 'Crestview Senior Communities',
+  },
 ];
 
 const TestimonialCard = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(4),
-    margin: theme.spacing(2),
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    textAlign: 'center',
-    borderRadius: theme.shape.borderRadius * 2,
-    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+  padding: theme.spacing(4),
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+  borderRadius: 12,
+  border: '1px solid #e2e8f0',
+  boxShadow: 'none',
 }));
 
-const QuoteIcon = styled(FormatQuoteIcon)(({ theme }) => ({
-    fontSize: 40,
-    color: theme.palette.primary.main,
-    transform: 'rotate(180deg)',
-    marginBottom: theme.spacing(1),
-}));
+const Testimonials = () => (
+  <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#ffffff' }}>
+    <Container maxWidth="lg">
+      <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+        <Typography
+          variant="overline"
+          sx={{ color: '#116530', fontWeight: 700, letterSpacing: 2, mb: 1, display: 'block' }}
+        >
+          Testimonials
+        </Typography>
+        <Typography
+          variant="h3"
+          component="h2"
+          sx={{ fontWeight: 800, color: '#1a1a2e', mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}
+        >
+          Trusted by Care Teams and Families
+        </Typography>
+      </Box>
 
-const Testimonials = () => {
-    return (
-        <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
-            <Container maxWidth="lg">
-                <Typography variant="h3" component="h2" gutterBottom textAlign="center" sx={{ mb: 8, fontWeight: 'bold' }}>
-                    Feedback from Our Testers
-                </Typography>
-
-                {/* 2. Replace Slider with Swiper */}
-                <Swiper
-                    modules={[Pagination, Autoplay]} // Enable required modules
-                    spaceBetween={30} // Space between slides
-                    slidesPerView={1} // Default slides to show
-                    pagination={{ clickable: true }} // Make dots clickable
-                    autoplay={{
-                        delay: 5000,
-                        disableOnInteraction: false,
-                    }}
-                    breakpoints={{
-                        400: {
-                            slidesPerView: 1,
-                        },
-                        600: {
-                            slidesPerView: 2,
-                        },
-                        1024: {
-                            slidesPerView: 3,
-                        },
-                    }}
-                    style={{ paddingBottom: '40px',   '--swiper-pagination-color':'#116530' }} // Add padding for pagination dots
+      <Swiper
+        modules={[Pagination, Autoplay]}
+        spaceBetween={24}
+        slidesPerView={1}
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        breakpoints={{
+          600: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 },
+        }}
+        style={{ paddingBottom: '48px', '--swiper-pagination-color': '#116530' }}
+      >
+        {testimonials.map((t, i) => (
+          <SwiperSlide key={i}>
+            <TestimonialCard>
+              <Box>
+                <FormatQuoteIcon
+                  sx={{ fontSize: 32, color: '#116530', opacity: 0.4, transform: 'rotate(180deg)', mb: 1 }}
+                />
+                <Typography
+                  variant="body1"
+                  sx={{ fontStyle: 'italic', color: '#4a5568', lineHeight: 1.7, mb: 3.5 }}
                 >
-                    {testimonials.map((testimonial, index) => (
-                        // 4. Wrap each item in a SwiperSlide
-                        <SwiperSlide key={index}>
-                            <TestimonialCard elevation={3} sx={{ height: '100%' }}>
-                                <Box>
-                                    <QuoteIcon />
-                                    <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 3, minHeight: '120px' }}>
-                                        "{testimonial.quote}"
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <Typography variant="h6" component="p" sx={{ fontWeight: 'bold' }}>
-                                        {testimonial.role}
-                                    </Typography>
-                                </Box>
-                            </TestimonialCard>
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-            </Container>
-        </Box>
-    );
-};
+                  &ldquo;{t.quote}&rdquo;
+                </Typography>
+              </Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1a1a2e' }}>
+                {t.name}
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
+                {t.role}{t.facility ? ` — ${t.facility}` : ''}
+              </Typography>
+            </TestimonialCard>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </Container>
+  </Box>
+);
 
 export default Testimonials;

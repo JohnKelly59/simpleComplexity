@@ -1,84 +1,107 @@
-import React from 'react';
-import { Box, Container, Typography, Grid, Card, CardContent, useTheme } from '@mui/material';
+import { Box, Container, Typography, Card, CardContent, Grid } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SecurityIcon from '@mui/icons-material/Security';
-import GroupIcon from '@mui/icons-material/Group';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import GroupIcon from '@mui/icons-material/Group';
 
 const reasons = [
-    {
-        icon: <TrendingUpIcon fontSize="large" color="primary" />,
-        title: 'Increase Occupancy Retention',
-        description: 'Happy families mean happy residents. By providing transparent, real-time updates, you build trust and loyalty that keeps your beds full.'
-    },
-    {
-        icon: <SecurityIcon fontSize="large" color="primary" />,
-        title: 'Reduce Liability Risk',
-        description: 'Comprehensive digital documentation of every visit, medication, and care activity creates an audit-proof trail that protects your facility.'
-    },
-    {
-        icon: <AccessTimeIcon fontSize="large" color="primary" />,
-        title: 'Save Staff Time',
-        description: 'Stop playing phone tag with families. Automated notifications and a centralized family portal reduce inbound calls by up to 40%.'
-    },
-    {
-        icon: <GroupIcon fontSize="large" color="primary" />,
-        title: 'Unify Care Coordination',
-        description: 'Bring external caregivers, family members, and your internal staff onto a single page, eliminating miscommunication and care gaps.'
-    }
+  {
+    icon: <TrendingUpIcon />,
+    title: 'Increase Occupancy Retention',
+    description:
+      'Transparent, real-time updates build family trust and loyalty — keeping your residents happy and your beds full.',
+  },
+  {
+    icon: <SecurityIcon />,
+    title: 'Reduce Liability & Risk',
+    description:
+      'Digital documentation of every visit, medication, incident, and care task creates an audit-ready trail that protects your facility.',
+  },
+  {
+    icon: <AccessTimeIcon />,
+    title: 'Save Staff Hours Every Week',
+    description:
+      'Automated notifications, a centralized family portal, and AI-assisted documentation cut administrative burden so staff focus on care.',
+  },
+  {
+    icon: <GroupIcon />,
+    title: 'Unify Care Coordination',
+    description:
+      'Bring external caregivers, family members, and internal staff onto a single platform — eliminating miscommunication and care gaps.',
+  },
 ];
 
-const WhySimpleGroup = () =>
-{
-    const theme = useTheme();
+const WhySimpleGroup = () => (
+  <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#f8f9fa' }}>
+    <Container maxWidth="lg">
+      <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 8 } }}>
+        <Typography
+          variant="overline"
+          sx={{ color: '#116530', fontWeight: 700, letterSpacing: 2, mb: 1, display: 'block' }}
+        >
+          Why SimpleGroup
+        </Typography>
+        <Typography
+          variant="h3"
+          component="h2"
+          sx={{ fontWeight: 800, color: '#1a1a2e', mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}
+        >
+          Built for the Way Senior Care Facilities Operate
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{ color: '#4a5568', maxWidth: 700, mx: 'auto', fontSize: '1.05rem', lineHeight: 1.7 }}
+        >
+          Designed specifically for Assisted Living, Memory Care, Skilled Nursing,
+          and Independent Living communities to solve your most pressing operational challenges.
+        </Typography>
+      </Box>
 
-    return (
-        <Box sx={{ py: 8, bgcolor: 'grey.50' }}>
-            <Container maxWidth="lg">
-                <Box sx={{ textAlign: 'center', mb: 6 }}>
-                    <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                        Why Top Facilities Choose SimpleGroup
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '800px', mx: 'auto' }}>
-                        Designed specifically for Assisted Living and Memory Care communities to solve your most pressing operational challenges.
-                    </Typography>
-                </Box>
-
-                <Grid container spacing={4}>
-                    {reasons.map((reason, index) => (
-                        <Grid item xs={12} md={6} key={index}>
-                            <Card
-                                sx={{
-                                    height: '100%',
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    p: 2,
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                                    transition: 'transform 0.2s',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-                                    }
-                                }}
-                            >
-                                <Box sx={{ p: 2, borderRadius: '50%', bgcolor: 'primary.light', color: 'primary.main', mr: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    {React.cloneElement(reason.icon, { sx: { color: '#fff' } })}
-                                </Box>
-                                <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                                    <Typography variant="h5" component="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
-                                        {reason.title}
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary">
-                                        {reason.description}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Container>
-        </Box>
-    );
-};
+      <Grid container spacing={3}>
+        {reasons.map((reason, index) => (
+          <Grid key={index} size={{ xs: 12, md: 6 }}>
+            <Card
+              elevation={0}
+              sx={{
+                height: '100%',
+                display: 'flex',
+                alignItems: 'flex-start',
+                p: 3,
+                border: '1px solid #e2e8f0',
+                borderRadius: 3,
+                transition: 'box-shadow 0.2s ease',
+                '&:hover': { boxShadow: '0 8px 24px rgba(0,0,0,0.06)' },
+              }}
+            >
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: 'rgba(17,101,48,0.08)',
+                  color: '#116530',
+                  mr: 2.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {reason.icon}
+              </Box>
+              <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#1a1a2e', mb: 0.5 }}>
+                  {reason.title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#4a5568', lineHeight: 1.7 }}>
+                  {reason.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
+  </Box>
+);
 
 export default WhySimpleGroup;

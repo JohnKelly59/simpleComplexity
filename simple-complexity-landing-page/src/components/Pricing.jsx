@@ -1,259 +1,192 @@
-import React, { useState } from 'react';
 import {
   Box,
   Card,
-  CardContent,
   Typography,
   Button,
-  Grid,
   Container,
-  Chip,
-  Tabs,
-  Tab,
+  Grid,
 } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 import { Link as RouterLink } from 'react-router-dom';
 
-const individualPlans = [
+const facilityPlans = [
   {
-    title: 'Free',
-    price: '$0',
-    priceDetail: null,
+    title: 'Engagement',
+    subtitle: 'Independent Living & 55+ Communities',
+    price: '$12',
+    priceUnit: '/ resident / month',
     features: [
-      '200 AI tooltips / month',
-      'Real‑Time updates',
-      'Community support',
-      'Simple Complexity branding',
-      'Instant Clarity',
-      'Seamless Integration',
+      'Family Feed & Activity Posts',
+      'Activities Calendar & Events',
+      'Secure Messaging',
+      'Visit Scheduling & Approval',
+      'Family Communication Portal',
+      'Resident Engagement Tools',
+      'Push Notifications',
+      'Mobile App Access (iOS & Web)',
+      'HIPAA-Compliant Infrastructure',
     ],
-    ctaText: 'Get Started Free',
-    href: 'https://app.simple-complexity.com',
+    ctaText: 'Get Started',
+    href: 'https://simplegroup.simple-complexity.com/',
   },
   {
-    title: 'Pro',
-    price: '$5 / month after trial',
-    priceDetail: '1‑Month Free Trial',
+    title: 'Care & Operations',
+    subtitle: 'Assisted Living, Skilled Nursing & Memory Care',
+    price: '$30',
+    priceUnit: '/ resident / month',
     features: [
-      'Up to 5,000 AI tooltips / month',
-      'AI‑Powered Insights',
-      'Multilingual Support',
-      'Audio Support',
-      'Video Recording',
-      'Interactive Question Assistant',
-      'Support Assistant',
-      'Real‑Time updates',
-      'Community support',
-      'Simple Complexity branding',
-      'Instant Clarity',
-      'Seamless Integration',
+      'eMAR (Electronic Medication Records)',
+      'Vitals & Incident Tracking',
+      'Care Task Management',
+      'Staff Shift Scheduling',
+      'Admission Workflows & AI Intake',
+      'Forms Builder (AI + Manual)',
+      'Document Management',
+      'Visit Documentation',
+      'Health Analytics & Reporting',
+      'Audit Logging & Compliance',
+      'Custom Roles & Permissions',
+      'All Engagement Features Included',
     ],
-    ctaText: 'Start Pro for Free',
+    ctaText: 'Get Started',
     isFeatured: true,
-    href: 'https://app.simple-complexity.com/',
+    href: 'https://simplegroup.simple-complexity.com/',
   },
   {
-    title: 'Unlimited',
-    price: '$10 / month after trial',
-    priceDetail: '1‑Month Free Trial',
+    title: 'Enterprise',
+    subtitle: 'Multi-facility organizations & custom needs',
+    price: 'Custom',
     features: [
-      'Unlimited AI‑generated tooltips',
-      'AI Demo creation',
-      'Priority email support',
-      'AI‑Powered Insights',
-      'Multilingual Support',
-      'Audio Support',
-      'Video Recording',
-      'Interactive Question Assistant',
-      'Support Assistant',
-      'Real‑Time updates',
-      'Simple Complexity branding',
-      'Instant Clarity',
-      'Seamless Integration',
+      'Volume-based pricing',
+      'Dedicated account manager',
+      'Custom onboarding & training',
+      'Priority support & SLA',
+      'Custom integrations',
+      'Advanced reporting & analytics',
+      'All Care & Operations features',
     ],
-    ctaText: 'Go Unlimited Free',
-    href: 'https://app.simple-complexity.com/',
+    ctaText: 'Contact Sales',
+    href: '/contact',
   },
 ];
-
-const businessPlans = [
-    {
-        title: 'Free',
-        price: '$0',
-        features: [
-          '200 AI tooltips / month',
-          'Real‑Time updates',
-          'Community support',
-          'Simple Complexity branding',
-          'Instant Clarity',
-          'Seamless Integration',
-        ],
-        ctaText: 'Get Started Free',
-        href: 'https://app.simple-complexity.com',
-      },
-      {
-        title: 'Pro',
-        price: '$75 / month after trial',
-        priceDetail: '1-Month Free Trial',
-        features: [
-          'Up to 10,000 AI tooltips / month',
-          'Remove Our Branding',
-          'Priority Support',
-          'Video Recording & Analytics',
-          'AI‑Powered Insights & Support',
-          'Multilingual & Audio Support',
-          'Real‑Time updates',
-          'Instant Clarity',
-          'Seamless Integration',
-        ],
-        ctaText: 'Start Pro Trial',
-        isFeatured: true,
-        href: 'https://app.simple-complexity.com/',
-      },
-      {
-        title: 'Executive',
-        price: 'Contact Us',
-        priceDetail: '1-Month Free Trial',
-        features: [
-          'Unlimited AI‑generated tooltips',
-          'Full Page Translation',
-          'Dedicated Account Manager',
-          'AI Demo creation',
-          'Custom Integrations',
-          'Remove Our Branding',
-          'Video Recording & Analytics',
-          'AI‑Powered Insights & Support',
-          'Multilingual & Audio Support',
-          'Real‑Time updates',
-          'Instant Clarity',
-          'Seamless Integration',
-        ],
-        ctaText: 'Contact Sales',
-        href: '/contact',
-      },
-];
-
 
 const Pricing = () => {
-    const [value, setValue] = useState(0);
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
-
-    const plansToDisplay = value === 0 ? businessPlans : individualPlans;
-
-    return (
-        <Box sx={{ py: 10, backgroundColor: 'background.paper' }}>
-            <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
-                <Typography variant="h3" fontWeight={700} gutterBottom>
-                    Integrate Our SDK in Minutes
-                </Typography>
-
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: '800px', mx:'auto' }}>
-                    Choose the right plan for your business and start improving your user experience today. Every paid plan starts with a&nbsp;
-                    <Typography component="span" fontWeight="bold" color="primary.main">
-                        1‑month free&nbsp;trial
-                    </Typography>
-                    .
-                </Typography>
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-                    <Tabs
-                        value={value}
-                        onChange={handleChange}
-                        indicatorColor="primary"
-                        textColor="primary"
-                        variant="standard"
-                    >
-                        <Tab label="For Business" sx={{ fontWeight: 'bold' }} />
-                        <Tab label="For Individuals" sx={{ fontWeight: 'bold' }} />
-                    </Tabs>
-                </Box>
-
-                <Grid container spacing={6} justifyContent="center" alignItems="stretch">
-                    {plansToDisplay.map((plan, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index} sx={{ display: 'flex' }}>
-                            <Card
-                                elevation={plan.isFeatured ? 8 : 2}
-                                sx={{
-                                    p: 3,
-                                    borderRadius: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    width: '100%',
-                                    backgroundColor: '#fff',
-                                }}
-                            >
-                                {plan.priceDetail && (
-                                    <Chip
-                                        label={plan.priceDetail}
-                                        color="primary"
-                                        sx={{ alignSelf: 'center', fontWeight: 700, mb: 2 }}
-                                    />
-                                )}
-
-                                <Typography variant="h5" gutterBottom>
-                                    {plan.title}
-                                </Typography>
-
-                                <Typography
-                                    variant="subtitle1"
-                                    color="text.secondary"
-                                    sx={{ fontWeight: 400, opacity: 0.65, mb: 2 }}
-                                >
-                                    {plan.price}
-                                </Typography>
-
-                                <Box sx={{ textAlign: 'left', flexGrow: 1, mt: 2 }}>
-                                    {plan.features.map((feature, idx) => (
-                                        <Typography
-                                            variant="body2"
-                                            key={idx}
-                                            sx={{ display: 'flex', alignItems: 'center', mb: 1 }}
-                                        >
-                                            <Box
-                                                component="span"
-                                                sx={{ mr: 1, color: 'primary.main', fontWeight: 700 }}
-                                            >
-                                                ✓
-                                            </Box>
-                                            {feature}
-                                        </Typography>
-                                    ))}
-                                </Box>
-
-                                <Button
-                                    component={plan.href.startsWith('http') ? 'a' : RouterLink}
-                                    to={!plan.href.startsWith('http') ? plan.href : undefined}
-                                    href={plan.href.startsWith('http') ? plan.href : undefined}
-                                    target={plan.href.startsWith('http') ? '_blank' : undefined}
-                                    rel="noopener noreferrer"
-                                    variant={plan.isFeatured ? 'contained' : 'outlined'}
-                                    color="primary"
-                                    fullWidth
-                                    size="large"
-                                    sx={{ mt: 3, textTransform: 'none', fontWeight: 700 }}
-                                >
-                                    {plan.ctaText}
-                                </Button>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-
-                <Box sx={{ mt: 6 }}>
-                    <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }}>
-                        Downgrade or cancel at any time directly from your dashboard.
-                    </Typography>
-                    {value === 1 && (
-                        <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary', fontWeight: 'bold' }}>
-                            Not satisfied? All our paid business plans come with a 30-day money-back guarantee.
-                        </Typography>
-                    )}
-                </Box>
-            </Container>
+  return (
+    <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#f8f9fa' }}>
+      <Container maxWidth="lg">
+        <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+          <Typography
+            variant="overline"
+            sx={{ color: '#116530', fontWeight: 700, letterSpacing: 2, mb: 1, display: 'block' }}
+          >
+            Pricing
+          </Typography>
+          <Typography
+            variant="h3"
+            component="h2"
+            sx={{ fontWeight: 800, color: '#1a1a2e', mb: 2, fontSize: { xs: '1.75rem', md: '2.5rem' } }}
+          >
+            Plans That Scale With Your Facility
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ color: '#4a5568', maxWidth: 700, mx: 'auto', fontSize: '1.05rem', lineHeight: 1.7, mb: 4 }}
+          >
+            Simple, transparent pricing per resident per month. Subscriptions are managed at the facility level through Stripe.
+          </Typography>
         </Box>
-    );
+
+        <Grid container spacing={4} justifyContent="center" alignItems="stretch">
+          {facilityPlans.map((plan, i) => (
+            <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex' }}>
+              <Card
+                elevation={0}
+                sx={{
+                  p: 4,
+                  borderRadius: 3,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%',
+                  border: plan.isFeatured ? '2px solid #116530' : '1px solid #e2e8f0',
+                  position: 'relative',
+                }}
+              >
+                {plan.isFeatured && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 4,
+                      bgcolor: '#116530',
+                      borderRadius: '12px 12px 0 0',
+                    }}
+                  />
+                )}
+
+                <Typography variant="h5" sx={{ fontWeight: 700, color: '#1a1a2e' }}>
+                  {plan.title}
+                </Typography>
+                {plan.subtitle && (
+                  <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic', mt: 0.5 }}>
+                    {plan.subtitle}
+                  </Typography>
+                )}
+
+                <Box sx={{ mt: 2, mb: 3 }}>
+                  <Typography component="span" variant="h3" sx={{ fontWeight: 800, color: '#1a1a2e' }}>
+                    {plan.price}
+                  </Typography>
+                  {plan.priceUnit && (
+                    <Typography component="span" variant="body1" sx={{ color: '#64748b', ml: 0.5 }}>
+                      {plan.priceUnit}
+                    </Typography>
+                  )}
+                </Box>
+
+                <Box sx={{ flexGrow: 1, mb: 3 }}>
+                  {plan.features.map((f, idx) => (
+                    <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.25 }}>
+                      <CheckIcon sx={{ fontSize: 18, color: '#116530', mr: 1, mt: 0.25, flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ color: '#4a5568', lineHeight: 1.5 }}>
+                        {f}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                <Button
+                  {...(plan.href.startsWith('http')
+                    ? { component: 'a', href: plan.href, target: '_blank', rel: 'noopener noreferrer' }
+                    : { component: RouterLink, to: plan.href }
+                  )}
+                  variant={plan.isFeatured ? 'contained' : 'outlined'}
+                  color="primary"
+                  fullWidth
+                  size="large"
+                  sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2, py: 1.25 }}
+                >
+                  {plan.ctaText}
+                </Button>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Box sx={{ textAlign: 'center', mt: 5 }}>
+          <Typography variant="body2" sx={{ color: '#64748b' }}>
+            All subscriptions are billed monthly per facility. Manage billing, upgrades, and cancellations from your facility dashboard.
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#4a5568', mt: 2, maxWidth: 700, mx: 'auto' }}>
+            <strong>Assisted Living, Skilled Nursing & Memory Care:</strong> Care & Operations includes eMAR, vitals, admissions, and clinical oversight.
+            <br />
+            <strong>Independent Living & 55+:</strong> Engagement covers activities, family communication, and community features.
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
+  );
 };
 
 export default Pricing;

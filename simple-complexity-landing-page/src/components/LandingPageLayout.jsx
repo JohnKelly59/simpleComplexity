@@ -1,75 +1,67 @@
-// src/components/LandingPageLayout.jsx
-import { Box } from "@mui/material";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import Footer from "./Footer";
-// Simple Group components
-import HeroGroup from "./HeroGroup";
-import FeaturesGroup from "./FeaturesGroup";
-import DemoGroup from "./DemoGroup";
-import VideoSectionGroup from "./VideoSectionGroup";
- import PricingGroup from "./PricingGroup";
-import DownloadExtensionGroup from "./DownloadExtensionGroup";
-import GuidedSetupGroup from "./GuidedSetupGroup";
-import TestimonialsGroup from "./TestimonialsGroup";
-import FormsCapabilityGroup from "./FormsCapabilityGroup";
+import { Box } from '@mui/material';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import Footer from './Footer';
+import Hero from './Hero';
+import TrustBar from './TrustBar';
+import WhySimpleGroup from './WhySimpleGroup';
+import Features from './Features';
+import FormsCapability from './FormsCapability';
+import Demo from './Demo';
+import VideoSection from './VideoSection';
+import Testimonials from './Testimonials';
+import Pricing from './Pricing';
+import DownloadApp from './DownloadApp';
+import CallToAction from './CallToAction';
 
 function LandingPageLayout() {
   const location = useLocation();
 
   useEffect(() => {
     const sectionId = location.hash?.replace('#', '');
-    if (!sectionId) {
-      return;
-    }
-
+    if (!sectionId) return;
     const timeout = setTimeout(() => {
       const target = document.getElementById(sectionId);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);
-
     return () => clearTimeout(timeout);
   }, [location.hash]);
 
   return (
-    <>
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
-        <Box component="main" sx={{ flexGrow: 1 }}>
-          <Box id="hero-section-group">
-            <HeroGroup />
-          </Box>
-          <Box id="demo-section-group">
-            <DemoGroup />
-          </Box>
-          <Box id="video-section-group">
-            <VideoSectionGroup />
-          </Box>
-          <Box id="features-section-group">
-            <FeaturesGroup />
-          </Box>
-          <Box id="forms-section-group">
-            <FormsCapabilityGroup />
-          </Box>
-          <Box id="download-section-group">
-            <DownloadExtensionGroup />
-          </Box>
-          <Box id="guided-setup-section-group">
-            <GuidedSetupGroup />
-          </Box>
-          <Box id="testimonials-section-group">
-            <TestimonialsGroup />
-          </Box>
-          <Box id="pricing-section-group">
-            <PricingGroup />
-          </Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box id="hero-section">
+          <Hero />
         </Box>
-        <Footer variant="default" />
+        <TrustBar />
+        <Box id="why-section">
+          <WhySimpleGroup />
+        </Box>
+        <Box id="features-section">
+          <Features />
+        </Box>
+        <Box id="forms-section">
+          <FormsCapability />
+        </Box>
+        <Box id="demo-section">
+          <Demo />
+        </Box>
+        <Box id="video-section">
+          <VideoSection />
+        </Box>
+        <Box id="testimonials-section">
+          <Testimonials />
+        </Box>
+        <Box id="pricing-section">
+          <Pricing />
+        </Box>
+        <Box id="download-section">
+          <DownloadApp />
+        </Box>
+        <CallToAction />
       </Box>
-    </>
+      <Footer />
+    </Box>
   );
 }
 
