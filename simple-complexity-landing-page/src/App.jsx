@@ -14,6 +14,7 @@ import FeaturesPage from './pages/FeaturesPage';
 import FAQPage from './pages/FAQPage';
 import SimpleGroupFormsPage from './pages/SimpleGroupFormsPage';
 import HipaaCompliancePage from './pages/HipaaCompliancePage';
+import PccIntegrationPage from './pages/PccIntegrationPage';
 
 const SubPageLayout = () => (
   <Box
@@ -57,6 +58,7 @@ function App() {
               <Route path="/simple-group-forms" element={<SimpleGroupFormsPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/hipaa" element={<HipaaCompliancePage />} />
+              <Route path="/pcc-integration" element={<PccIntegrationPage />} />
             </Route>
           </Routes>
         </NavigationDrawer>

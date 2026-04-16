@@ -32,6 +32,7 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import DescriptionIcon from '@mui/icons-material/Description';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import SecurityIcon from '@mui/icons-material/Security';
+import SyncIcon from '@mui/icons-material/Sync';
 
 const drawerWidth = 280;
 
@@ -54,6 +55,7 @@ const drawerItems = [
   { text: 'Why SimpleGroup', icon: <ChecklistIcon />, path: '/', sectionId: 'why-section' },
   { text: 'Features', icon: <FormatListBulletedIcon />, path: '/', sectionId: 'features-section' },
   { text: 'Forms', icon: <DescriptionIcon />, path: '/', sectionId: 'forms-section' },
+  { text: 'PCC Integration', icon: <SyncIcon />, path: '/', sectionId: 'pcc-section' },
   { text: 'Demo', icon: <OndemandVideoIcon />, path: '/', sectionId: 'demo-section' },
   { text: 'Testimonials', icon: <InfoIcon />, path: '/', sectionId: 'testimonials-section' },
   { text: 'Pricing', icon: <AttachMoneyIcon />, path: '/', sectionId: 'pricing-section' },
@@ -61,6 +63,7 @@ const drawerItems = [
   { type: 'divider' },
   { text: 'Full Features', icon: <FormatListBulletedIcon />, path: '/features' },
   { text: 'Simple Group Forms', icon: <DescriptionIcon />, path: '/simple-group-forms' },
+  { text: 'PCC Integration', icon: <SyncIcon />, path: '/pcc-integration' },
   { text: 'About', icon: <InfoIcon />, path: '/about' },
   { text: 'Contact', icon: <ContactMailIcon />, path: '/contact' },
   { text: 'FAQ', icon: <QuizIcon />, path: '/faq' },

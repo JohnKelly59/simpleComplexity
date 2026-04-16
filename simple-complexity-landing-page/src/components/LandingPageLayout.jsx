@@ -13,6 +13,7 @@ import Testimonials from './Testimonials';
 import Pricing from './Pricing';
 import DownloadApp from './DownloadApp';
 import CallToAction from './CallToAction';
+import PccIntegration from './PccIntegration';
 
 function LandingPageLayout() {
   const location = useLocation();
@@ -42,6 +43,9 @@ function LandingPageLayout() {
         </Box>
         <Box id="forms-section">
           <FormsCapability />
+        </Box>
+        <Box id="pcc-section">
+          <PccIntegration />
         </Box>
         <Box id="demo-section">
           <Demo />

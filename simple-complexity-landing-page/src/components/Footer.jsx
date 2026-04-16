@@ -17,6 +17,7 @@ const columns = [
       { to: '/features', label: 'Features' },
       { to: '/simple-group-forms', label: 'Forms' },
       { to: '/#pricing-section', label: 'Pricing' },
+      { to: '/pcc-integration', label: 'PCC Integration' },
       { href: 'https://simplegroup.simple-complexity.com', label: 'Login', external: true },
     ],
   },
