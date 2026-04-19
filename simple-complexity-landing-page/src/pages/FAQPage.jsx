@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 import {
+  alpha,
   Box,
+  Chip,
   Container,
   Typography,
-  Fade,
+  Paper,
+  Stack,
   Accordion,
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
+import { motion } from 'framer-motion';
+import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const faqItems = [
@@ -88,45 +93,103 @@ const FAQPage = () => {
         name="description"
         content="Frequently asked questions about SimpleGroup, including features, access controls, AI capabilities, security, and onboarding."
       />
-      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', p: 4 }}>
-        <Container maxWidth="md">
-          <Fade in={loaded} timeout={1000}>
-            <Box>
-              <Box sx={{ textAlign: 'center', mb: 5 }}>
-                <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 800, color: '#1a1a2e' }}>
+      <Box
+        sx={{
+          '--faq-ink': '#0f172a',
+          '--faq-muted': '#4b5563',
+          '--faq-emerald': '#116530',
+          '--faq-gold': '#D4A017',
+          flexGrow: 1,
+          px: { xs: 2, sm: 3 },
+          py: { xs: 4, md: 7 },
+          background:
+            'radial-gradient(circle at 10% 8%, rgba(17,101,48,0.12), transparent 34%), radial-gradient(circle at 86% 88%, rgba(212,160,23,0.16), transparent 40%), linear-gradient(180deg, #ffffff 0%, #f6faf8 100%)',
+        }}
+      >
+        <Container maxWidth="lg">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={loaded ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: 4,
+                border: `1px solid ${alpha('#116530', 0.2)}`,
+                overflow: 'hidden',
+                boxShadow: '0 24px 64px rgba(15, 23, 42, 0.12)',
+              }}
+            >
+              <Box
+                sx={{
+                  p: { xs: 3, sm: 4, md: 5 },
+                  background:
+                    'linear-gradient(112deg, rgba(17,101,48,0.1) 0%, rgba(212,160,23,0.16) 100%)',
+                }}
+              >
+                <Chip
+                  icon={<HelpOutlineRoundedIcon />}
+                  label="Support"
+                  sx={{
+                    mb: 2,
+                    fontWeight: 700,
+                    color: '#0b3f24',
+                    bgcolor: alpha('#116530', 0.14),
+                    '& .MuiChip-icon': { color: '#0b3f24' },
+                  }}
+                />
+                <Typography variant="h3" component="h1" sx={{ fontWeight: 800, color: 'var(--faq-ink)', mb: 1 }}>
                   Frequently Asked Questions
                 </Typography>
-                <Typography variant="h6" sx={{ color: '#4a5568' }}>
+                <Typography variant="body1" sx={{ color: 'var(--faq-muted)', maxWidth: 760 }}>
                   Answers to common questions about SimpleGroup for healthcare teams and families.
                 </Typography>
               </Box>
 
-              {faqItems.map((item, index) => (
-                <Accordion
-                  key={index}
-                  elevation={0}
-                  sx={{
-                    mb: 1.5,
-                    borderRadius: 2,
-                    border: '1px solid #e2e8f0',
-                    overflow: 'hidden',
-                    '&::before': { display: 'none' },
-                  }}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1a1a2e' }}>
-                      {item.question}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography variant="body1" sx={{ color: '#4a5568', lineHeight: 1.7 }}>
-                      {item.answer}
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </Box>
-          </Fade>
+              <Box sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
+                <Stack spacing={1.5}>
+                  {faqItems.map((item, index) => (
+                    <motion.div
+                      key={item.question}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={loaded ? { opacity: 1, y: 0 } : {}}
+                      transition={{ duration: 0.35, delay: 0.05 + index * 0.03 }}
+                    >
+                      <Accordion
+                        elevation={0}
+                        sx={{
+                          borderRadius: 2,
+                          border: `1px solid ${alpha('#116530', 0.16)}`,
+                          backgroundColor: alpha('#ffffff', 0.94),
+                          overflow: 'hidden',
+                          '&::before': { display: 'none' },
+                          '&.Mui-expanded': {
+                            borderColor: alpha('#116530', 0.34),
+                            boxShadow: '0 10px 20px rgba(17, 101, 48, 0.1)',
+                          },
+                        }}
+                      >
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon sx={{ color: 'var(--faq-emerald)' }} />}
+                          sx={{ px: { xs: 2, sm: 2.5 }, py: 0.4 }}
+                        >
+                          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'var(--faq-ink)' }}>
+                            {item.question}
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ px: { xs: 2, sm: 2.5 }, pt: 0.5, pb: 2.2 }}>
+                          <Typography variant="body1" sx={{ color: 'var(--faq-muted)', lineHeight: 1.75 }}>
+                            {item.answer}
+                          </Typography>
+                        </AccordionDetails>
+                      </Accordion>
+                    </motion.div>
+                  ))}
+                </Stack>
+              </Box>
+            </Paper>
+          </motion.div>
         </Container>
       </Box>
     </>
