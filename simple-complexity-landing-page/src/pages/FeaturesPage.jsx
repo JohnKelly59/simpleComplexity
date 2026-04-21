@@ -45,6 +45,7 @@ const featureData = [
     items: [
       'Operations: Create, edit, and manage care facilities.',
       'Staffing: Manage users, teams, and assignments.',
+      'Resident Room Tracking: Store and update resident room numbers in facility context for accurate location visibility.',
       'Invitations: Search and invite users easily.',
       'Scoped Access: Facility-level access segmentation.',
       'Role Permissions: Fine-grained read/write controls by module.',
@@ -72,6 +73,7 @@ const featureData = [
     items: [
       'Events: Manage facility-wide activities with RSVP.',
       'Unified View: Staff, activity, and personal events.',
+      'Work Orders: Create, assign, prioritize, and track maintenance requests by status, category, due date, and location.',
       'Google Sync: Two-way sync with personal calendars.',
       'Visits: Family request and approval system.',
       'Shifts: Staff shift management and coverage visibility.',
@@ -151,6 +153,7 @@ const featureData = [
     items: [
       'Push: Real-time mobile and web alerts.',
       'Smart Alerts: For messages, incidents, and care events.',
+      'Work Order Assignment Alerts: Send push + email notifications to assignees when work orders are assigned or reassigned.',
       'Email: Summaries and urgent notifications.',
       'Preferences: Granular user control per notification type.',
       'Device Management: Register and manage push devices.',

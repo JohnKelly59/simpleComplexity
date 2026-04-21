@@ -84,6 +84,8 @@ const featureCategories = [
     features: [
       { icon: <CalendarMonthIcon />, title: 'Facility Calendar & Events', desc: 'Plan and manage facility-wide activities, outings, and appointments with shared calendars and RSVP tracking.' },
       { icon: <BadgeIcon />, title: 'Staff Shift Management', desc: 'Schedule staff shifts, manage coverage, and improve handoff planning with staffing continuity tools.' },
+      { icon: <AssignmentIcon />, title: 'Work Order Management', desc: 'Create, assign, prioritize, and track maintenance work orders with status, due dates, categories, and location details.' },
+      { icon: <HomeWorkIcon />, title: 'Resident Room Number Tracking', desc: 'Store and update room numbers per resident in facility context so teams always have accurate location details.' },
       { icon: <HomeWorkIcon />, title: 'Visit Request & Approval', desc: 'Families request visits, staff approve or decline — with full scheduling, status tracking, and documentation.' },
       { icon: <SyncIcon />, title: 'Google Calendar Integration', desc: 'Two-way sync with Google Calendar so personal and facility schedules stay aligned automatically.' },
       { icon: <EventNoteIcon />, title: 'Unified Schedule View', desc: 'See events, tasks, and shifts in one aggregated view with date-range filtering and event statistics.' },
@@ -97,6 +99,7 @@ const featureCategories = [
       { icon: <FamilyRestroomIcon />, title: 'Family Connections Portal', desc: 'Invite and manage family relationships. Families see resident care info, visit schedules, and activity updates.' },
       { icon: <DynamicFeedIcon />, title: 'Posts & Activity Feed', desc: 'Facility staff publish updates, families comment and react. A social feed keeps everyone informed without phone calls.' },
       { icon: <NotificationsActiveIcon />, title: 'Push Notifications', desc: 'Real-time alerts on mobile and web. Register devices, set preferences, and control notification delivery per user.' },
+      { icon: <NotificationsActiveIcon />, title: 'Work Order Assignee Alerts', desc: 'Automatically notify assigned staff by push and email when a work order is assigned or reassigned.' },
       { icon: <ConnectWithoutContactIcon />, title: 'Family Invitations', desc: 'Send, accept, or decline family connection invitations. Track relationship status and manage privacy controls.' },
       { icon: <CameraAltIcon />, title: 'Visit Documentation', desc: 'Document care visits with photos, notes, and observations for comprehensive care records shared with families.' },
     ],
